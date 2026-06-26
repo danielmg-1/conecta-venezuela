@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { Layout } from "@/components/Layout";
-import { Search, Map, Phone, AlertCircle, MessageSquare } from "lucide-react";
+import { Search, Map, Phone, AlertCircle, MessageSquare, HeartHandshake, Users, Newspaper } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -59,6 +59,24 @@ function Index() {
           title="Emergencias"
           desc="Números oficiales: bomberos, Protección Civil, Cruz Roja, primeros auxilios psicológicos."
           to="/emergencias"
+        />
+        <FeatureCard
+          icon={<HeartHandshake className="h-5 w-5" />}
+          title="Centros de ayuda"
+          desc="Centros de acopio, puntos de recaudación, hospitales y servicios activos en cada estado."
+          to="/centros-acopio"
+        />
+        <FeatureCard
+          icon={<Users className="h-5 w-5" />}
+          title="Voluntarios"
+          desc="Profesionales y voluntarios listos para ayudar — médicos, psicólogos, ingenieros, conductores."
+          to="/voluntarios"
+        />
+        <FeatureCard
+          icon={<Newspaper className="h-5 w-5" />}
+          title="Noticias y avisos"
+          desc="Información verificada y actualizaciones del equipo de la plataforma."
+          to="/noticias"
         />
       </section>
 

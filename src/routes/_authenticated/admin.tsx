@@ -45,6 +45,11 @@ function Page() {
   return (
     <Layout>
       <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Panel admin</h1>
+      <div className="mt-3">
+        <Link to="/admin/noticias" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">
+          Gestionar noticias
+        </Link>
+      </div>
 
       {counts && (
         <div className="mt-6 grid gap-3 md:grid-cols-5">

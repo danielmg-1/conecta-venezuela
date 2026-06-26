@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      aid_points: {
+        Row: {
+          ciudad: string | null
+          created_at: string
+          descripcion: string | null
+          direccion: string | null
+          estado: string
+          hidden_by_admin: boolean
+          horario: string | null
+          id: string
+          lat: number | null
+          lng: number | null
+          necesidades: string | null
+          nombre: string
+          owner_id: string
+          photo_path: string | null
+          telefono: string | null
+          tipo: Database["public"]["Enums"]["aid_point_type"]
+          updated_at: string
+        }
+        Insert: {
+          ciudad?: string | null
+          created_at?: string
+          descripcion?: string | null
+          direccion?: string | null
+          estado: string
+          hidden_by_admin?: boolean
+          horario?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          necesidades?: string | null
+          nombre: string
+          owner_id: string
+          photo_path?: string | null
+          telefono?: string | null
+          tipo: Database["public"]["Enums"]["aid_point_type"]
+          updated_at?: string
+        }
+        Update: {
+          ciudad?: string | null
+          created_at?: string
+          descripcion?: string | null
+          direccion?: string | null
+          estado?: string
+          hidden_by_admin?: boolean
+          horario?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          necesidades?: string | null
+          nombre?: string
+          owner_id?: string
+          photo_path?: string | null
+          telefono?: string | null
+          tipo?: Database["public"]["Enums"]["aid_point_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       emergency_contacts: {
         Row: {
           categoria: string
@@ -136,6 +196,39 @@ export type Database = {
         }
         Relationships: []
       }
+      news: {
+        Row: {
+          author_id: string
+          contenido: string
+          created_at: string
+          id: string
+          photo_path: string | null
+          published: boolean
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          contenido: string
+          created_at?: string
+          id?: string
+          photo_path?: string | null
+          published?: boolean
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          contenido?: string
+          created_at?: string
+          id?: string
+          photo_path?: string | null
+          published?: boolean
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -210,6 +303,54 @@ export type Database = {
         }
         Relationships: []
       }
+      volunteers: {
+        Row: {
+          ciudad: string | null
+          contacto: string
+          created_at: string
+          descripcion: string | null
+          disponibilidad: string | null
+          estado: string
+          habilidades: string | null
+          hidden_by_admin: boolean
+          id: string
+          nombre: string
+          profesion: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ciudad?: string | null
+          contacto: string
+          created_at?: string
+          descripcion?: string | null
+          disponibilidad?: string | null
+          estado: string
+          habilidades?: string | null
+          hidden_by_admin?: boolean
+          id?: string
+          nombre: string
+          profesion: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ciudad?: string | null
+          contacto?: string
+          created_at?: string
+          descripcion?: string | null
+          disponibilidad?: string | null
+          estado?: string
+          habilidades?: string | null
+          hidden_by_admin?: boolean
+          id?: string
+          nombre?: string
+          profesion?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -224,6 +365,14 @@ export type Database = {
       }
     }
     Enums: {
+      aid_point_type:
+        | "centro_acopio"
+        | "punto_recaudacion"
+        | "hospital"
+        | "clinica"
+        | "primeros_auxilios"
+        | "apoyo_psicologico"
+        | "otro"
       app_role: "admin" | "user"
       contact_type: "telefono" | "whatsapp" | "email" | "instagram" | "otro"
       missing_status: "desaparecido" | "en_busqueda" | "encontrado"
@@ -354,6 +503,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      aid_point_type: [
+        "centro_acopio",
+        "punto_recaudacion",
+        "hospital",
+        "clinica",
+        "primeros_auxilios",
+        "apoyo_psicologico",
+        "otro",
+      ],
       app_role: ["admin", "user"],
       contact_type: ["telefono", "whatsapp", "email", "instagram", "otro"],
       missing_status: ["desaparecido", "en_busqueda", "encontrado"],

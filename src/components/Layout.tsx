@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Search, Map, Phone, User } from "lucide-react";
+import { Home, Search, Map, Phone, User, HeartHandshake, Users, Newspaper } from "lucide-react";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import type { ReactNode } from "react";
 
@@ -7,8 +7,14 @@ const navItems = [
   { to: "/", label: "Inicio", icon: Home },
   { to: "/desaparecidos", label: "Buscar", icon: Search },
   { to: "/mapa", label: "Mapa", icon: Map },
-  { to: "/emergencias", label: "Emergencias", icon: Phone },
+  { to: "/centros-acopio", label: "Ayuda", icon: HeartHandshake },
   { to: "/auth", label: "Cuenta", icon: User },
+] as const;
+
+const secondaryNav = [
+  { to: "/voluntarios", label: "Voluntarios", icon: Users },
+  { to: "/emergencias", label: "Emergencias", icon: Phone },
+  { to: "/noticias", label: "Noticias", icon: Newspaper },
 ] as const;
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -28,6 +34,20 @@ export function Layout({ children }: { children: ReactNode }) {
           <nav className="flex items-center gap-1">
             {navItems.map((item) => {
               const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                    active ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+            {secondaryNav.map((item) => {
+              const active = pathname.startsWith(item.to);
               return (
                 <Link
                   key={item.to}

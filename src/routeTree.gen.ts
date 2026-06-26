@@ -9,17 +9,33 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VoluntariosRouteImport } from './routes/voluntarios'
+import { Route as NoticiasRouteImport } from './routes/noticias'
 import { Route as MapaRouteImport } from './routes/mapa'
 import { Route as EmergenciasRouteImport } from './routes/emergencias'
 import { Route as DesaparecidosRouteImport } from './routes/desaparecidos'
+import { Route as CentrosAcopioRouteImport } from './routes/centros-acopio'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DesaparecidosIdRouteImport } from './routes/desaparecidos.$id'
 import { Route as AuthenticatedMisReportesRouteImport } from './routes/_authenticated/mis-reportes'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedVoluntariosRegistrarmeRouteImport } from './routes/_authenticated/voluntarios.registrarme'
 import { Route as AuthenticatedDesaparecidosNuevoRouteImport } from './routes/_authenticated/desaparecidos.nuevo'
+import { Route as AuthenticatedCentrosAcopioNuevoRouteImport } from './routes/_authenticated/centros-acopio.nuevo'
+import { Route as AuthenticatedAdminNoticiasRouteImport } from './routes/_authenticated/admin.noticias'
 
+const VoluntariosRoute = VoluntariosRouteImport.update({
+  id: '/voluntarios',
+  path: '/voluntarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NoticiasRoute = NoticiasRouteImport.update({
+  id: '/noticias',
+  path: '/noticias',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MapaRoute = MapaRouteImport.update({
   id: '/mapa',
   path: '/mapa',
@@ -33,6 +49,11 @@ const EmergenciasRoute = EmergenciasRouteImport.update({
 const DesaparecidosRoute = DesaparecidosRouteImport.update({
   id: '/desaparecidos',
   path: '/desaparecidos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CentrosAcopioRoute = CentrosAcopioRouteImport.update({
+  id: '/centros-acopio',
+  path: '/centros-acopio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -65,96 +86,167 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedVoluntariosRegistrarmeRoute =
+  AuthenticatedVoluntariosRegistrarmeRouteImport.update({
+    id: '/voluntarios/registrarme',
+    path: '/voluntarios/registrarme',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDesaparecidosNuevoRoute =
   AuthenticatedDesaparecidosNuevoRouteImport.update({
     id: '/desaparecidos/nuevo',
     path: '/desaparecidos/nuevo',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCentrosAcopioNuevoRoute =
+  AuthenticatedCentrosAcopioNuevoRouteImport.update({
+    id: '/centros-acopio/nuevo',
+    path: '/centros-acopio/nuevo',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminNoticiasRoute =
+  AuthenticatedAdminNoticiasRouteImport.update({
+    id: '/noticias',
+    path: '/noticias',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/centros-acopio': typeof CentrosAcopioRoute
   '/desaparecidos': typeof DesaparecidosRouteWithChildren
   '/emergencias': typeof EmergenciasRoute
   '/mapa': typeof MapaRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/noticias': typeof NoticiasRoute
+  '/voluntarios': typeof VoluntariosRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
+  '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
+  '/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/centros-acopio': typeof CentrosAcopioRoute
   '/desaparecidos': typeof DesaparecidosRouteWithChildren
   '/emergencias': typeof EmergenciasRoute
   '/mapa': typeof MapaRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/noticias': typeof NoticiasRoute
+  '/voluntarios': typeof VoluntariosRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
+  '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
+  '/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/centros-acopio': typeof CentrosAcopioRoute
   '/desaparecidos': typeof DesaparecidosRouteWithChildren
   '/emergencias': typeof EmergenciasRoute
   '/mapa': typeof MapaRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/noticias': typeof NoticiasRoute
+  '/voluntarios': typeof VoluntariosRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/_authenticated/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
+  '/_authenticated/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/_authenticated/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
+  '/_authenticated/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
+    | '/centros-acopio'
     | '/desaparecidos'
     | '/emergencias'
     | '/mapa'
+    | '/noticias'
+    | '/voluntarios'
     | '/admin'
     | '/mis-reportes'
     | '/desaparecidos/$id'
+    | '/admin/noticias'
+    | '/centros-acopio/nuevo'
     | '/desaparecidos/nuevo'
+    | '/voluntarios/registrarme'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/centros-acopio'
     | '/desaparecidos'
     | '/emergencias'
     | '/mapa'
+    | '/noticias'
+    | '/voluntarios'
     | '/admin'
     | '/mis-reportes'
     | '/desaparecidos/$id'
+    | '/admin/noticias'
+    | '/centros-acopio/nuevo'
     | '/desaparecidos/nuevo'
+    | '/voluntarios/registrarme'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/centros-acopio'
     | '/desaparecidos'
     | '/emergencias'
     | '/mapa'
+    | '/noticias'
+    | '/voluntarios'
     | '/_authenticated/admin'
     | '/_authenticated/mis-reportes'
     | '/desaparecidos/$id'
+    | '/_authenticated/admin/noticias'
+    | '/_authenticated/centros-acopio/nuevo'
     | '/_authenticated/desaparecidos/nuevo'
+    | '/_authenticated/voluntarios/registrarme'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CentrosAcopioRoute: typeof CentrosAcopioRoute
   DesaparecidosRoute: typeof DesaparecidosRouteWithChildren
   EmergenciasRoute: typeof EmergenciasRoute
   MapaRoute: typeof MapaRoute
+  NoticiasRoute: typeof NoticiasRoute
+  VoluntariosRoute: typeof VoluntariosRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/voluntarios': {
+      id: '/voluntarios'
+      path: '/voluntarios'
+      fullPath: '/voluntarios'
+      preLoaderRoute: typeof VoluntariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/noticias': {
+      id: '/noticias'
+      path: '/noticias'
+      fullPath: '/noticias'
+      preLoaderRoute: typeof NoticiasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mapa': {
       id: '/mapa'
       path: '/mapa'
@@ -174,6 +266,13 @@ declare module '@tanstack/react-router' {
       path: '/desaparecidos'
       fullPath: '/desaparecidos'
       preLoaderRoute: typeof DesaparecidosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/centros-acopio': {
+      id: '/centros-acopio'
+      path: '/centros-acopio'
+      fullPath: '/centros-acopio'
+      preLoaderRoute: typeof CentrosAcopioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -218,6 +317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/voluntarios/registrarme': {
+      id: '/_authenticated/voluntarios/registrarme'
+      path: '/voluntarios/registrarme'
+      fullPath: '/voluntarios/registrarme'
+      preLoaderRoute: typeof AuthenticatedVoluntariosRegistrarmeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/desaparecidos/nuevo': {
       id: '/_authenticated/desaparecidos/nuevo'
       path: '/desaparecidos/nuevo'
@@ -225,19 +331,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDesaparecidosNuevoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/centros-acopio/nuevo': {
+      id: '/_authenticated/centros-acopio/nuevo'
+      path: '/centros-acopio/nuevo'
+      fullPath: '/centros-acopio/nuevo'
+      preLoaderRoute: typeof AuthenticatedCentrosAcopioNuevoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/noticias': {
+      id: '/_authenticated/admin/noticias'
+      path: '/noticias'
+      fullPath: '/admin/noticias'
+      preLoaderRoute: typeof AuthenticatedAdminNoticiasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminNoticiasRoute: typeof AuthenticatedAdminNoticiasRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminNoticiasRoute: AuthenticatedAdminNoticiasRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedMisReportesRoute: typeof AuthenticatedMisReportesRoute
+  AuthenticatedCentrosAcopioNuevoRoute: typeof AuthenticatedCentrosAcopioNuevoRoute
   AuthenticatedDesaparecidosNuevoRoute: typeof AuthenticatedDesaparecidosNuevoRoute
+  AuthenticatedVoluntariosRegistrarmeRoute: typeof AuthenticatedVoluntariosRegistrarmeRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedMisReportesRoute: AuthenticatedMisReportesRoute,
+  AuthenticatedCentrosAcopioNuevoRoute: AuthenticatedCentrosAcopioNuevoRoute,
   AuthenticatedDesaparecidosNuevoRoute: AuthenticatedDesaparecidosNuevoRoute,
+  AuthenticatedVoluntariosRegistrarmeRoute:
+    AuthenticatedVoluntariosRegistrarmeRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -259,9 +395,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  CentrosAcopioRoute: CentrosAcopioRoute,
   DesaparecidosRoute: DesaparecidosRouteWithChildren,
   EmergenciasRoute: EmergenciasRoute,
   MapaRoute: MapaRoute,
+  NoticiasRoute: NoticiasRoute,
+  VoluntariosRoute: VoluntariosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

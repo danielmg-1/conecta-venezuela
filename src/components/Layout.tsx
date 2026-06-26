@@ -1,5 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Search, Map, Phone, User } from "lucide-react";
+import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import type { ReactNode } from "react";
 
 const navItems = [
@@ -12,6 +13,8 @@ const navItems = [
 
 export function Layout({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { user } = useAuth();
+  const isAdmin = useIsAdmin(user?.id);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -37,6 +40,16 @@ export function Layout({ children }: { children: ReactNode }) {
                 </Link>
               );
             })}
+            {user && (
+              <Link to="/mis-reportes" className={`rounded-full px-4 py-2 text-sm font-medium ${pathname.startsWith("/mis-reportes") ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
+                Mis reportes
+              </Link>
+            )}
+            {isAdmin && (
+              <Link to="/admin" className={`rounded-full px-4 py-2 text-sm font-medium ${pathname.startsWith("/admin") ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
+                Admin
+              </Link>
+            )}
           </nav>
         </div>
       </header>

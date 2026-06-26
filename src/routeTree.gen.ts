@@ -26,6 +26,7 @@ import { Route as AuthenticatedVoluntariosRegistrarmeRouteImport } from './route
 import { Route as AuthenticatedDesaparecidosNuevoRouteImport } from './routes/_authenticated/desaparecidos.nuevo'
 import { Route as AuthenticatedCentrosAcopioNuevoRouteImport } from './routes/_authenticated/centros-acopio.nuevo'
 import { Route as AuthenticatedAdminNoticiasRouteImport } from './routes/_authenticated/admin.noticias'
+import { Route as AuthenticatedAdminEmergenciasRouteImport } from './routes/_authenticated/admin.emergencias'
 import { Route as AuthenticatedAdminAnunciosRouteImport } from './routes/_authenticated/admin.anuncios'
 
 const VoluntariosRoute = VoluntariosRouteImport.update({
@@ -117,6 +118,12 @@ const AuthenticatedAdminNoticiasRoute =
     path: '/noticias',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminEmergenciasRoute =
+  AuthenticatedAdminEmergenciasRouteImport.update({
+    id: '/emergencias',
+    path: '/emergencias',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminAnunciosRoute =
   AuthenticatedAdminAnunciosRouteImport.update({
     id: '/anuncios',
@@ -138,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
+  '/admin/emergencias': typeof AuthenticatedAdminEmergenciasRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
@@ -157,6 +165,7 @@ export interface FileRoutesByTo {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
+  '/admin/emergencias': typeof AuthenticatedAdminEmergenciasRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
@@ -178,6 +187,7 @@ export interface FileRoutesById {
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
   '/_authenticated/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
+  '/_authenticated/admin/emergencias': typeof AuthenticatedAdminEmergenciasRoute
   '/_authenticated/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/_authenticated/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/_authenticated/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
@@ -199,6 +209,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/desaparecidos/$id'
     | '/admin/anuncios'
+    | '/admin/emergencias'
     | '/admin/noticias'
     | '/centros-acopio/nuevo'
     | '/desaparecidos/nuevo'
@@ -218,6 +229,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/desaparecidos/$id'
     | '/admin/anuncios'
+    | '/admin/emergencias'
     | '/admin/noticias'
     | '/centros-acopio/nuevo'
     | '/desaparecidos/nuevo'
@@ -238,6 +250,7 @@ export interface FileRouteTypes {
     | '/_authenticated/perfil'
     | '/desaparecidos/$id'
     | '/_authenticated/admin/anuncios'
+    | '/_authenticated/admin/emergencias'
     | '/_authenticated/admin/noticias'
     | '/_authenticated/centros-acopio/nuevo'
     | '/_authenticated/desaparecidos/nuevo'
@@ -377,6 +390,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminNoticiasRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/emergencias': {
+      id: '/_authenticated/admin/emergencias'
+      path: '/emergencias'
+      fullPath: '/admin/emergencias'
+      preLoaderRoute: typeof AuthenticatedAdminEmergenciasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/anuncios': {
       id: '/_authenticated/admin/anuncios'
       path: '/anuncios'
@@ -389,11 +409,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAnunciosRoute: typeof AuthenticatedAdminAnunciosRoute
+  AuthenticatedAdminEmergenciasRoute: typeof AuthenticatedAdminEmergenciasRoute
   AuthenticatedAdminNoticiasRoute: typeof AuthenticatedAdminNoticiasRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAnunciosRoute: AuthenticatedAdminAnunciosRoute,
+  AuthenticatedAdminEmergenciasRoute: AuthenticatedAdminEmergenciasRoute,
   AuthenticatedAdminNoticiasRoute: AuthenticatedAdminNoticiasRoute,
 }
 

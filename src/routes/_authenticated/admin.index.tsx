@@ -29,7 +29,7 @@ function download(name: string, content: string) {
   URL.revokeObjectURL(url);
 }
 
-export const Route = createFileRoute("/_authenticated/admin")({
+export const Route = createFileRoute("/_authenticated/admin/")({
   component: Page,
 });
 

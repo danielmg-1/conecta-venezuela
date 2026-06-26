@@ -10,12 +10,20 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DesaparecidosRouteImport } from './routes/desaparecidos'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DesaparecidosIdRouteImport } from './routes/desaparecidos.$id'
+import { Route as AuthenticatedMisReportesRouteImport } from './routes/_authenticated/mis-reportes'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedDesaparecidosNuevoRouteImport } from './routes/_authenticated/desaparecidos.nuevo'
 
 const DesaparecidosRoute = DesaparecidosRouteImport.update({
   id: '/desaparecidos',
   path: '/desaparecidos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -28,33 +36,81 @@ const DesaparecidosIdRoute = DesaparecidosIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => DesaparecidosRoute,
 } as any)
+const AuthenticatedMisReportesRoute =
+  AuthenticatedMisReportesRouteImport.update({
+    id: '/mis-reportes',
+    path: '/mis-reportes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDesaparecidosNuevoRoute =
+  AuthenticatedDesaparecidosNuevoRouteImport.update({
+    id: '/desaparecidos/nuevo',
+    path: '/desaparecidos/nuevo',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/desaparecidos': typeof DesaparecidosRouteWithChildren
+  '/admin': typeof AuthenticatedAdminRoute
+  '/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/desaparecidos': typeof DesaparecidosRouteWithChildren
+  '/admin': typeof AuthenticatedAdminRoute
+  '/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/desaparecidos': typeof DesaparecidosRouteWithChildren
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/_authenticated/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/desaparecidos' | '/desaparecidos/$id'
+  fullPaths:
+    | '/'
+    | '/desaparecidos'
+    | '/admin'
+    | '/mis-reportes'
+    | '/desaparecidos/$id'
+    | '/desaparecidos/nuevo'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/desaparecidos' | '/desaparecidos/$id'
-  id: '__root__' | '/' | '/desaparecidos' | '/desaparecidos/$id'
+  to:
+    | '/'
+    | '/desaparecidos'
+    | '/admin'
+    | '/mis-reportes'
+    | '/desaparecidos/$id'
+    | '/desaparecidos/nuevo'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/desaparecidos'
+    | '/_authenticated/admin'
+    | '/_authenticated/mis-reportes'
+    | '/desaparecidos/$id'
+    | '/_authenticated/desaparecidos/nuevo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   DesaparecidosRoute: typeof DesaparecidosRouteWithChildren
 }
 
@@ -65,6 +121,13 @@ declare module '@tanstack/react-router' {
       path: '/desaparecidos'
       fullPath: '/desaparecidos'
       preLoaderRoute: typeof DesaparecidosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -81,8 +144,44 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DesaparecidosIdRouteImport
       parentRoute: typeof DesaparecidosRoute
     }
+    '/_authenticated/mis-reportes': {
+      id: '/_authenticated/mis-reportes'
+      path: '/mis-reportes'
+      fullPath: '/mis-reportes'
+      preLoaderRoute: typeof AuthenticatedMisReportesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/desaparecidos/nuevo': {
+      id: '/_authenticated/desaparecidos/nuevo'
+      path: '/desaparecidos/nuevo'
+      fullPath: '/desaparecidos/nuevo'
+      preLoaderRoute: typeof AuthenticatedDesaparecidosNuevoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedMisReportesRoute: typeof AuthenticatedMisReportesRoute
+  AuthenticatedDesaparecidosNuevoRoute: typeof AuthenticatedDesaparecidosNuevoRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedMisReportesRoute: AuthenticatedMisReportesRoute,
+  AuthenticatedDesaparecidosNuevoRoute: AuthenticatedDesaparecidosNuevoRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface DesaparecidosRouteChildren {
   DesaparecidosIdRoute: typeof DesaparecidosIdRoute
@@ -98,6 +197,7 @@ const DesaparecidosRouteWithChildren = DesaparecidosRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   DesaparecidosRoute: DesaparecidosRouteWithChildren,
 }
 export const routeTree = rootRouteImport

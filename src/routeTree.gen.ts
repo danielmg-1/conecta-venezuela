@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VoluntariosRouteImport } from './routes/voluntarios'
 import { Route as MapaRouteImport } from './routes/mapa'
 import { Route as EmergenciasRouteImport } from './routes/emergencias'
 import { Route as DesaparecidosRouteImport } from './routes/desaparecidos'
@@ -22,6 +23,11 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedDesaparecidosNuevoRouteImport } from './routes/_authenticated/desaparecidos.nuevo'
 import { Route as AuthenticatedCentrosAcopioNuevoRouteImport } from './routes/_authenticated/centros-acopio.nuevo'
 
+const VoluntariosRoute = VoluntariosRouteImport.update({
+  id: '/voluntarios',
+  path: '/voluntarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MapaRoute = MapaRouteImport.update({
   id: '/mapa',
   path: '/mapa',
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/desaparecidos': typeof DesaparecidosRouteWithChildren
   '/emergencias': typeof EmergenciasRoute
   '/mapa': typeof MapaRoute
+  '/voluntarios': typeof VoluntariosRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/desaparecidos': typeof DesaparecidosRouteWithChildren
   '/emergencias': typeof EmergenciasRoute
   '/mapa': typeof MapaRoute
+  '/voluntarios': typeof VoluntariosRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/desaparecidos': typeof DesaparecidosRouteWithChildren
   '/emergencias': typeof EmergenciasRoute
   '/mapa': typeof MapaRoute
+  '/voluntarios': typeof VoluntariosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
@@ -135,6 +144,7 @@ export interface FileRouteTypes {
     | '/desaparecidos'
     | '/emergencias'
     | '/mapa'
+    | '/voluntarios'
     | '/admin'
     | '/mis-reportes'
     | '/desaparecidos/$id'
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/desaparecidos'
     | '/emergencias'
     | '/mapa'
+    | '/voluntarios'
     | '/admin'
     | '/mis-reportes'
     | '/desaparecidos/$id'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/desaparecidos'
     | '/emergencias'
     | '/mapa'
+    | '/voluntarios'
     | '/_authenticated/admin'
     | '/_authenticated/mis-reportes'
     | '/desaparecidos/$id'
@@ -177,10 +189,18 @@ export interface RootRouteChildren {
   DesaparecidosRoute: typeof DesaparecidosRouteWithChildren
   EmergenciasRoute: typeof EmergenciasRoute
   MapaRoute: typeof MapaRoute
+  VoluntariosRoute: typeof VoluntariosRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/voluntarios': {
+      id: '/voluntarios'
+      path: '/voluntarios'
+      fullPath: '/voluntarios'
+      preLoaderRoute: typeof VoluntariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mapa': {
       id: '/mapa'
       path: '/mapa'
@@ -305,6 +325,7 @@ const rootRouteChildren: RootRouteChildren = {
   DesaparecidosRoute: DesaparecidosRouteWithChildren,
   EmergenciasRoute: EmergenciasRoute,
   MapaRoute: MapaRoute,
+  VoluntariosRoute: VoluntariosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

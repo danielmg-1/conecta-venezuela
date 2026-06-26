@@ -74,6 +74,48 @@ export type Database = {
         }
         Relationships: []
       }
+      announcements: {
+        Row: {
+          active: boolean
+          body: string | null
+          created_at: string
+          created_by: string | null
+          ends_at: string | null
+          id: string
+          pages: string[]
+          starts_at: string | null
+          title: string
+          updated_at: string
+          variant: string
+        }
+        Insert: {
+          active?: boolean
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          id?: string
+          pages?: string[]
+          starts_at?: string | null
+          title: string
+          updated_at?: string
+          variant?: string
+        }
+        Update: {
+          active?: boolean
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          id?: string
+          pages?: string[]
+          starts_at?: string | null
+          title?: string
+          updated_at?: string
+          variant?: string
+        }
+        Relationships: []
+      }
       emergency_contacts: {
         Row: {
           categoria: string

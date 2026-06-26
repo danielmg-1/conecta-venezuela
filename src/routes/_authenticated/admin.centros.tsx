@@ -11,9 +11,10 @@ export const Route = createFileRoute("/_authenticated/admin/centros")({
   component: Page,
 });
 
+type AidTipo = "apoyo_psicologico" | "centro_acopio" | "clinica" | "hospital" | "otro" | "primeros_auxilios" | "punto_recaudacion";
 type Aid = {
   id: string;
-  tipo: string;
+  tipo: AidTipo;
   nombre: string;
   descripcion: string | null;
   direccion: string | null;
@@ -46,7 +47,7 @@ function Page() {
     setError(null);
     const fd = new FormData(e.currentTarget);
     const payload = {
-      tipo: String(fd.get("tipo") || editing.tipo) as Aid["tipo"],
+      tipo: (String(fd.get("tipo") || editing.tipo) as AidTipo),
       nombre: String(fd.get("nombre") || "").trim(),
       descripcion: String(fd.get("descripcion") || "").trim() || null,
       direccion: String(fd.get("direccion") || "").trim() || null,

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VoluntariosRouteImport } from './routes/voluntarios'
+import { Route as NoticiasRouteImport } from './routes/noticias'
 import { Route as MapaRouteImport } from './routes/mapa'
 import { Route as EmergenciasRouteImport } from './routes/emergencias'
 import { Route as DesaparecidosRouteImport } from './routes/desaparecidos'
@@ -27,6 +28,11 @@ import { Route as AuthenticatedCentrosAcopioNuevoRouteImport } from './routes/_a
 const VoluntariosRoute = VoluntariosRouteImport.update({
   id: '/voluntarios',
   path: '/voluntarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NoticiasRoute = NoticiasRouteImport.update({
+  id: '/noticias',
+  path: '/noticias',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MapaRoute = MapaRouteImport.update({
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/desaparecidos': typeof DesaparecidosRouteWithChildren
   '/emergencias': typeof EmergenciasRoute
   '/mapa': typeof MapaRoute
+  '/noticias': typeof NoticiasRoute
   '/voluntarios': typeof VoluntariosRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/desaparecidos': typeof DesaparecidosRouteWithChildren
   '/emergencias': typeof EmergenciasRoute
   '/mapa': typeof MapaRoute
+  '/noticias': typeof NoticiasRoute
   '/voluntarios': typeof VoluntariosRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
@@ -137,6 +145,7 @@ export interface FileRoutesById {
   '/desaparecidos': typeof DesaparecidosRouteWithChildren
   '/emergencias': typeof EmergenciasRoute
   '/mapa': typeof MapaRoute
+  '/noticias': typeof NoticiasRoute
   '/voluntarios': typeof VoluntariosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/mis-reportes': typeof AuthenticatedMisReportesRoute
@@ -154,6 +163,7 @@ export interface FileRouteTypes {
     | '/desaparecidos'
     | '/emergencias'
     | '/mapa'
+    | '/noticias'
     | '/voluntarios'
     | '/admin'
     | '/mis-reportes'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/desaparecidos'
     | '/emergencias'
     | '/mapa'
+    | '/noticias'
     | '/voluntarios'
     | '/admin'
     | '/mis-reportes'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/desaparecidos'
     | '/emergencias'
     | '/mapa'
+    | '/noticias'
     | '/voluntarios'
     | '/_authenticated/admin'
     | '/_authenticated/mis-reportes'
@@ -202,6 +214,7 @@ export interface RootRouteChildren {
   DesaparecidosRoute: typeof DesaparecidosRouteWithChildren
   EmergenciasRoute: typeof EmergenciasRoute
   MapaRoute: typeof MapaRoute
+  NoticiasRoute: typeof NoticiasRoute
   VoluntariosRoute: typeof VoluntariosRoute
 }
 
@@ -212,6 +225,13 @@ declare module '@tanstack/react-router' {
       path: '/voluntarios'
       fullPath: '/voluntarios'
       preLoaderRoute: typeof VoluntariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/noticias': {
+      id: '/noticias'
+      path: '/noticias'
+      fullPath: '/noticias'
+      preLoaderRoute: typeof NoticiasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mapa': {
@@ -348,6 +368,7 @@ const rootRouteChildren: RootRouteChildren = {
   DesaparecidosRoute: DesaparecidosRouteWithChildren,
   EmergenciasRoute: EmergenciasRoute,
   MapaRoute: MapaRoute,
+  NoticiasRoute: NoticiasRoute,
   VoluntariosRoute: VoluntariosRoute,
 }
 export const routeTree = rootRouteImport

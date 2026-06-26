@@ -26,6 +26,7 @@ import { Route as AuthenticatedVoluntariosRegistrarmeRouteImport } from './route
 import { Route as AuthenticatedDesaparecidosNuevoRouteImport } from './routes/_authenticated/desaparecidos.nuevo'
 import { Route as AuthenticatedCentrosAcopioNuevoRouteImport } from './routes/_authenticated/centros-acopio.nuevo'
 import { Route as AuthenticatedAdminNoticiasRouteImport } from './routes/_authenticated/admin.noticias'
+import { Route as AuthenticatedAdminAnunciosRouteImport } from './routes/_authenticated/admin.anuncios'
 
 const VoluntariosRoute = VoluntariosRouteImport.update({
   id: '/voluntarios',
@@ -116,6 +117,12 @@ const AuthenticatedAdminNoticiasRoute =
     path: '/noticias',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminAnunciosRoute =
+  AuthenticatedAdminAnunciosRouteImport.update({
+    id: '/anuncios',
+    path: '/anuncios',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
@@ -148,6 +156,7 @@ export interface FileRoutesByTo {
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
@@ -168,6 +177,7 @@ export interface FileRoutesById {
   '/_authenticated/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/_authenticated/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/_authenticated/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/_authenticated/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/_authenticated/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/mis-reportes'
     | '/perfil'
     | '/desaparecidos/$id'
+    | '/admin/anuncios'
     | '/admin/noticias'
     | '/centros-acopio/nuevo'
     | '/desaparecidos/nuevo'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/mis-reportes'
     | '/perfil'
     | '/desaparecidos/$id'
+    | '/admin/anuncios'
     | '/admin/noticias'
     | '/centros-acopio/nuevo'
     | '/desaparecidos/nuevo'
@@ -225,6 +237,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mis-reportes'
     | '/_authenticated/perfil'
     | '/desaparecidos/$id'
+    | '/_authenticated/admin/anuncios'
     | '/_authenticated/admin/noticias'
     | '/_authenticated/centros-acopio/nuevo'
     | '/_authenticated/desaparecidos/nuevo'
@@ -364,14 +377,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminNoticiasRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/anuncios': {
+      id: '/_authenticated/admin/anuncios'
+      path: '/anuncios'
+      fullPath: '/admin/anuncios'
+      preLoaderRoute: typeof AuthenticatedAdminAnunciosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAnunciosRoute: typeof AuthenticatedAdminAnunciosRoute
   AuthenticatedAdminNoticiasRoute: typeof AuthenticatedAdminNoticiasRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAnunciosRoute: AuthenticatedAdminAnunciosRoute,
   AuthenticatedAdminNoticiasRoute: AuthenticatedAdminNoticiasRoute,
 }
 

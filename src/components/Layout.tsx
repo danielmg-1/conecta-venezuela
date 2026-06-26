@@ -3,12 +3,11 @@ import { Home, Search, Map, Phone, User, HeartHandshake, Users, Newspaper } from
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import type { ReactNode } from "react";
 
-const navItems = [
+const baseNav = [
   { to: "/", label: "Inicio", icon: Home },
   { to: "/desaparecidos", label: "Buscar", icon: Search },
   { to: "/mapa", label: "Mapa", icon: Map },
   { to: "/centros-acopio", label: "Ayuda", icon: HeartHandshake },
-  { to: "/auth", label: "Cuenta", icon: User },
 ] as const;
 
 const secondaryNav = [
@@ -21,6 +20,10 @@ export function Layout({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { user } = useAuth();
   const isAdmin = useIsAdmin(user?.id);
+  const accountItem = user
+    ? { to: "/perfil" as const, label: "Perfil", icon: User }
+    : { to: "/auth" as const, label: "Cuenta", icon: User };
+  const navItems = [...baseNav, accountItem];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -61,8 +64,8 @@ export function Layout({ children }: { children: ReactNode }) {
               );
             })}
             {user && (
-              <Link to="/mis-reportes" className={`rounded-full px-4 py-2 text-sm font-medium ${pathname.startsWith("/mis-reportes") ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
-                Mis reportes
+              <Link to="/perfil" className={`rounded-full px-4 py-2 text-sm font-medium ${pathname.startsWith("/perfil") ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
+                Mi perfil
               </Link>
             )}
             {isAdmin && (

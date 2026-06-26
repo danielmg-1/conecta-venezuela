@@ -19,6 +19,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DesaparecidosIdRouteImport } from './routes/desaparecidos.$id'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedMisReportesRouteImport } from './routes/_authenticated/mis-reportes'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedVoluntariosRegistrarmeRouteImport } from './routes/_authenticated/voluntarios.registrarme'
@@ -75,6 +76,11 @@ const DesaparecidosIdRoute = DesaparecidosIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => DesaparecidosRoute,
 } as any)
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMisReportesRoute =
   AuthenticatedMisReportesRouteImport.update({
     id: '/mis-reportes',
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/voluntarios': typeof VoluntariosRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/voluntarios': typeof VoluntariosRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/voluntarios': typeof VoluntariosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/mis-reportes': typeof AuthenticatedMisReportesRoute
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
   '/_authenticated/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/_authenticated/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/voluntarios'
     | '/admin'
     | '/mis-reportes'
+    | '/perfil'
     | '/desaparecidos/$id'
     | '/admin/noticias'
     | '/centros-acopio/nuevo'
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/voluntarios'
     | '/admin'
     | '/mis-reportes'
+    | '/perfil'
     | '/desaparecidos/$id'
     | '/admin/noticias'
     | '/centros-acopio/nuevo'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/voluntarios'
     | '/_authenticated/admin'
     | '/_authenticated/mis-reportes'
+    | '/_authenticated/perfil'
     | '/desaparecidos/$id'
     | '/_authenticated/admin/noticias'
     | '/_authenticated/centros-acopio/nuevo'
@@ -303,6 +315,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DesaparecidosIdRouteImport
       parentRoute: typeof DesaparecidosRoute
     }
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/mis-reportes': {
       id: '/_authenticated/mis-reportes'
       path: '/mis-reportes'
@@ -362,6 +381,7 @@ const AuthenticatedAdminRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedMisReportesRoute: typeof AuthenticatedMisReportesRoute
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
   AuthenticatedCentrosAcopioNuevoRoute: typeof AuthenticatedCentrosAcopioNuevoRoute
   AuthenticatedDesaparecidosNuevoRoute: typeof AuthenticatedDesaparecidosNuevoRoute
   AuthenticatedVoluntariosRegistrarmeRoute: typeof AuthenticatedVoluntariosRegistrarmeRoute
@@ -370,6 +390,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedMisReportesRoute: AuthenticatedMisReportesRoute,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
   AuthenticatedCentrosAcopioNuevoRoute: AuthenticatedCentrosAcopioNuevoRoute,
   AuthenticatedDesaparecidosNuevoRoute: AuthenticatedDesaparecidosNuevoRoute,
   AuthenticatedVoluntariosRegistrarmeRoute:

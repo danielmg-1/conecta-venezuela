@@ -20,6 +20,7 @@ function Page() {
   const [error, setError] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [contacts, setContacts] = useState<ContactDraft[]>([{ tipo: "whatsapp", valor: "", codigo_pais: "+58" }]);
+  const [consent, setConsent] = useState(false);
 
   function addContact() {
     if (contacts.length >= 4) return;
@@ -39,6 +40,7 @@ function Page() {
       const valid = contacts.filter((c) => c.valor.trim().length > 0);
       if (valid.length < 1) throw new Error("Debes indicar al menos un contacto.");
       if (valid.length > 4) throw new Error("Máximo 4 contactos.");
+      if (!consent) throw new Error("Debes aceptar el consentimiento de publicación de datos.");
 
       let photoPath: string | null = null;
       if (file) photoPath = await uploadMissingPhoto(user.id, file);
@@ -55,6 +57,8 @@ function Page() {
           lugar_desaparicion: String(fd.get("lugar_desaparicion") || "").trim() || null,
           descripcion: String(fd.get("descripcion") || "").trim() || null,
           photo_path: photoPath,
+          public_consent: true,
+          consent_at: new Date().toISOString(),
         })
         .select("id")
         .single();
@@ -142,6 +146,24 @@ function Page() {
         </div>
 
         {error && <p className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}
+        <label className="flex items-start gap-3 rounded-2xl border border-border bg-muted/40 p-4 text-sm">
+          <input
+            type="checkbox"
+            checked={consent}
+            onChange={(e) => setConsent(e.target.checked)}
+            className="mt-0.5 h-4 w-4"
+            required
+          />
+          <span className="text-muted-foreground">
+            <span className="font-medium text-foreground">Consentimiento de publicación.</span>{" "}
+            Confirmo que soy familiar, amigo cercano o tengo autorización para publicar estos
+            datos, y acepto que la información del reporte (nombre, foto, cédula, lugar y
+            contactos indicados) se muestre de forma <strong>pública</strong> en esta guía con
+            el único fin de ayudar a localizar a la persona y permitir que otras personas se
+            comuniquen con los contactos suministrados. Podré solicitar la eliminación del
+            reporte en cualquier momento.
+          </span>
+        </label>
         <button disabled={submitting} className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50">
           {submitting ? "Publicando…" : "Publicar reporte"}
         </button>

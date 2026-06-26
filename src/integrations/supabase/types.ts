@@ -186,6 +186,7 @@ export type Database = {
           birth_date: string | null
           cedula: string | null
           ciudad: string | null
+          consent_at: string | null
           created_at: string
           descripcion: string | null
           estado: string
@@ -196,6 +197,7 @@ export type Database = {
           lng: number | null
           lugar_desaparicion: string | null
           photo_path: string | null
+          public_consent: boolean
           reporter_id: string
           status: Database["public"]["Enums"]["missing_status"]
           updated_at: string
@@ -204,6 +206,7 @@ export type Database = {
           birth_date?: string | null
           cedula?: string | null
           ciudad?: string | null
+          consent_at?: string | null
           created_at?: string
           descripcion?: string | null
           estado: string
@@ -214,6 +217,7 @@ export type Database = {
           lng?: number | null
           lugar_desaparicion?: string | null
           photo_path?: string | null
+          public_consent?: boolean
           reporter_id: string
           status?: Database["public"]["Enums"]["missing_status"]
           updated_at?: string
@@ -222,6 +226,7 @@ export type Database = {
           birth_date?: string | null
           cedula?: string | null
           ciudad?: string | null
+          consent_at?: string | null
           created_at?: string
           descripcion?: string | null
           estado?: string
@@ -232,6 +237,7 @@ export type Database = {
           lng?: number | null
           lugar_desaparicion?: string | null
           photo_path?: string | null
+          public_consent?: boolean
           reporter_id?: string
           status?: Database["public"]["Enums"]["missing_status"]
           updated_at?: string

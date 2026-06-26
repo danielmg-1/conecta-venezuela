@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
+import { aidTypeLabel } from "@/lib/aid";
 
 type GMap = { setMap?: unknown };
 type AnyMap = any;
@@ -10,6 +11,7 @@ declare global {
 }
 
 type Row = { id: string; full_name: string; estado: string; ciudad: string | null; status: string; lat: number | null; lng: number | null };
+type AidRow = { id: string; nombre: string; tipo: string; estado: string; ciudad: string | null; lat: number | null; lng: number | null };
 
 const BASE_COORDS: Record<string, [number, number]> = {
   "Amazonas": [5.65, -67.62], "Anzoátegui": [10.13, -64.68], "Apure": [7.89, -67.48],
@@ -35,7 +37,10 @@ export const Route = createFileRoute("/mapa")({
 
 function Page() {
   const [rows, setRows] = useState<Row[] | null>(null);
+  const [aid, setAid] = useState<AidRow[] | null>(null);
   const [map, setMap] = useState<AnyMap | null>(null);
+  const [showMissing, setShowMissing] = useState(true);
+  const [showAid, setShowAid] = useState(true);
 
   useEffect(() => {
     (async () => {
@@ -45,6 +50,12 @@ function Page() {
         .eq("hidden_by_admin", false)
         .limit(1000);
       setRows((data ?? []) as Row[]);
+      const { data: ad } = await supabase
+        .from("aid_points")
+        .select("id,nombre,tipo,estado,ciudad,lat,lng")
+        .eq("hidden_by_admin", false)
+        .limit(1000);
+      setAid((ad ?? []) as AidRow[]);
     })();
   }, []);
 
@@ -93,7 +104,7 @@ function Page() {
     if (!map || !window.google?.maps) return;
     const circles: any[] = [];
     const markers: any[] = [];
-    byEstado.forEach((v, estado) => {
+    if (showMissing) byEstado.forEach((v, estado) => {
       const c = BASE_COORDS[estado];
       if (!c) return;
       const circle = new window.google.maps.Circle({
@@ -110,15 +121,54 @@ function Page() {
       });
       markers.push(marker);
     });
+    if (showAid && aid) {
+      const info = new window.google.maps.InfoWindow();
+      aid.forEach((a) => {
+        const pos = a.lat != null && a.lng != null
+          ? { lat: Number(a.lat), lng: Number(a.lng) }
+          : (BASE_COORDS[a.estado] ? { lat: BASE_COORDS[a.estado][0] + (Math.random() - 0.5) * 0.3, lng: BASE_COORDS[a.estado][1] + (Math.random() - 0.5) * 0.3 } : null);
+        if (!pos) return;
+        const m = new window.google.maps.Marker({
+          position: pos, map,
+          icon: {
+            path: window.google.maps.SymbolPath.CIRCLE,
+            scale: 7, fillColor: "#10b981", fillOpacity: 0.95, strokeColor: "#fff", strokeWeight: 2,
+          },
+          title: a.nombre,
+        });
+        m.addListener("click", () => {
+          info.setContent(`<div style="font-family:system-ui;font-size:13px"><strong>${a.nombre}</strong><br/>${aidTypeLabel(a.tipo)}<br/><span style="color:#666">${a.ciudad ? a.ciudad + ", " : ""}${a.estado}</span></div>`);
+          info.open({ anchor: m, map });
+        });
+        markers.push(m);
+      });
+    }
     return () => { circles.forEach((c) => c.setMap(null)); markers.forEach((m) => m.setMap(null)); };
-  }, [map, byEstado]);
+  }, [map, byEstado, aid, showMissing, showAid]);
 
   const hasKey = !!(import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY);
 
   return (
     <Layout>
       <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Mapa en vivo</h1>
-      <p className="mt-1 text-muted-foreground">Concentración de reportes por estado.</p>
+      <p className="mt-1 text-muted-foreground">Concentración de reportes por estado y puntos de ayuda.</p>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <button
+          onClick={() => setShowMissing((v) => !v)}
+          className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${showMissing ? "border-red-500 bg-red-500/10 text-red-700 dark:text-red-300" : "border-border text-muted-foreground"}`}
+        >
+          <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-red-500" />
+          Desaparecidos
+        </button>
+        <button
+          onClick={() => setShowAid((v) => !v)}
+          className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${showAid ? "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "border-border text-muted-foreground"}`}
+        >
+          <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-emerald-500" />
+          Centros de ayuda
+        </button>
+      </div>
 
       <div className="mt-6 overflow-hidden rounded-3xl border border-border bg-card">
         {hasKey ? (

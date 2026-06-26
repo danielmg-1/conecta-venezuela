@@ -427,7 +427,7 @@ export type Database = {
         | "primeros_auxilios"
         | "apoyo_psicologico"
         | "otro"
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "moderator"
       contact_type: "telefono" | "whatsapp" | "email" | "instagram" | "otro"
       missing_status: "desaparecido" | "en_busqueda" | "encontrado"
     }
@@ -566,7 +566,7 @@ export const Constants = {
         "apoyo_psicologico",
         "otro",
       ],
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "moderator"],
       contact_type: ["telefono", "whatsapp", "email", "instagram", "otro"],
       missing_status: ["desaparecido", "en_busqueda", "encontrado"],
     },

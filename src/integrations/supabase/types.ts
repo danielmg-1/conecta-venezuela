@@ -14,16 +14,219 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      emergency_contacts: {
+        Row: {
+          categoria: string
+          created_at: string
+          descripcion: string | null
+          id: string
+          nombre_institucion: string
+          orden: number
+          telefono: string
+        }
+        Insert: {
+          categoria: string
+          created_at?: string
+          descripcion?: string | null
+          id?: string
+          nombre_institucion: string
+          orden?: number
+          telefono: string
+        }
+        Update: {
+          categoria?: string
+          created_at?: string
+          descripcion?: string | null
+          id?: string
+          nombre_institucion?: string
+          orden?: number
+          telefono?: string
+        }
+        Relationships: []
+      }
+      missing_person_contacts: {
+        Row: {
+          codigo_pais: string | null
+          created_at: string
+          id: string
+          person_id: string
+          tipo: Database["public"]["Enums"]["contact_type"]
+          valor: string
+        }
+        Insert: {
+          codigo_pais?: string | null
+          created_at?: string
+          id?: string
+          person_id: string
+          tipo: Database["public"]["Enums"]["contact_type"]
+          valor: string
+        }
+        Update: {
+          codigo_pais?: string | null
+          created_at?: string
+          id?: string
+          person_id?: string
+          tipo?: Database["public"]["Enums"]["contact_type"]
+          valor?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "missing_person_contacts_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "missing_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      missing_persons: {
+        Row: {
+          birth_date: string | null
+          cedula: string | null
+          ciudad: string | null
+          created_at: string
+          descripcion: string | null
+          estado: string
+          full_name: string
+          hidden_by_admin: boolean
+          id: string
+          lat: number | null
+          lng: number | null
+          lugar_desaparicion: string | null
+          photo_path: string | null
+          reporter_id: string
+          status: Database["public"]["Enums"]["missing_status"]
+          updated_at: string
+        }
+        Insert: {
+          birth_date?: string | null
+          cedula?: string | null
+          ciudad?: string | null
+          created_at?: string
+          descripcion?: string | null
+          estado: string
+          full_name: string
+          hidden_by_admin?: boolean
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          lugar_desaparicion?: string | null
+          photo_path?: string | null
+          reporter_id: string
+          status?: Database["public"]["Enums"]["missing_status"]
+          updated_at?: string
+        }
+        Update: {
+          birth_date?: string | null
+          cedula?: string | null
+          ciudad?: string | null
+          created_at?: string
+          descripcion?: string | null
+          estado?: string
+          full_name?: string
+          hidden_by_admin?: boolean
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          lugar_desaparicion?: string | null
+          photo_path?: string | null
+          reporter_id?: string
+          status?: Database["public"]["Enums"]["missing_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      tips: {
+        Row: {
+          autor_contacto: string | null
+          autor_nombre: string
+          created_at: string
+          id: string
+          mensaje: string
+          person_id: string
+        }
+        Insert: {
+          autor_contacto?: string | null
+          autor_nombre: string
+          created_at?: string
+          id?: string
+          mensaje: string
+          person_id: string
+        }
+        Update: {
+          autor_contacto?: string | null
+          autor_nombre?: string
+          created_at?: string
+          id?: string
+          mensaje?: string
+          person_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tips_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "missing_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
+      contact_type: "telefono" | "whatsapp" | "email" | "instagram" | "otro"
+      missing_status: "desaparecido" | "en_busqueda" | "encontrado"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +353,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+      contact_type: ["telefono", "whatsapp", "email", "instagram", "otro"],
+      missing_status: ["desaparecido", "en_busqueda", "encontrado"],
+    },
   },
 } as const

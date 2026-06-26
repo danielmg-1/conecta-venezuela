@@ -24,6 +24,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedVoluntariosRegistrarmeRouteImport } from './routes/_authenticated/voluntarios.registrarme'
 import { Route as AuthenticatedDesaparecidosNuevoRouteImport } from './routes/_authenticated/desaparecidos.nuevo'
 import { Route as AuthenticatedCentrosAcopioNuevoRouteImport } from './routes/_authenticated/centros-acopio.nuevo'
+import { Route as AuthenticatedAdminNoticiasRouteImport } from './routes/_authenticated/admin.noticias'
 
 const VoluntariosRoute = VoluntariosRouteImport.update({
   id: '/voluntarios',
@@ -103,6 +104,12 @@ const AuthenticatedCentrosAcopioNuevoRoute =
     path: '/centros-acopio/nuevo',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminNoticiasRoute =
+  AuthenticatedAdminNoticiasRouteImport.update({
+    id: '/noticias',
+    path: '/noticias',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -113,9 +120,10 @@ export interface FileRoutesByFullPath {
   '/mapa': typeof MapaRoute
   '/noticias': typeof NoticiasRoute
   '/voluntarios': typeof VoluntariosRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
@@ -129,9 +137,10 @@ export interface FileRoutesByTo {
   '/mapa': typeof MapaRoute
   '/noticias': typeof NoticiasRoute
   '/voluntarios': typeof VoluntariosRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
@@ -147,9 +156,10 @@ export interface FileRoutesById {
   '/mapa': typeof MapaRoute
   '/noticias': typeof NoticiasRoute
   '/voluntarios': typeof VoluntariosRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/_authenticated/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/_authenticated/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/_authenticated/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/_authenticated/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/mis-reportes'
     | '/desaparecidos/$id'
+    | '/admin/noticias'
     | '/centros-acopio/nuevo'
     | '/desaparecidos/nuevo'
     | '/voluntarios/registrarme'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/mis-reportes'
     | '/desaparecidos/$id'
+    | '/admin/noticias'
     | '/centros-acopio/nuevo'
     | '/desaparecidos/nuevo'
     | '/voluntarios/registrarme'
@@ -201,6 +213,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/mis-reportes'
     | '/desaparecidos/$id'
+    | '/_authenticated/admin/noticias'
     | '/_authenticated/centros-acopio/nuevo'
     | '/_authenticated/desaparecidos/nuevo'
     | '/_authenticated/voluntarios/registrarme'
@@ -325,11 +338,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCentrosAcopioNuevoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/noticias': {
+      id: '/_authenticated/admin/noticias'
+      path: '/noticias'
+      fullPath: '/admin/noticias'
+      preLoaderRoute: typeof AuthenticatedAdminNoticiasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminNoticiasRoute: typeof AuthenticatedAdminNoticiasRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminNoticiasRoute: AuthenticatedAdminNoticiasRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedMisReportesRoute: typeof AuthenticatedMisReportesRoute
   AuthenticatedCentrosAcopioNuevoRoute: typeof AuthenticatedCentrosAcopioNuevoRoute
   AuthenticatedDesaparecidosNuevoRoute: typeof AuthenticatedDesaparecidosNuevoRoute
@@ -337,7 +368,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedMisReportesRoute: AuthenticatedMisReportesRoute,
   AuthenticatedCentrosAcopioNuevoRoute: AuthenticatedCentrosAcopioNuevoRoute,
   AuthenticatedDesaparecidosNuevoRoute: AuthenticatedDesaparecidosNuevoRoute,

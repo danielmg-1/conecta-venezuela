@@ -9,9 +9,9 @@ type Row = { id: string; categoria: string; nombre_institucion: string; telefono
 const FALLBACK: Row[] = [
   { id: "1", categoria: "Emergencia general", nombre_institucion: "Sistema 911", telefono: "911", descripcion: "Emergencias en todo el país" },
   { id: "2", categoria: "Bomberos", nombre_institucion: "Bomberos de Venezuela", telefono: "171", descripcion: "Rescate, incendios, atención" },
-  { id: "3", categoria: "Protección Civil", nombre_institucion: "Protección Civil", telefono: "0212-662-1181", descripcion: "Coordinación de desastres" },
-  { id: "4", categoria: "Cruz Roja", nombre_institucion: "Cruz Roja Venezolana", telefono: "0212-571-4380", descripcion: "Atención humanitaria" },
-  { id: "5", categoria: "Apoyo psicológico", nombre_institucion: "Línea de ayuda psicológica UCAB", telefono: "0212-407-4434", descripcion: "Primeros auxilios psicológicos" },
+  { id: "3", categoria: "Protección Civil", nombre_institucion: "Protección Civil", telefono: "0800-7248451", descripcion: "Coordinación de desastres" },
+  { id: "4", categoria: "Cruz Roja", nombre_institucion: "Cruz Roja Venezolana", telefono: "0241-8214841", descripcion: "Atención humanitaria" },
+  { id: "5", categoria: "Apoyo psicológico", nombre_institucion: "Línea de ayuda psicológica UCAB", telefono: "0424-1723981", descripcion: "Primeros auxilios psicológicos" },
 ];
 
 export const Route = createFileRoute("/emergencias")({

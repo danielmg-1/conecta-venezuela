@@ -1,0 +1,120 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { Layout } from "@/components/Layout";
+import { supabase } from "@/integrations/supabase/client";
+import { AID_TYPES, aidTypeLabel } from "@/lib/aid";
+import { ESTADOS_VE } from "@/lib/venezuela";
+import { MapPin, Phone, Plus } from "lucide-react";
+
+export const Route = createFileRoute("/centros-acopio")({
+  head: () => ({
+    meta: [
+      { title: "Centros de acopio y ayuda — Guía de Apoyo Venezuela" },
+      { name: "description", content: "Encuentra centros de acopio, puntos de recaudación, hospitales y servicios de ayuda activos tras el terremoto en Venezuela." },
+      { property: "og:title", content: "Centros de acopio y ayuda" },
+      { property: "og:description", content: "Mapa colaborativo de puntos de ayuda en Venezuela." },
+    ],
+  }),
+  component: Page,
+});
+
+type Row = {
+  id: string;
+  tipo: string;
+  nombre: string;
+  descripcion: string | null;
+  direccion: string | null;
+  estado: string;
+  ciudad: string | null;
+  telefono: string | null;
+  horario: string | null;
+  necesidades: string | null;
+};
+
+function Page() {
+  const [items, setItems] = useState<Row[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [tipo, setTipo] = useState<string>("");
+  const [estado, setEstado] = useState<string>("");
+  const [q, setQ] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    let query = supabase
+      .from("aid_points")
+      .select("id,tipo,nombre,descripcion,direccion,estado,ciudad,telefono,horario,necesidades")
+      .eq("hidden_by_admin", false)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (tipo) query = query.eq("tipo", tipo as never);
+    if (estado) query = query.eq("estado", estado);
+    if (q.trim()) query = query.ilike("nombre", `%${q.trim()}%`);
+    query.then(({ data }) => {
+      if (!cancelled) {
+        setItems((data ?? []) as Row[]);
+        setLoading(false);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [tipo, estado, q]);
+
+  return (
+    <Layout>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Centros de ayuda</h1>
+          <p className="mt-1 text-muted-foreground">Acopio, recaudación, hospitales, primeros auxilios y apoyo psicológico.</p>
+        </div>
+        <Link to="/centros-acopio/nuevo" className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">
+          <Plus className="h-4 w-4" /> Publicar punto
+        </Link>
+      </div>
+
+      <div className="mt-6 grid gap-3 rounded-3xl border border-border bg-card p-4 md:grid-cols-3">
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nombre…" className="rounded-xl border border-input bg-background px-3 py-2.5 text-sm" />
+        <select value={tipo} onChange={(e) => setTipo(e.target.value)} className="rounded-xl border border-input bg-background px-3 py-2.5 text-sm">
+          <option value="">Todos los tipos</option>
+          {AID_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+        </select>
+        <select value={estado} onChange={(e) => setEstado(e.target.value)} className="rounded-xl border border-input bg-background px-3 py-2.5 text-sm">
+          <option value="">Todos los estados</option>
+          {ESTADOS_VE.map((e) => <option key={e} value={e}>{e}</option>)}
+        </select>
+      </div>
+
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
+        {loading ? (
+          <p className="text-sm text-muted-foreground">Cargando…</p>
+        ) : items.length === 0 ? (
+          <p className="col-span-full rounded-3xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
+            Aún no hay puntos publicados con esos filtros.
+          </p>
+        ) : (
+          items.map((it) => (
+            <article key={it.id} className="rounded-3xl border border-border bg-card p-5">
+              <span className="inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">{aidTypeLabel(it.tipo)}</span>
+              <h3 className="mt-2 text-lg font-semibold">{it.nombre}</h3>
+              <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+                <MapPin className="h-3.5 w-3.5" /> {it.ciudad ? `${it.ciudad}, ` : ""}{it.estado}
+              </p>
+              {it.direccion && <p className="mt-1 text-sm">{it.direccion}</p>}
+              {it.descripcion && <p className="mt-2 text-sm text-muted-foreground line-clamp-3">{it.descripcion}</p>}
+              {it.necesidades && (
+                <p className="mt-2 rounded-xl bg-amber-50 p-2 text-xs text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+                  <strong>Necesita:</strong> {it.necesidades}
+                </p>
+              )}
+              {it.horario && <p className="mt-2 text-xs text-muted-foreground">Horario: {it.horario}</p>}
+              {it.telefono && (
+                <a href={`tel:${it.telefono}`} className="mt-3 inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium">
+                  <Phone className="h-3.5 w-3.5" /> {it.telefono}
+                </a>
+              )}
+            </article>
+          ))
+        )}
+      </div>
+    </Layout>
+  );
+}

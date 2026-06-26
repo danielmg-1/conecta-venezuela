@@ -81,10 +81,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Guía de Apoyo Venezuela — Personas desaparecidas y ayuda tras el terremoto" },
       { name: "description", content: "Plataforma para reportar y buscar personas desaparecidas en Venezuela tras el terremoto, con mapa en vivo y números de emergencia." },
       { name: "author", content: "Guía de Apoyo Venezuela" },
-      { property: "og:title", content: "Guía de Apoyo Venezuela" },
-      { property: "og:description", content: "Reporta, busca y ayuda a localizar personas desaparecidas tras el terremoto en Venezuela." },
+      { property: "og:title", content: "Guía de Apoyo Venezuela — Personas desaparecidas y ayuda tras el terremoto" },
+      { property: "og:description", content: "Plataforma para reportar y buscar personas desaparecidas en Venezuela tras el terremoto, con mapa en vivo y números de emergencia." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Guía de Apoyo Venezuela — Personas desaparecidas y ayuda tras el terremoto" },
+      { name: "twitter:description", content: "Plataforma para reportar y buscar personas desaparecidas en Venezuela tras el terremoto, con mapa en vivo y números de emergencia." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/29e30bd7-75cf-4282-b06f-47541b6bde55" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/29e30bd7-75cf-4282-b06f-47541b6bde55" },
     ],
     links: [
       {

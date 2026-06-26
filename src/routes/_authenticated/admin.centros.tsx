@@ -46,7 +46,7 @@ function Page() {
     setError(null);
     const fd = new FormData(e.currentTarget);
     const payload = {
-      tipo: String(fd.get("tipo") || editing.tipo),
+      tipo: String(fd.get("tipo") || editing.tipo) as Aid["tipo"],
       nombre: String(fd.get("nombre") || "").trim(),
       descripcion: String(fd.get("descripcion") || "").trim() || null,
       direccion: String(fd.get("direccion") || "").trim() || null,

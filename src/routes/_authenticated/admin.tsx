@@ -116,9 +116,11 @@ function Page() {
     <Layout>
       <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Panel admin</h1>
       <div className="mt-3 flex flex-wrap gap-2">
-        <Link to="/admin/noticias" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">
-          Gestionar noticias
-        </Link>
+        <Link to="/admin/noticias" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Noticias</Link>
+        <Link to="/admin/anuncios" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Anuncios globales</Link>
+        <Link to="/admin/emergencias" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Emergencias</Link>
+        <Link to="/admin/centros" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Centros</Link>
+        <Link to="/admin/voluntarios" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Voluntarios</Link>
         <button onClick={() => rows && download(`desaparecidos-${new Date().toISOString().slice(0,10)}.csv`, toCSV(rows))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Exportar desaparecidos CSV</button>
         <button onClick={() => aid && download(`centros-${new Date().toISOString().slice(0,10)}.csv`, toCSV(aid))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Exportar centros CSV</button>
         <button onClick={() => vols && download(`voluntarios-${new Date().toISOString().slice(0,10)}.csv`, toCSV(vols))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Exportar voluntarios CSV</button>

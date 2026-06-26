@@ -25,7 +25,11 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedVoluntariosRegistrarmeRouteImport } from './routes/_authenticated/voluntarios.registrarme'
 import { Route as AuthenticatedDesaparecidosNuevoRouteImport } from './routes/_authenticated/desaparecidos.nuevo'
 import { Route as AuthenticatedCentrosAcopioNuevoRouteImport } from './routes/_authenticated/centros-acopio.nuevo'
+import { Route as AuthenticatedAdminVoluntariosRouteImport } from './routes/_authenticated/admin.voluntarios'
 import { Route as AuthenticatedAdminNoticiasRouteImport } from './routes/_authenticated/admin.noticias'
+import { Route as AuthenticatedAdminEmergenciasRouteImport } from './routes/_authenticated/admin.emergencias'
+import { Route as AuthenticatedAdminCentrosRouteImport } from './routes/_authenticated/admin.centros'
+import { Route as AuthenticatedAdminAnunciosRouteImport } from './routes/_authenticated/admin.anuncios'
 
 const VoluntariosRoute = VoluntariosRouteImport.update({
   id: '/voluntarios',
@@ -110,10 +114,34 @@ const AuthenticatedCentrosAcopioNuevoRoute =
     path: '/centros-acopio/nuevo',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminVoluntariosRoute =
+  AuthenticatedAdminVoluntariosRouteImport.update({
+    id: '/voluntarios',
+    path: '/voluntarios',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminNoticiasRoute =
   AuthenticatedAdminNoticiasRouteImport.update({
     id: '/noticias',
     path: '/noticias',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminEmergenciasRoute =
+  AuthenticatedAdminEmergenciasRouteImport.update({
+    id: '/emergencias',
+    path: '/emergencias',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCentrosRoute =
+  AuthenticatedAdminCentrosRouteImport.update({
+    id: '/centros',
+    path: '/centros',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminAnunciosRoute =
+  AuthenticatedAdminAnunciosRouteImport.update({
+    id: '/anuncios',
+    path: '/anuncios',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 
@@ -130,7 +158,11 @@ export interface FileRoutesByFullPath {
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
+  '/admin/centros': typeof AuthenticatedAdminCentrosRoute
+  '/admin/emergencias': typeof AuthenticatedAdminEmergenciasRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
+  '/admin/voluntarios': typeof AuthenticatedAdminVoluntariosRoute
   '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
@@ -148,7 +180,11 @@ export interface FileRoutesByTo {
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
+  '/admin/centros': typeof AuthenticatedAdminCentrosRoute
+  '/admin/emergencias': typeof AuthenticatedAdminEmergenciasRoute
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
+  '/admin/voluntarios': typeof AuthenticatedAdminVoluntariosRoute
   '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
@@ -168,7 +204,11 @@ export interface FileRoutesById {
   '/_authenticated/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/_authenticated/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
+  '/_authenticated/admin/centros': typeof AuthenticatedAdminCentrosRoute
+  '/_authenticated/admin/emergencias': typeof AuthenticatedAdminEmergenciasRoute
   '/_authenticated/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
+  '/_authenticated/admin/voluntarios': typeof AuthenticatedAdminVoluntariosRoute
   '/_authenticated/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/_authenticated/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/_authenticated/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
@@ -188,7 +228,11 @@ export interface FileRouteTypes {
     | '/mis-reportes'
     | '/perfil'
     | '/desaparecidos/$id'
+    | '/admin/anuncios'
+    | '/admin/centros'
+    | '/admin/emergencias'
     | '/admin/noticias'
+    | '/admin/voluntarios'
     | '/centros-acopio/nuevo'
     | '/desaparecidos/nuevo'
     | '/voluntarios/registrarme'
@@ -206,7 +250,11 @@ export interface FileRouteTypes {
     | '/mis-reportes'
     | '/perfil'
     | '/desaparecidos/$id'
+    | '/admin/anuncios'
+    | '/admin/centros'
+    | '/admin/emergencias'
     | '/admin/noticias'
+    | '/admin/voluntarios'
     | '/centros-acopio/nuevo'
     | '/desaparecidos/nuevo'
     | '/voluntarios/registrarme'
@@ -225,7 +273,11 @@ export interface FileRouteTypes {
     | '/_authenticated/mis-reportes'
     | '/_authenticated/perfil'
     | '/desaparecidos/$id'
+    | '/_authenticated/admin/anuncios'
+    | '/_authenticated/admin/centros'
+    | '/_authenticated/admin/emergencias'
     | '/_authenticated/admin/noticias'
+    | '/_authenticated/admin/voluntarios'
     | '/_authenticated/centros-acopio/nuevo'
     | '/_authenticated/desaparecidos/nuevo'
     | '/_authenticated/voluntarios/registrarme'
@@ -357,6 +409,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCentrosAcopioNuevoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/voluntarios': {
+      id: '/_authenticated/admin/voluntarios'
+      path: '/voluntarios'
+      fullPath: '/admin/voluntarios'
+      preLoaderRoute: typeof AuthenticatedAdminVoluntariosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/noticias': {
       id: '/_authenticated/admin/noticias'
       path: '/noticias'
@@ -364,15 +423,44 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminNoticiasRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/emergencias': {
+      id: '/_authenticated/admin/emergencias'
+      path: '/emergencias'
+      fullPath: '/admin/emergencias'
+      preLoaderRoute: typeof AuthenticatedAdminEmergenciasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/centros': {
+      id: '/_authenticated/admin/centros'
+      path: '/centros'
+      fullPath: '/admin/centros'
+      preLoaderRoute: typeof AuthenticatedAdminCentrosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/anuncios': {
+      id: '/_authenticated/admin/anuncios'
+      path: '/anuncios'
+      fullPath: '/admin/anuncios'
+      preLoaderRoute: typeof AuthenticatedAdminAnunciosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAnunciosRoute: typeof AuthenticatedAdminAnunciosRoute
+  AuthenticatedAdminCentrosRoute: typeof AuthenticatedAdminCentrosRoute
+  AuthenticatedAdminEmergenciasRoute: typeof AuthenticatedAdminEmergenciasRoute
   AuthenticatedAdminNoticiasRoute: typeof AuthenticatedAdminNoticiasRoute
+  AuthenticatedAdminVoluntariosRoute: typeof AuthenticatedAdminVoluntariosRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAnunciosRoute: AuthenticatedAdminAnunciosRoute,
+  AuthenticatedAdminCentrosRoute: AuthenticatedAdminCentrosRoute,
+  AuthenticatedAdminEmergenciasRoute: AuthenticatedAdminEmergenciasRoute,
   AuthenticatedAdminNoticiasRoute: AuthenticatedAdminNoticiasRoute,
+  AuthenticatedAdminVoluntariosRoute: AuthenticatedAdminVoluntariosRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =

@@ -4,7 +4,8 @@ import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { AID_TYPES, aidTypeLabel } from "@/lib/aid";
 import { ESTADOS_VE } from "@/lib/venezuela";
-import { MapPin, Phone, Plus } from "lucide-react";
+import { MapPin, Phone, Plus, Pencil } from "lucide-react";
+import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/centros-acopio")({
   head: () => ({
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/centros-acopio")({
 
 type Row = {
   id: string;
+  owner_id: string;
   tipo: string;
   nombre: string;
   descripcion: string | null;
@@ -32,6 +34,8 @@ type Row = {
 };
 
 function Page() {
+  const { user } = useAuth();
+  const isAdmin = useIsAdmin(user?.id);
   const [items, setItems] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [tipo, setTipo] = useState<string>("");
@@ -43,7 +47,7 @@ function Page() {
     setLoading(true);
     let query = supabase
       .from("aid_points")
-      .select("id,tipo,nombre,descripcion,direccion,estado,ciudad,telefono,horario,necesidades")
+      .select("id,owner_id,tipo,nombre,descripcion,direccion,estado,ciudad,telefono,horario,necesidades")
       .eq("hidden_by_admin", false)
       .order("created_at", { ascending: false })
       .limit(200);
@@ -110,6 +114,11 @@ function Page() {
                 <a href={`tel:${it.telefono}`} className="mt-3 inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium">
                   <Phone className="h-3.5 w-3.5" /> {it.telefono}
                 </a>
+              )}
+              {(user?.id === it.owner_id || isAdmin) && (
+                <Link to="/centros-acopio/$id/editar" params={{ id: it.id }} className="mt-3 ml-2 inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium">
+                  <Pencil className="h-3.5 w-3.5" /> Editar
+                </Link>
               )}
             </article>
           ))

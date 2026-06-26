@@ -32,6 +32,7 @@ import { Route as AuthenticatedAdminModeradoresRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminEmergenciasRouteImport } from './routes/_authenticated/admin.emergencias'
 import { Route as AuthenticatedAdminCentrosRouteImport } from './routes/_authenticated/admin.centros'
 import { Route as AuthenticatedAdminAnunciosRouteImport } from './routes/_authenticated/admin.anuncios'
+import { Route as AuthenticatedCentrosAcopioIdEditarRouteImport } from './routes/_authenticated/centros-acopio.$id.editar'
 
 const VoluntariosRoute = VoluntariosRouteImport.update({
   id: '/voluntarios',
@@ -157,6 +158,12 @@ const AuthenticatedAdminAnunciosRoute =
     path: '/admin/anuncios',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCentrosAcopioIdEditarRoute =
+  AuthenticatedCentrosAcopioIdEditarRouteImport.update({
+    id: '/centros-acopio/$id/editar',
+    path: '/centros-acopio/$id/editar',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByFullPath {
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/centros-acopio/$id/editar': typeof AuthenticatedCentrosAcopioIdEditarRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -205,6 +213,7 @@ export interface FileRoutesByTo {
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/centros-acopio/$id/editar': typeof AuthenticatedCentrosAcopioIdEditarRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -231,6 +240,7 @@ export interface FileRoutesById {
   '/_authenticated/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/_authenticated/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/centros-acopio/$id/editar': typeof AuthenticatedCentrosAcopioIdEditarRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -257,6 +267,7 @@ export interface FileRouteTypes {
     | '/desaparecidos/nuevo'
     | '/voluntarios/registrarme'
     | '/admin/'
+    | '/centros-acopio/$id/editar'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -281,6 +292,7 @@ export interface FileRouteTypes {
     | '/desaparecidos/nuevo'
     | '/voluntarios/registrarme'
     | '/admin'
+    | '/centros-acopio/$id/editar'
   id:
     | '__root__'
     | '/'
@@ -306,6 +318,7 @@ export interface FileRouteTypes {
     | '/_authenticated/desaparecidos/nuevo'
     | '/_authenticated/voluntarios/registrarme'
     | '/_authenticated/admin/'
+    | '/_authenticated/centros-acopio/$id/editar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -484,6 +497,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAnunciosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/centros-acopio/$id/editar': {
+      id: '/_authenticated/centros-acopio/$id/editar'
+      path: '/centros-acopio/$id/editar'
+      fullPath: '/centros-acopio/$id/editar'
+      preLoaderRoute: typeof AuthenticatedCentrosAcopioIdEditarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -500,6 +520,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDesaparecidosNuevoRoute: typeof AuthenticatedDesaparecidosNuevoRoute
   AuthenticatedVoluntariosRegistrarmeRoute: typeof AuthenticatedVoluntariosRegistrarmeRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedCentrosAcopioIdEditarRoute: typeof AuthenticatedCentrosAcopioIdEditarRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -516,6 +537,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedVoluntariosRegistrarmeRoute:
     AuthenticatedVoluntariosRegistrarmeRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedCentrosAcopioIdEditarRoute:
+    AuthenticatedCentrosAcopioIdEditarRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DesaparecidosRouteImport } from './routes/desaparecidos'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DesaparecidosIdRouteImport } from './routes/desaparecidos.$id'
 
 const DesaparecidosRoute = DesaparecidosRouteImport.update({
   id: '/desaparecidos',
@@ -22,31 +23,39 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DesaparecidosIdRoute = DesaparecidosIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => DesaparecidosRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/desaparecidos': typeof DesaparecidosRoute
+  '/desaparecidos': typeof DesaparecidosRouteWithChildren
+  '/desaparecidos/$id': typeof DesaparecidosIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/desaparecidos': typeof DesaparecidosRoute
+  '/desaparecidos': typeof DesaparecidosRouteWithChildren
+  '/desaparecidos/$id': typeof DesaparecidosIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/desaparecidos': typeof DesaparecidosRoute
+  '/desaparecidos': typeof DesaparecidosRouteWithChildren
+  '/desaparecidos/$id': typeof DesaparecidosIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/desaparecidos'
+  fullPaths: '/' | '/desaparecidos' | '/desaparecidos/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/desaparecidos'
-  id: '__root__' | '/' | '/desaparecidos'
+  to: '/' | '/desaparecidos' | '/desaparecidos/$id'
+  id: '__root__' | '/' | '/desaparecidos' | '/desaparecidos/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DesaparecidosRoute: typeof DesaparecidosRoute
+  DesaparecidosRoute: typeof DesaparecidosRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +74,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/desaparecidos/$id': {
+      id: '/desaparecidos/$id'
+      path: '/$id'
+      fullPath: '/desaparecidos/$id'
+      preLoaderRoute: typeof DesaparecidosIdRouteImport
+      parentRoute: typeof DesaparecidosRoute
+    }
   }
 }
 
+interface DesaparecidosRouteChildren {
+  DesaparecidosIdRoute: typeof DesaparecidosIdRoute
+}
+
+const DesaparecidosRouteChildren: DesaparecidosRouteChildren = {
+  DesaparecidosIdRoute: DesaparecidosIdRoute,
+}
+
+const DesaparecidosRouteWithChildren = DesaparecidosRoute._addFileChildren(
+  DesaparecidosRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DesaparecidosRoute: DesaparecidosRoute,
+  DesaparecidosRoute: DesaparecidosRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

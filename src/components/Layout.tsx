@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Search, Map, Phone, User, HeartHandshake, Users, Newspaper } from "lucide-react";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
+import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import type { ReactNode } from "react";
 
 const baseNav = [
@@ -87,6 +88,7 @@ export function Layout({ children }: { children: ReactNode }) {
         </div>
       </header>
 
+      <AnnouncementBanner />
       <main className="mx-auto max-w-6xl px-4 pb-24 pt-6 md:px-6 md:pb-12">{children}</main>
 
       {/* Mobile bottom tab bar */}

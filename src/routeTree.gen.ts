@@ -20,6 +20,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DesaparecidosIdRouteImport } from './routes/desaparecidos.$id'
 import { Route as AuthenticatedMisReportesRouteImport } from './routes/_authenticated/mis-reportes'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedVoluntariosRegistrarmeRouteImport } from './routes/_authenticated/voluntarios.registrarme'
 import { Route as AuthenticatedDesaparecidosNuevoRouteImport } from './routes/_authenticated/desaparecidos.nuevo'
 import { Route as AuthenticatedCentrosAcopioNuevoRouteImport } from './routes/_authenticated/centros-acopio.nuevo'
 
@@ -78,6 +79,12 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedVoluntariosRegistrarmeRoute =
+  AuthenticatedVoluntariosRegistrarmeRouteImport.update({
+    id: '/voluntarios/registrarme',
+    path: '/voluntarios/registrarme',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDesaparecidosNuevoRoute =
   AuthenticatedDesaparecidosNuevoRouteImport.update({
     id: '/desaparecidos/nuevo',
@@ -104,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
   '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
+  '/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -118,6 +126,7 @@ export interface FileRoutesByTo {
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
   '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
+  '/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -134,6 +143,7 @@ export interface FileRoutesById {
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
   '/_authenticated/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/_authenticated/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
+  '/_authenticated/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/desaparecidos/$id'
     | '/centros-acopio/nuevo'
     | '/desaparecidos/nuevo'
+    | '/voluntarios/registrarme'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/desaparecidos/$id'
     | '/centros-acopio/nuevo'
     | '/desaparecidos/nuevo'
+    | '/voluntarios/registrarme'
   id:
     | '__root__'
     | '/'
@@ -179,6 +191,7 @@ export interface FileRouteTypes {
     | '/desaparecidos/$id'
     | '/_authenticated/centros-acopio/nuevo'
     | '/_authenticated/desaparecidos/nuevo'
+    | '/_authenticated/voluntarios/registrarme'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -271,6 +284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/voluntarios/registrarme': {
+      id: '/_authenticated/voluntarios/registrarme'
+      path: '/voluntarios/registrarme'
+      fullPath: '/voluntarios/registrarme'
+      preLoaderRoute: typeof AuthenticatedVoluntariosRegistrarmeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/desaparecidos/nuevo': {
       id: '/_authenticated/desaparecidos/nuevo'
       path: '/desaparecidos/nuevo'
@@ -293,6 +313,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMisReportesRoute: typeof AuthenticatedMisReportesRoute
   AuthenticatedCentrosAcopioNuevoRoute: typeof AuthenticatedCentrosAcopioNuevoRoute
   AuthenticatedDesaparecidosNuevoRoute: typeof AuthenticatedDesaparecidosNuevoRoute
+  AuthenticatedVoluntariosRegistrarmeRoute: typeof AuthenticatedVoluntariosRegistrarmeRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -300,6 +321,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMisReportesRoute: AuthenticatedMisReportesRoute,
   AuthenticatedCentrosAcopioNuevoRoute: AuthenticatedCentrosAcopioNuevoRoute,
   AuthenticatedDesaparecidosNuevoRoute: AuthenticatedDesaparecidosNuevoRoute,
+  AuthenticatedVoluntariosRegistrarmeRoute:
+    AuthenticatedVoluntariosRegistrarmeRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

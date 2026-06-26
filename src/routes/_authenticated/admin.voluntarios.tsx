@@ -48,7 +48,7 @@ function Page() {
       habilidades: String(fd.get("habilidades") || "").trim() || null,
       estado: String(fd.get("estado") || editing.estado),
       ciudad: String(fd.get("ciudad") || "").trim() || null,
-      contacto: String(fd.get("contacto") || "").trim() || null,
+      contacto: String(fd.get("contacto") || "").trim(),
       disponibilidad: String(fd.get("disponibilidad") || "").trim() || null,
     };
     const { error: e1 } = await supabase.from("volunteers").update(payload).eq("id", editing.id);

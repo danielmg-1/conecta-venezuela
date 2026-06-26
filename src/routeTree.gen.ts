@@ -14,6 +14,7 @@ import { Route as NoticiasRouteImport } from './routes/noticias'
 import { Route as MapaRouteImport } from './routes/mapa'
 import { Route as EmergenciasRouteImport } from './routes/emergencias'
 import { Route as DesaparecidosRouteImport } from './routes/desaparecidos'
+import { Route as ConsejosRouteImport } from './routes/consejos'
 import { Route as CentrosAcopioRouteImport } from './routes/centros-acopio'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -55,6 +56,11 @@ const EmergenciasRoute = EmergenciasRouteImport.update({
 const DesaparecidosRoute = DesaparecidosRouteImport.update({
   id: '/desaparecidos',
   path: '/desaparecidos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsejosRoute = ConsejosRouteImport.update({
+  id: '/consejos',
+  path: '/consejos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CentrosAcopioRoute = CentrosAcopioRouteImport.update({
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/centros-acopio': typeof CentrosAcopioRoute
+  '/consejos': typeof ConsejosRoute
   '/desaparecidos': typeof DesaparecidosRouteWithChildren
   '/emergencias': typeof EmergenciasRoute
   '/mapa': typeof MapaRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/centros-acopio': typeof CentrosAcopioRoute
+  '/consejos': typeof ConsejosRoute
   '/desaparecidos': typeof DesaparecidosRouteWithChildren
   '/emergencias': typeof EmergenciasRoute
   '/mapa': typeof MapaRoute
@@ -204,6 +212,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/centros-acopio': typeof CentrosAcopioRoute
+  '/consejos': typeof ConsejosRoute
   '/desaparecidos': typeof DesaparecidosRouteWithChildren
   '/emergencias': typeof EmergenciasRoute
   '/mapa': typeof MapaRoute
@@ -229,6 +238,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/centros-acopio'
+    | '/consejos'
     | '/desaparecidos'
     | '/emergencias'
     | '/mapa'
@@ -252,6 +262,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/centros-acopio'
+    | '/consejos'
     | '/desaparecidos'
     | '/emergencias'
     | '/mapa'
@@ -276,6 +287,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/centros-acopio'
+    | '/consejos'
     | '/desaparecidos'
     | '/emergencias'
     | '/mapa'
@@ -301,6 +313,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CentrosAcopioRoute: typeof CentrosAcopioRoute
+  ConsejosRoute: typeof ConsejosRoute
   DesaparecidosRoute: typeof DesaparecidosRouteWithChildren
   EmergenciasRoute: typeof EmergenciasRoute
   MapaRoute: typeof MapaRoute
@@ -343,6 +356,13 @@ declare module '@tanstack/react-router' {
       path: '/desaparecidos'
       fullPath: '/desaparecidos'
       preLoaderRoute: typeof DesaparecidosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/consejos': {
+      id: '/consejos'
+      path: '/consejos'
+      fullPath: '/consejos'
+      preLoaderRoute: typeof ConsejosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/centros-acopio': {
@@ -518,6 +538,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   CentrosAcopioRoute: CentrosAcopioRoute,
+  ConsejosRoute: ConsejosRoute,
   DesaparecidosRoute: DesaparecidosRouteWithChildren,
   EmergenciasRoute: EmergenciasRoute,
   MapaRoute: MapaRoute,

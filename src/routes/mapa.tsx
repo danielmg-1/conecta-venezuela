@@ -3,6 +3,12 @@ import { useEffect, useMemo, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 
+type GMap = { setMap?: unknown };
+type AnyMap = any;
+declare global {
+  interface Window { google?: any }
+}
+
 type Row = { id: string; full_name: string; estado: string; ciudad: string | null; status: string; lat: number | null; lng: number | null };
 
 const BASE_COORDS: Record<string, [number, number]> = {
@@ -29,7 +35,7 @@ export const Route = createFileRoute("/mapa")({
 
 function Page() {
   const [rows, setRows] = useState<Row[] | null>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [map, setMap] = useState<AnyMap | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -85,8 +91,8 @@ function Page() {
   // Place circles
   useEffect(() => {
     if (!map || !window.google?.maps) return;
-    const circles: google.maps.Circle[] = [];
-    const markers: google.maps.Marker[] = [];
+    const circles: any[] = [];
+    const markers: any[] = [];
     byEstado.forEach((v, estado) => {
       const c = BASE_COORDS[estado];
       if (!c) return;

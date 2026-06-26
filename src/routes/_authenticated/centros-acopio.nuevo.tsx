@@ -5,8 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { AID_TYPES } from "@/lib/aid";
 import { ESTADOS_VE } from "@/lib/venezuela";
+import { MapPicker } from "@/components/MapPicker";
 
 export const Route = createFileRoute("/_authenticated/centros-acopio/nuevo")({
+  ssr: false,
   component: Page,
 });
 
@@ -15,6 +17,7 @@ function Page() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -34,6 +37,8 @@ function Page() {
         telefono: String(fd.get("telefono") || "").trim() || null,
         horario: String(fd.get("horario") || "").trim() || null,
         necesidades: String(fd.get("necesidades") || "").trim() || null,
+        lat: coords?.lat ?? null,
+        lng: coords?.lng ?? null,
       });
       if (insErr) throw insErr;
       router.navigate({ to: "/centros-acopio" });
@@ -75,6 +80,11 @@ function Page() {
         </div>
 
         <Field name="direccion" label="Dirección" placeholder="Av., edificio, sector…" />
+        <div className="grid gap-1.5 text-sm">
+          <span className="font-medium">Ubicación en el mapa</span>
+          <p className="text-xs text-muted-foreground">Toca el mapa para marcar el punto exacto. Puedes arrastrar el marcador para ajustarlo.</p>
+          <MapPicker value={coords} onChange={setCoords} />
+        </div>
         <div className="grid gap-4 md:grid-cols-2">
           <Field name="telefono" label="Teléfono" placeholder="+58 412 …" />
           <Field name="horario" label="Horario" placeholder="L-V 8am-5pm" />

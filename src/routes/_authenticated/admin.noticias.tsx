@@ -15,6 +15,14 @@ type News = { id: string; titulo: string; contenido: string; body_html: string |
 
 const SIGNED_TTL = 60 * 60 * 24 * 365 * 10; // 10 years
 
+function ToolbarBtn({ onClick, title, children }: { onClick: () => void; title: string; children: React.ReactNode }) {
+  return (
+    <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={onClick} title={title} className="inline-flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-sm hover:bg-muted">
+      {children}
+    </button>
+  );
+}
+
 async function signedNewsImage(path: string) {
   const { data } = await supabase.storage.from("news-images").createSignedUrl(path, SIGNED_TTL);
   return data?.signedUrl ?? null;

@@ -22,6 +22,13 @@ type Person = {
   created_at: string;
 };
 type Contact = { id: string; tipo: string; valor: string; codigo_pais: string | null };
+type AuditRow = {
+  id: string;
+  actor_email: string | null;
+  action: string;
+  changes: Record<string, unknown>;
+  created_at: string;
+};
 
 export const Route = createFileRoute("/desaparecidos/$id")({
   component: Page,
@@ -34,6 +41,7 @@ function Page() {
   const isAdmin = useIsAdmin(user?.id);
   const [person, setPerson] = useState<Person | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [audit, setAudit] = useState<AuditRow[]>([]);
   const [tipName, setTipName] = useState("");
   const [tipContact, setTipContact] = useState("");
   const [tipMsg, setTipMsg] = useState("");
@@ -50,6 +58,16 @@ function Page() {
   }, [id]);
 
   const isOwner = !!user && person?.reporter_id === user.id;
+
+  useEffect(() => {
+    if (!person || !user || !(isOwner || isAdmin)) { setAudit([]); return; }
+    supabase
+      .from("missing_person_audit")
+      .select("id, actor_email, action, changes, created_at")
+      .eq("person_id", person.id)
+      .order("created_at", { ascending: false })
+      .then(({ data }) => setAudit((data ?? []) as AuditRow[]));
+  }, [person, user, isOwner, isAdmin]);
 
   async function updateStatus(s: MissingStatus) {
     if (!person) return;

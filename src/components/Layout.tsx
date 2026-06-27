@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 
 const baseNav = [
   { to: "/", label: "Inicio", icon: Home },
-  { to: "/desaparecidos", label: "Buscar", icon: Search },
+  { to: "/desaparecidos", label: "Desaparecidos", icon: Search },
   { to: "/mapa", label: "Mapa", icon: Map },
   { to: "/centros-acopio", label: "Donaciones", icon: HeartHandshake },
 ] as const;

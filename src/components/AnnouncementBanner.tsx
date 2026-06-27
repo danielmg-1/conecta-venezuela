@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { X, Info, AlertTriangle, CheckCircle2, AlertOctagon } from "lucide-react";
@@ -42,13 +42,25 @@ export function AnnouncementBanner() {
     try { return new Set(JSON.parse(localStorage.getItem("dismissed_announcements") || "[]")); } catch { return new Set(); }
   });
 
-  useEffect(() => {
-    let cancelled = false;
-    supabase.from("announcements").select("*").eq("active", true).order("created_at", { ascending: false }).limit(50).then(({ data }) => {
-      if (!cancelled) setItems((data ?? []) as Announcement[]);
-    });
-    return () => { cancelled = true; };
+  const loadAnnouncements = useCallback(async () => {
+    const { data } = await supabase
+      .from("announcements")
+      .select("*")
+      .eq("active", true)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    setItems((data ?? []) as Announcement[]);
   }, []);
+
+  useEffect(() => {
+    loadAnnouncements();
+  }, [loadAnnouncements, pathname]);
+
+  useEffect(() => {
+    const onChanged = () => loadAnnouncements();
+    window.addEventListener("announcements:changed", onChanged);
+    return () => window.removeEventListener("announcements:changed", onChanged);
+  }, [loadAnnouncements]);
 
   const now = Date.now();
   const pageKey = pageKeyFromPath(pathname);

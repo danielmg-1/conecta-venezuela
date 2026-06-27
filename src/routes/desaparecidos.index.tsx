@@ -4,8 +4,9 @@ import { Layout } from "@/components/Layout";
 import { Photo } from "@/components/Photo";
 import { StatusBadge, type MissingStatus } from "@/components/StatusBadge";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { ESTADOS_VE } from "@/lib/venezuela";
-import { Search, SlidersHorizontal, Plus, MapPin, Calendar, IdCard, Phone, Mail, MessageCircle, Instagram, Share2 } from "lucide-react";
+import { Search, SlidersHorizontal, Plus, MapPin, Calendar, IdCard, Phone, Mail, MessageCircle, Instagram, Share2, Pencil, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 type Row = {
@@ -24,7 +25,7 @@ type Row = {
 type PersonFull = Row & { descripcion: string | null; reporter_id: string };
 type Contact = { id: string; tipo: string; valor: string; codigo_pais: string | null };
 
-export const Route = createFileRoute("/desaparecidos")({
+export const Route = createFileRoute("/desaparecidos/")({
   head: () => ({
     meta: [
       { title: "Personas desaparecidas — Guía de Apoyo Venezuela" },
@@ -37,6 +38,8 @@ export const Route = createFileRoute("/desaparecidos")({
 });
 
 function Page() {
+  const { user } = useAuth();
+  const isAdmin = useIsAdmin(user?.id);
   const [rows, setRows] = useState<Row[] | null>(null);
   const [query, setQuery] = useState("");
   const [cedula, setCedula] = useState("");
@@ -95,6 +98,23 @@ function Page() {
       return true;
     });
   }, [rows, query, cedula, estado, status, bornFrom, bornTo]);
+
+  const canManageOpenPerson = !!openPerson && !!user && (openPerson.reporter_id === user.id || isAdmin);
+
+  async function deleteOpenPerson() {
+    if (!openPerson) return;
+    if (!confirm("¿Eliminar este reporte de forma permanente? Esta acción no se puede deshacer.")) return;
+    if (openPerson.photo_path) {
+      await supabase.storage.from("missing-photos").remove([openPerson.photo_path]).catch(() => {});
+    }
+    const { error } = await supabase.from("missing_persons").delete().eq("id", openPerson.id);
+    if (error) {
+      alert("No se pudo eliminar: " + error.message);
+      return;
+    }
+    setRows((prev) => (prev ? prev.filter((r) => r.id !== openPerson.id) : prev));
+    setOpenId(null);
+  }
 
   return (
     <Layout>
@@ -221,6 +241,23 @@ function Page() {
                 >
                   <Share2 className="h-4 w-4" /> Compartir
                 </button>
+                {canManageOpenPerson && (
+                  <Link
+                    to="/desaparecidos/$id/editar"
+                    params={{ id: openPerson.id }}
+                    className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold hover:bg-muted"
+                  >
+                    <Pencil className="h-4 w-4" /> Editar
+                  </Link>
+                )}
+                {canManageOpenPerson && (
+                  <button
+                    onClick={deleteOpenPerson}
+                    className="inline-flex items-center gap-2 rounded-full border border-destructive/40 bg-destructive px-4 py-2 text-sm font-semibold text-destructive-foreground"
+                  >
+                    <Trash2 className="h-4 w-4" /> Eliminar
+                  </button>
+                )}
               </div>
             </>
           )}

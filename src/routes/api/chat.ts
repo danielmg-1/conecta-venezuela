@@ -79,7 +79,7 @@ export const Route = createFileRoute("/api/chat")({
           }),
           listar_centros_ayuda: tool({
             description:
-              "Lista centros de acopio, puntos de recaudación, donaciones, hospitales, clínicas, refugios y puntos de primeros auxilios o apoyo psicológico. Filtra por tipo o estado. Úsala SIEMPRE que pregunten dónde donar, dónde llevar ayuda, centros de acopio, puntos de recaudación o lugares de ayuda.",
+              "Lista centros de acopio, puntos de recaudación, donaciones, hospitales, clínicas, refugios y puntos de primeros auxilios o apoyo psicológico. Úsala SIEMPRE que pregunten dónde donar, dónde llevar ayuda, centros de acopio, puntos de recaudación o lugares de ayuda. IMPORTANTE: si la pregunta es genérica ('¿dónde puedo donar?', '¿dónde llevo ayuda?'), NO envíes el parámetro 'tipo' — déjalo vacío para traer todos los registros (centros de acopio y puntos de recaudación juntos). Filtra por tipo solo cuando el usuario lo pida explícitamente.",
             inputSchema: z.object({
               tipo: z
                 .enum([

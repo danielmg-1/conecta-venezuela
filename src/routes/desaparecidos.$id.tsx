@@ -5,7 +5,7 @@ import { Photo } from "@/components/Photo";
 import { StatusBadge, type MissingStatus } from "@/components/StatusBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
-import { MapPin, Calendar, IdCard, Phone, Mail, MessageCircle, Instagram, Share2 } from "lucide-react";
+import { MapPin, Calendar, IdCard, Phone, Mail, MessageCircle, Instagram, Share2, Pencil } from "lucide-react";
 
 type Person = {
   id: string;
@@ -121,6 +121,15 @@ function Page() {
             <button onClick={share} className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-background">
               <Share2 className="h-4 w-4" /> Compartir
             </button>
+            {(isOwner || isAdmin) && (
+              <Link
+                to="/desaparecidos/$id/editar"
+                params={{ id: person.id }}
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold hover:bg-muted"
+              >
+                <Pencil className="h-4 w-4" /> Editar
+              </Link>
+            )}
             {(isOwner || isAdmin) && (
               <div className="flex flex-wrap gap-2">
                 {(["desaparecido","en_busqueda","encontrado"] as MissingStatus[]).filter(s => s !== person.status).map((s) => (

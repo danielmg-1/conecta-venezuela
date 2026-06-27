@@ -14,7 +14,7 @@ type ContactDraft = {
   codigo_pais: string;
 };
 
-export const Route = createFileRoute("/_authenticated/desaparecidos/$id/editar")({
+export const Route = createFileRoute("/_authenticated/desaparecidos/editar")({
   component: Page,
 });
 

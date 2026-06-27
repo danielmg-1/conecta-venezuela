@@ -30,6 +30,7 @@ import { Route as AuthenticatedMisReportesRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedVoluntariosRegistrarmeRouteImport } from './routes/_authenticated/voluntarios.registrarme'
 import { Route as AuthenticatedDesaparecidosNuevoRouteImport } from './routes/_authenticated/desaparecidos.nuevo'
+import { Route as AuthenticatedDesaparecidosEditarRouteImport } from './routes/_authenticated/desaparecidos..editar'
 import { Route as AuthenticatedCentrosAcopioNuevoRouteImport } from './routes/_authenticated/centros-acopio.nuevo'
 import { Route as AuthenticatedAdminVoluntariosRouteImport } from './routes/_authenticated/admin.voluntarios'
 import { Route as AuthenticatedAdminNoticiasRouteImport } from './routes/_authenticated/admin.noticias'
@@ -146,6 +147,12 @@ const AuthenticatedDesaparecidosNuevoRoute =
     path: '/desaparecidos/nuevo',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDesaparecidosEditarRoute =
+  AuthenticatedDesaparecidosEditarRouteImport.update({
+    id: '/desaparecidos/editar',
+    path: '/desaparecidos/editar',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCentrosAcopioNuevoRoute =
   AuthenticatedCentrosAcopioNuevoRouteImport.update({
     id: '/centros-acopio/nuevo',
@@ -220,6 +227,7 @@ export interface FileRoutesByFullPath {
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/admin/voluntarios': typeof AuthenticatedAdminVoluntariosRoute
   '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
+  '/desaparecidos/editar': typeof AuthenticatedDesaparecidosEditarRoute
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -249,6 +257,7 @@ export interface FileRoutesByTo {
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/admin/voluntarios': typeof AuthenticatedAdminVoluntariosRoute
   '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
+  '/desaparecidos/editar': typeof AuthenticatedDesaparecidosEditarRoute
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -281,6 +290,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/_authenticated/admin/voluntarios': typeof AuthenticatedAdminVoluntariosRoute
   '/_authenticated/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
+  '/_authenticated/desaparecidos/editar': typeof AuthenticatedDesaparecidosEditarRoute
   '/_authenticated/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/_authenticated/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -313,6 +323,7 @@ export interface FileRouteTypes {
     | '/admin/noticias'
     | '/admin/voluntarios'
     | '/centros-acopio/nuevo'
+    | '/desaparecidos/editar'
     | '/desaparecidos/nuevo'
     | '/voluntarios/registrarme'
     | '/admin/'
@@ -342,6 +353,7 @@ export interface FileRouteTypes {
     | '/admin/noticias'
     | '/admin/voluntarios'
     | '/centros-acopio/nuevo'
+    | '/desaparecidos/editar'
     | '/desaparecidos/nuevo'
     | '/voluntarios/registrarme'
     | '/admin'
@@ -373,6 +385,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/noticias'
     | '/_authenticated/admin/voluntarios'
     | '/_authenticated/centros-acopio/nuevo'
+    | '/_authenticated/desaparecidos/editar'
     | '/_authenticated/desaparecidos/nuevo'
     | '/_authenticated/voluntarios/registrarme'
     | '/_authenticated/admin/'
@@ -544,6 +557,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDesaparecidosNuevoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/desaparecidos/editar': {
+      id: '/_authenticated/desaparecidos/editar'
+      path: '/desaparecidos/editar'
+      fullPath: '/desaparecidos/editar'
+      preLoaderRoute: typeof AuthenticatedDesaparecidosEditarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/centros-acopio/nuevo': {
       id: '/_authenticated/centros-acopio/nuevo'
       path: '/centros-acopio/nuevo'
@@ -613,6 +633,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminNoticiasRoute: typeof AuthenticatedAdminNoticiasRoute
   AuthenticatedAdminVoluntariosRoute: typeof AuthenticatedAdminVoluntariosRoute
   AuthenticatedCentrosAcopioNuevoRoute: typeof AuthenticatedCentrosAcopioNuevoRoute
+  AuthenticatedDesaparecidosEditarRoute: typeof AuthenticatedDesaparecidosEditarRoute
   AuthenticatedDesaparecidosNuevoRoute: typeof AuthenticatedDesaparecidosNuevoRoute
   AuthenticatedVoluntariosRegistrarmeRoute: typeof AuthenticatedVoluntariosRegistrarmeRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -629,6 +650,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminNoticiasRoute: AuthenticatedAdminNoticiasRoute,
   AuthenticatedAdminVoluntariosRoute: AuthenticatedAdminVoluntariosRoute,
   AuthenticatedCentrosAcopioNuevoRoute: AuthenticatedCentrosAcopioNuevoRoute,
+  AuthenticatedDesaparecidosEditarRoute: AuthenticatedDesaparecidosEditarRoute,
   AuthenticatedDesaparecidosNuevoRoute: AuthenticatedDesaparecidosNuevoRoute,
   AuthenticatedVoluntariosRegistrarmeRoute:
     AuthenticatedVoluntariosRegistrarmeRoute,

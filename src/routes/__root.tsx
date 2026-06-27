@@ -12,6 +12,8 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
+import iconAsset from "@/assets/conecta-icon.png.asset.json";
+import logoAsset from "@/assets/conecta-logo-light.png.asset.json";
 
 function NotFoundComponent() {
   return (
@@ -78,23 +80,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Guía de Apoyo Venezuela — Personas desaparecidas y ayuda tras el terremoto" },
-      { name: "description", content: "Plataforma para reportar y buscar personas desaparecidas en Venezuela tras el terremoto, con mapa en vivo y números de emergencia." },
-      { name: "author", content: "Guía de Apoyo Venezuela" },
-      { property: "og:title", content: "Guía de Apoyo Venezuela — Personas desaparecidas y ayuda tras el terremoto" },
-      { property: "og:description", content: "Plataforma para reportar y buscar personas desaparecidas en Venezuela tras el terremoto, con mapa en vivo y números de emergencia." },
+      { title: "Conecta Venezuela — Guía de apoyo tras el terremoto" },
+      { name: "description", content: "Conecta Venezuela: reporta y busca personas desaparecidas, encuentra centros de ayuda, voluntarios y números de emergencia tras el terremoto." },
+      { name: "author", content: "Conecta Venezuela" },
+      { property: "og:title", content: "Conecta Venezuela — Guía de apoyo tras el terremoto" },
+      { property: "og:description", content: "Reporta y busca personas desaparecidas, centros de ayuda y emergencias en Venezuela." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Guía de Apoyo Venezuela — Personas desaparecidas y ayuda tras el terremoto" },
-      { name: "twitter:description", content: "Plataforma para reportar y buscar personas desaparecidas en Venezuela tras el terremoto, con mapa en vivo y números de emergencia." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/29e30bd7-75cf-4282-b06f-47541b6bde55" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/29e30bd7-75cf-4282-b06f-47541b6bde55" },
+      { name: "twitter:title", content: "Conecta Venezuela — Guía de apoyo tras el terremoto" },
+      { name: "twitter:description", content: "Reporta y busca personas desaparecidas, centros de ayuda y emergencias en Venezuela." },
+      { property: "og:image", content: logoAsset.url },
+      { name: "twitter:image", content: logoAsset.url },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "icon", type: "image/png", href: iconAsset.url },
+      { rel: "apple-touch-icon", href: iconAsset.url },
     ],
   }),
   shellComponent: RootShell,

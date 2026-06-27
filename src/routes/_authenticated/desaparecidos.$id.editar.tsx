@@ -110,7 +110,16 @@ function Page() {
       if (file) photoPath = await uploadMissingPhoto(user.id, file);
       else if (removePhoto) photoPath = null;
 
-      const update: Record<string, unknown> = {
+      const update: {
+        full_name: string;
+        cedula: string | null;
+        birth_date: string | null;
+        estado: string;
+        ciudad: string | null;
+        lugar_desaparicion: string | null;
+        descripcion: string | null;
+        photo_path?: string | null;
+      } = {
         full_name: form.full_name.trim(),
         cedula: form.cedula.trim() || null,
         birth_date: form.birth_date || null,

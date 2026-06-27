@@ -30,7 +30,6 @@ import { Route as AuthenticatedMisReportesRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedVoluntariosRegistrarmeRouteImport } from './routes/_authenticated/voluntarios.registrarme'
 import { Route as AuthenticatedDesaparecidosNuevoRouteImport } from './routes/_authenticated/desaparecidos.nuevo'
-import { Route as AuthenticatedDesaparecidosEditarRouteImport } from './routes/_authenticated/desaparecidos..editar'
 import { Route as AuthenticatedCentrosAcopioNuevoRouteImport } from './routes/_authenticated/centros-acopio.nuevo'
 import { Route as AuthenticatedAdminVoluntariosRouteImport } from './routes/_authenticated/admin.voluntarios'
 import { Route as AuthenticatedAdminNoticiasRouteImport } from './routes/_authenticated/admin.noticias'
@@ -38,6 +37,7 @@ import { Route as AuthenticatedAdminModeradoresRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminEmergenciasRouteImport } from './routes/_authenticated/admin.emergencias'
 import { Route as AuthenticatedAdminCentrosRouteImport } from './routes/_authenticated/admin.centros'
 import { Route as AuthenticatedAdminAnunciosRouteImport } from './routes/_authenticated/admin.anuncios'
+import { Route as AuthenticatedDesaparecidosIdEditarRouteImport } from './routes/_authenticated/desaparecidos.$id.editar'
 import { Route as AuthenticatedCentrosAcopioIdEditarRouteImport } from './routes/_authenticated/centros-acopio.$id.editar'
 
 const VoluntariosRoute = VoluntariosRouteImport.update({
@@ -147,12 +147,6 @@ const AuthenticatedDesaparecidosNuevoRoute =
     path: '/desaparecidos/nuevo',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedDesaparecidosEditarRoute =
-  AuthenticatedDesaparecidosEditarRouteImport.update({
-    id: '/desaparecidos/editar',
-    path: '/desaparecidos/editar',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedCentrosAcopioNuevoRoute =
   AuthenticatedCentrosAcopioNuevoRouteImport.update({
     id: '/centros-acopio/nuevo',
@@ -195,6 +189,12 @@ const AuthenticatedAdminAnunciosRoute =
     path: '/admin/anuncios',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDesaparecidosIdEditarRoute =
+  AuthenticatedDesaparecidosIdEditarRouteImport.update({
+    id: '/desaparecidos/$id/editar',
+    path: '/desaparecidos/$id/editar',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCentrosAcopioIdEditarRoute =
   AuthenticatedCentrosAcopioIdEditarRouteImport.update({
     id: '/centros-acopio/$id/editar',
@@ -227,11 +227,11 @@ export interface FileRoutesByFullPath {
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/admin/voluntarios': typeof AuthenticatedAdminVoluntariosRoute
   '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
-  '/desaparecidos/editar': typeof AuthenticatedDesaparecidosEditarRoute
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/centros-acopio/$id/editar': typeof AuthenticatedCentrosAcopioIdEditarRoute
+  '/desaparecidos/$id/editar': typeof AuthenticatedDesaparecidosIdEditarRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -257,11 +257,11 @@ export interface FileRoutesByTo {
   '/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/admin/voluntarios': typeof AuthenticatedAdminVoluntariosRoute
   '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
-  '/desaparecidos/editar': typeof AuthenticatedDesaparecidosEditarRoute
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/centros-acopio/$id/editar': typeof AuthenticatedCentrosAcopioIdEditarRoute
+  '/desaparecidos/$id/editar': typeof AuthenticatedDesaparecidosIdEditarRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -290,11 +290,11 @@ export interface FileRoutesById {
   '/_authenticated/admin/noticias': typeof AuthenticatedAdminNoticiasRoute
   '/_authenticated/admin/voluntarios': typeof AuthenticatedAdminVoluntariosRoute
   '/_authenticated/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
-  '/_authenticated/desaparecidos/editar': typeof AuthenticatedDesaparecidosEditarRoute
   '/_authenticated/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/_authenticated/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/centros-acopio/$id/editar': typeof AuthenticatedCentrosAcopioIdEditarRoute
+  '/_authenticated/desaparecidos/$id/editar': typeof AuthenticatedDesaparecidosIdEditarRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -323,11 +323,11 @@ export interface FileRouteTypes {
     | '/admin/noticias'
     | '/admin/voluntarios'
     | '/centros-acopio/nuevo'
-    | '/desaparecidos/editar'
     | '/desaparecidos/nuevo'
     | '/voluntarios/registrarme'
     | '/admin/'
     | '/centros-acopio/$id/editar'
+    | '/desaparecidos/$id/editar'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -353,11 +353,11 @@ export interface FileRouteTypes {
     | '/admin/noticias'
     | '/admin/voluntarios'
     | '/centros-acopio/nuevo'
-    | '/desaparecidos/editar'
     | '/desaparecidos/nuevo'
     | '/voluntarios/registrarme'
     | '/admin'
     | '/centros-acopio/$id/editar'
+    | '/desaparecidos/$id/editar'
   id:
     | '__root__'
     | '/'
@@ -385,11 +385,11 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/noticias'
     | '/_authenticated/admin/voluntarios'
     | '/_authenticated/centros-acopio/nuevo'
-    | '/_authenticated/desaparecidos/editar'
     | '/_authenticated/desaparecidos/nuevo'
     | '/_authenticated/voluntarios/registrarme'
     | '/_authenticated/admin/'
     | '/_authenticated/centros-acopio/$id/editar'
+    | '/_authenticated/desaparecidos/$id/editar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -557,13 +557,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDesaparecidosNuevoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/desaparecidos/editar': {
-      id: '/_authenticated/desaparecidos/editar'
-      path: '/desaparecidos/editar'
-      fullPath: '/desaparecidos/editar'
-      preLoaderRoute: typeof AuthenticatedDesaparecidosEditarRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/centros-acopio/nuevo': {
       id: '/_authenticated/centros-acopio/nuevo'
       path: '/centros-acopio/nuevo'
@@ -613,6 +606,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAnunciosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/desaparecidos/$id/editar': {
+      id: '/_authenticated/desaparecidos/$id/editar'
+      path: '/desaparecidos/$id/editar'
+      fullPath: '/desaparecidos/$id/editar'
+      preLoaderRoute: typeof AuthenticatedDesaparecidosIdEditarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/centros-acopio/$id/editar': {
       id: '/_authenticated/centros-acopio/$id/editar'
       path: '/centros-acopio/$id/editar'
@@ -633,11 +633,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminNoticiasRoute: typeof AuthenticatedAdminNoticiasRoute
   AuthenticatedAdminVoluntariosRoute: typeof AuthenticatedAdminVoluntariosRoute
   AuthenticatedCentrosAcopioNuevoRoute: typeof AuthenticatedCentrosAcopioNuevoRoute
-  AuthenticatedDesaparecidosEditarRoute: typeof AuthenticatedDesaparecidosEditarRoute
   AuthenticatedDesaparecidosNuevoRoute: typeof AuthenticatedDesaparecidosNuevoRoute
   AuthenticatedVoluntariosRegistrarmeRoute: typeof AuthenticatedVoluntariosRegistrarmeRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedCentrosAcopioIdEditarRoute: typeof AuthenticatedCentrosAcopioIdEditarRoute
+  AuthenticatedDesaparecidosIdEditarRoute: typeof AuthenticatedDesaparecidosIdEditarRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -650,13 +650,14 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminNoticiasRoute: AuthenticatedAdminNoticiasRoute,
   AuthenticatedAdminVoluntariosRoute: AuthenticatedAdminVoluntariosRoute,
   AuthenticatedCentrosAcopioNuevoRoute: AuthenticatedCentrosAcopioNuevoRoute,
-  AuthenticatedDesaparecidosEditarRoute: AuthenticatedDesaparecidosEditarRoute,
   AuthenticatedDesaparecidosNuevoRoute: AuthenticatedDesaparecidosNuevoRoute,
   AuthenticatedVoluntariosRegistrarmeRoute:
     AuthenticatedVoluntariosRegistrarmeRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedCentrosAcopioIdEditarRoute:
     AuthenticatedCentrosAcopioIdEditarRoute,
+  AuthenticatedDesaparecidosIdEditarRoute:
+    AuthenticatedDesaparecidosIdEditarRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

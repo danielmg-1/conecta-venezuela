@@ -223,7 +223,7 @@ function Page() {
                 <div className="space-y-3 text-sm">
                   <StatusBadge status={openPerson.status} />
                   {openPerson.cedula && <DRow icon={<IdCard className="h-4 w-4" />} label="Cédula" value={openPerson.cedula} />}
-                  {openPerson.birth_date && <DRow icon={<Calendar className="h-4 w-4" />} label="Fecha de nacimiento" value={new Date(openPerson.birth_date).toLocaleDateString("es-VE")} />}
+                  {openPerson.birth_date && <DRow icon={<Calendar className="h-4 w-4" />} label="Fecha de nacimiento" value={formatDateOnly(openPerson.birth_date)} />}
                   <DRow icon={<MapPin className="h-4 w-4" />} label="Última ubicación" value={[openPerson.lugar_desaparicion, openPerson.ciudad, openPerson.estado].filter(Boolean).join(", ") || "—"} />
                 </div>
               </div>

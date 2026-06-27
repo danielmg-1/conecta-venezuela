@@ -62,7 +62,7 @@ function Index() {
         />
         <FeatureCard
           icon={<HeartHandshake className="h-5 w-5" />}
-          title="Centros de ayuda"
+          title="Donaciones"
           desc="Centros de acopio, puntos de recaudación, hospitales y servicios activos en cada estado."
           to="/centros-acopio"
         />

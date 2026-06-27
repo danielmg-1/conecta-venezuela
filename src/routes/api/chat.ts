@@ -79,18 +79,17 @@ export const Route = createFileRoute("/api/chat")({
           }),
           listar_centros_ayuda: tool({
             description:
-              "Lista centros de acopio, hospitales, clínicas, donaciones, refugios y puntos de primeros auxilios. Filtra por tipo o estado.",
+              "Lista centros de acopio, puntos de recaudación, donaciones, hospitales, clínicas, refugios y puntos de primeros auxilios o apoyo psicológico. Filtra por tipo o estado. Úsala SIEMPRE que pregunten dónde donar, dónde llevar ayuda, centros de acopio, puntos de recaudación o lugares de ayuda.",
             inputSchema: z.object({
               tipo: z
                 .enum([
                   "centro_acopio",
-                  "donaciones",
+                  "punto_recaudacion",
                   "hospital",
                   "clinica",
-                  "refugio",
                   "primeros_auxilios",
                   "apoyo_psicologico",
-                  "otros",
+                  "otro",
                 ])
                 .optional(),
               estado: z.string().optional(),
@@ -98,11 +97,11 @@ export const Route = createFileRoute("/api/chat")({
             execute: async ({ tipo, estado }) => {
               let q = supabase
                 .from("aid_points")
-                .select("id, name, kind, state, address, phone, description")
-                .eq("status", "active")
+                .select("id, nombre, tipo, estado, ciudad, direccion, telefono, horario, necesidades, descripcion")
+                .eq("hidden_by_admin", false)
                 .limit(15);
-              if (tipo) q = q.eq("kind", tipo);
-              if (estado) q = q.ilike("state", `%${estado}%`);
+              if (tipo) q = q.eq("tipo", tipo);
+              if (estado) q = q.ilike("estado", `%${estado}%`);
               const { data, error } = await q;
               if (error) return { error: error.message, centros: [] };
               return { centros: data ?? [] };

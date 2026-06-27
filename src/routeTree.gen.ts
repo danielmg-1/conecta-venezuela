@@ -17,6 +17,7 @@ import { Route as DesaparecidosRouteImport } from './routes/desaparecidos'
 import { Route as ConsejosRouteImport } from './routes/consejos'
 import { Route as CentrosAcopioRouteImport } from './routes/centros-acopio'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AsistenteRouteImport } from './routes/asistente'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DesaparecidosIdRouteImport } from './routes/desaparecidos.$id'
@@ -73,6 +74,11 @@ const CentrosAcopioRoute = CentrosAcopioRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AsistenteRoute = AsistenteRouteImport.update({
+  id: '/asistente',
+  path: '/asistente',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -173,6 +179,7 @@ const AuthenticatedCentrosAcopioIdEditarRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/asistente': typeof AsistenteRoute
   '/auth': typeof AuthRoute
   '/centros-acopio': typeof CentrosAcopioRoute
   '/consejos': typeof ConsejosRoute
@@ -199,6 +206,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/asistente': typeof AsistenteRoute
   '/auth': typeof AuthRoute
   '/centros-acopio': typeof CentrosAcopioRoute
   '/consejos': typeof ConsejosRoute
@@ -227,6 +235,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/asistente': typeof AsistenteRoute
   '/auth': typeof AuthRoute
   '/centros-acopio': typeof CentrosAcopioRoute
   '/consejos': typeof ConsejosRoute
@@ -255,6 +264,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/asistente'
     | '/auth'
     | '/centros-acopio'
     | '/consejos'
@@ -281,6 +291,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/asistente'
     | '/auth'
     | '/centros-acopio'
     | '/consejos'
@@ -308,6 +319,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/asistente'
     | '/auth'
     | '/centros-acopio'
     | '/consejos'
@@ -336,6 +348,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AsistenteRoute: typeof AsistenteRoute
   AuthRoute: typeof AuthRoute
   CentrosAcopioRoute: typeof CentrosAcopioRoute
   ConsejosRoute: typeof ConsejosRoute
@@ -403,6 +416,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/asistente': {
+      id: '/asistente'
+      path: '/asistente'
+      fullPath: '/asistente'
+      preLoaderRoute: typeof AsistenteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -579,6 +599,7 @@ const DesaparecidosRouteWithChildren = DesaparecidosRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AsistenteRoute: AsistenteRoute,
   AuthRoute: AuthRoute,
   CentrosAcopioRoute: CentrosAcopioRoute,
   ConsejosRoute: ConsejosRoute,

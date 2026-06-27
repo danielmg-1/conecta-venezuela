@@ -33,7 +33,7 @@ export function FloatingGuide() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const { messages, sendMessage, status } = useChat({
-    transport: new DefaultChatTransport({ api: "/api/guide" }),
+    transport: new DefaultChatTransport({ api: "/api/chat" }),
     onError: (e) => console.error("guide error", e),
   });
 

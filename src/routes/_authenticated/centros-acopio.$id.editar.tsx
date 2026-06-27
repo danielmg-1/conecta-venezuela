@@ -7,6 +7,7 @@ import { AID_TYPES } from "@/lib/aid";
 import { ESTADOS_VE } from "@/lib/venezuela";
 import { MapPicker } from "@/components/MapPicker";
 import { UserPlus, X } from "lucide-react";
+import { AidContactsSection } from "@/components/AidContactsSection";
 
 export const Route = createFileRoute("/_authenticated/centros-acopio/$id/editar")({
   ssr: false,
@@ -52,8 +53,8 @@ function Page() {
 
   useEffect(() => {
     if (!user) { setIsHost(false); return; }
-    supabase.from("aid_point_hosts").select("id").eq("aid_point_id", id).eq("user_id", user.id).maybeSingle().then(({ data }) => {
-      setIsHost(!!data);
+    supabase.from("aid_point_hosts").select("status").eq("aid_point_id", id).eq("user_id", user.id).maybeSingle().then(({ data }) => {
+      setIsHost(!!data && (data as { status?: string }).status === "accepted");
     });
   }, [user, id]);
 
@@ -142,15 +143,17 @@ function Page() {
       </form>
 
       {canManageHosts && <HostsSection aidPointId={row.id} />}
+      <AidContactsSection aidPointId={row.id} canManage={canEdit} />
     </Layout>
   );
 }
 
 function HostsSection({ aidPointId }: { aidPointId: string }) {
-  const [hosts, setHosts] = useState<Array<{ user_id: string; email: string; full_name: string | null; invited_at: string }>>([]);
+  const [hosts, setHosts] = useState<Array<{ user_id: string; email: string; full_name: string | null; invited_at: string; status: string }>>([]);
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [okMsg, setOkMsg] = useState<string | null>(null);
 
   async function load() {
     const { data } = await supabase.rpc("aid_point_list_hosts", { _aid_point_id: aidPointId });
@@ -160,11 +163,13 @@ function HostsSection({ aidPointId }: { aidPointId: string }) {
 
   async function invite() {
     setErr(null);
+    setOkMsg(null);
     if (!email.trim()) return;
     setBusy(true);
     const { error } = await supabase.rpc("aid_point_add_host_by_email", { _aid_point_id: aidPointId, _email: email.trim() });
     setBusy(false);
     if (error) { setErr(error.message); return; }
+    setOkMsg("Invitación enviada. La persona la verá en su panel ‘Mis reportes’ y podrá aceptarla o rechazarla. No editará el centro hasta aceptar.");
     setEmail("");
     load();
   }
@@ -181,7 +186,7 @@ function HostsSection({ aidPointId }: { aidPointId: string }) {
   return (
     <section className="mt-8 rounded-3xl border border-border bg-card p-6 md:p-8">
       <h2 className="text-xl font-semibold">Anfitriones</h2>
-      <p className="mt-1 text-sm text-muted-foreground">Hasta 4 personas pueden coadministrar este centro (editar la info y gestionar necesidades). Deben estar registradas en la página.</p>
+      <p className="mt-1 text-sm text-muted-foreground">Hasta 4 personas pueden coadministrar este centro. Deben estar registradas en la página. La persona invitada verá la invitación en su panel <strong>Mis reportes</strong> y deberá aceptarla antes de poder editar.</p>
 
       <div className="mt-4 flex flex-col gap-2 sm:flex-row">
         <input
@@ -198,6 +203,7 @@ function HostsSection({ aidPointId }: { aidPointId: string }) {
       </div>
       {full && <p className="mt-2 text-xs text-amber-700 dark:text-amber-300">Alcanzaste el máximo de 4 anfitriones. Quita a alguien para invitar a otra persona.</p>}
       {err && <p className="mt-2 text-xs text-destructive">{err}</p>}
+      {okMsg && <p className="mt-2 rounded-xl bg-emerald-50 p-2 text-xs text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200">{okMsg}</p>}
 
       <ul className="mt-4 divide-y divide-border">
         {hosts.length === 0 ? (
@@ -205,7 +211,14 @@ function HostsSection({ aidPointId }: { aidPointId: string }) {
         ) : hosts.map((h) => (
           <li key={h.user_id} className="flex items-center justify-between gap-3 py-3">
             <div className="min-w-0">
-              <p className="text-sm font-medium truncate">{h.full_name || h.email}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-medium truncate">{h.full_name || h.email}</p>
+                <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                  h.status === "accepted" ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200"
+                  : h.status === "declined" ? "bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-200"
+                  : "bg-amber-100 text-amber-900 dark:bg-amber-950/40 dark:text-amber-200"
+                }`}>{h.status === "accepted" ? "Aceptada" : h.status === "declined" ? "Rechazada" : "Pendiente"}</span>
+              </div>
               <p className="text-xs text-muted-foreground truncate">{h.email}</p>
             </div>
             <button onClick={() => remove(h.user_id)} className="inline-flex items-center gap-1 rounded-full border border-input px-3 py-1 text-xs text-muted-foreground hover:text-destructive">

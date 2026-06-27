@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { ESTADOS_VE } from "@/lib/venezuela";
-import { MapPin, UserPlus } from "lucide-react";
+import { MapPin, UserPlus, Lock } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/voluntarios")({
   head: () => ({
@@ -25,11 +26,12 @@ type Row = {
   estado: string;
   ciudad: string | null;
   descripcion: string | null;
-  contacto: string;
+  contacto: string | null;
   disponibilidad: string | null;
 };
 
 function Page() {
+  const { user } = useAuth();
   const [items, setItems] = useState<Row[]>([]);
   const [estado, setEstado] = useState("");
   const [q, setQ] = useState("");
@@ -38,9 +40,12 @@ function Page() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    const cols = user
+      ? "id,nombre,profesion,habilidades,estado,ciudad,descripcion,contacto,disponibilidad"
+      : "id,nombre,profesion,habilidades,estado,ciudad,descripcion,disponibilidad";
     let query = supabase
       .from("volunteers")
-      .select("id,nombre,profesion,habilidades,estado,ciudad,descripcion,contacto,disponibilidad")
+      .select(cols)
       .eq("hidden_by_admin", false)
       .order("created_at", { ascending: false })
       .limit(200);
@@ -53,7 +58,7 @@ function Page() {
       }
     });
     return () => { cancelled = true; };
-  }, [estado, q]);
+  }, [estado, q, user]);
 
   return (
     <Layout>
@@ -93,7 +98,13 @@ function Page() {
               {it.habilidades && <p className="mt-2 text-sm"><strong>Habilidades:</strong> {it.habilidades}</p>}
               {it.descripcion && <p className="mt-2 text-sm text-muted-foreground">{it.descripcion}</p>}
               {it.disponibilidad && <p className="mt-2 text-xs text-muted-foreground">Disponibilidad: {it.disponibilidad}</p>}
-              <p className="mt-3 rounded-xl bg-muted px-3 py-2 text-sm"><strong>Contacto:</strong> {it.contacto}</p>
+              {it.contacto ? (
+                <p className="mt-3 rounded-xl bg-muted px-3 py-2 text-sm"><strong>Contacto:</strong> {it.contacto}</p>
+              ) : (
+                <p className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-muted px-3 py-2 text-xs text-muted-foreground">
+                  <Lock className="h-3 w-3" /> Inicia sesión para ver el contacto
+                </p>
+              )}
             </article>
           ))
         )}

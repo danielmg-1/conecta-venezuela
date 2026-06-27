@@ -5,7 +5,8 @@ import { Photo } from "@/components/Photo";
 import { StatusBadge, type MissingStatus } from "@/components/StatusBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { ESTADOS_VE } from "@/lib/venezuela";
-import { Search, SlidersHorizontal, Plus } from "lucide-react";
+import { Search, SlidersHorizontal, Plus, MapPin, Calendar, IdCard, Phone, Mail, MessageCircle, Instagram, ExternalLink, Share2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 type Row = {
   id: string;
@@ -19,6 +20,9 @@ type Row = {
   photo_path: string | null;
   created_at: string;
 };
+
+type PersonFull = Row & { descripcion: string | null; reporter_id: string };
+type Contact = { id: string; tipo: string; valor: string; codigo_pais: string | null };
 
 export const Route = createFileRoute("/desaparecidos")({
   head: () => ({
@@ -41,6 +45,27 @@ function Page() {
   const [bornFrom, setBornFrom] = useState("");
   const [bornTo, setBornTo] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [openPerson, setOpenPerson] = useState<PersonFull | null>(null);
+  const [openContacts, setOpenContacts] = useState<Contact[]>([]);
+  const [loadingPerson, setLoadingPerson] = useState(false);
+
+  useEffect(() => {
+    if (!openId) { setOpenPerson(null); setOpenContacts([]); return; }
+    let cancelled = false;
+    setLoadingPerson(true);
+    (async () => {
+      const [{ data: p }, { data: c }] = await Promise.all([
+        supabase.from("missing_persons").select("*").eq("id", openId).maybeSingle(),
+        supabase.from("missing_person_contacts").select("*").eq("person_id", openId),
+      ]);
+      if (cancelled) return;
+      setOpenPerson((p ?? null) as PersonFull | null);
+      setOpenContacts((c ?? []) as Contact[]);
+      setLoadingPerson(false);
+    })();
+    return () => { cancelled = true; };
+  }, [openId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -131,7 +156,12 @@ function Page() {
       ) : (
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((r) => (
-            <Link key={r.id} to="/desaparecidos/$id" params={{ id: r.id }} className="group overflow-hidden rounded-3xl border border-border bg-card transition-all hover:-translate-y-0.5 hover:shadow-md">
+            <button
+              key={r.id}
+              type="button"
+              onClick={() => setOpenId(r.id)}
+              className="group overflow-hidden rounded-3xl border border-border bg-card text-left transition-all hover:-translate-y-0.5 hover:shadow-md"
+            >
               <Photo path={r.photo_path} alt={r.full_name} className="aspect-[4/5] w-full object-cover" />
               <div className="p-4">
                 <div className="flex items-start justify-between gap-2">
@@ -143,10 +173,92 @@ function Page() {
                 </p>
                 {r.cedula && <p className="mt-1 text-xs text-muted-foreground">CI: {r.cedula}</p>}
               </div>
-            </Link>
+            </button>
           ))}
         </div>
       )}
+
+      <Dialog open={!!openId} onOpenChange={(o) => !o && setOpenId(null)}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto rounded-3xl sm:max-w-2xl">
+          {loadingPerson || !openPerson ? (
+            <p className="py-10 text-center text-sm text-muted-foreground">Cargando…</p>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-2xl">{openPerson.full_name}</DialogTitle>
+                <DialogDescription>Ficha de la persona reportada.</DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-5 sm:grid-cols-[180px_1fr]">
+                <div className="overflow-hidden rounded-2xl border border-border bg-muted">
+                  <Photo path={openPerson.photo_path} alt={openPerson.full_name} className="aspect-square w-full object-cover" />
+                </div>
+                <div className="space-y-3 text-sm">
+                  <StatusBadge status={openPerson.status} />
+                  {openPerson.cedula && <DRow icon={<IdCard className="h-4 w-4" />} label="Cédula" value={openPerson.cedula} />}
+                  {openPerson.birth_date && <DRow icon={<Calendar className="h-4 w-4" />} label="Fecha de nacimiento" value={new Date(openPerson.birth_date).toLocaleDateString("es-VE")} />}
+                  <DRow icon={<MapPin className="h-4 w-4" />} label="Última ubicación" value={[openPerson.lugar_desaparicion, openPerson.ciudad, openPerson.estado].filter(Boolean).join(", ") || "—"} />
+                </div>
+              </div>
+              {openPerson.descripcion && (
+                <div className="rounded-2xl bg-muted p-4 text-sm">{openPerson.descripcion}</div>
+              )}
+              {openContacts.length > 0 && (
+                <div>
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Contactos de familiares</h3>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {openContacts.map((c) => <DContactPill key={c.id} c={c} />)}
+                  </div>
+                </div>
+              )}
+              <div className="flex flex-wrap gap-2 pt-2">
+                <button
+                  onClick={() => {
+                    const url = `${window.location.origin}/desaparecidos/${openPerson.id}`;
+                    if (navigator.share) navigator.share({ title: `Ayuda a localizar a ${openPerson.full_name}`, url }).catch(() => {});
+                    else navigator.clipboard.writeText(url);
+                  }}
+                  className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-background"
+                >
+                  <Share2 className="h-4 w-4" /> Compartir
+                </button>
+                <Link
+                  to="/desaparecidos/$id"
+                  params={{ id: openPerson.id }}
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold hover:bg-muted"
+                >
+                  <ExternalLink className="h-4 w-4" /> Ver perfil completo
+                </Link>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </Layout>
+  );
+}
+
+function DRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="flex items-start gap-3">
+      <span className="mt-0.5 text-muted-foreground">{icon}</span>
+      <div>
+        <dt className="text-xs uppercase tracking-wide text-muted-foreground">{label}</dt>
+        <dd className="font-medium">{value}</dd>
+      </div>
+    </div>
+  );
+}
+
+function DContactPill({ c }: { c: Contact }) {
+  const v = c.codigo_pais ? `${c.codigo_pais} ${c.valor}` : c.valor;
+  let Icon = Phone;
+  let href = `tel:${(c.codigo_pais ?? "") + c.valor}`;
+  if (c.tipo === "email") { Icon = Mail; href = `mailto:${c.valor}`; }
+  else if (c.tipo === "whatsapp") { Icon = MessageCircle; href = `https://wa.me/${(c.codigo_pais ?? "").replace(/\D/g,"")}${c.valor.replace(/\D/g,"")}`; }
+  else if (c.tipo === "instagram") { Icon = Instagram; href = `https://instagram.com/${c.valor.replace(/^@/, "")}`; }
+  return (
+    <a href={href} target="_blank" rel="noopener" className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm hover:bg-muted">
+      <Icon className="h-4 w-4 text-primary" /> {v}
+    </a>
   );
 }

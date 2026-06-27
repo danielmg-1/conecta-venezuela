@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth, useIsAdmin } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth";
+import { useCanModerate } from "@/hooks/use-moderator-permissions";
 import { Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/anuncios")({
@@ -36,7 +37,7 @@ const PAGE_OPTIONS = [
 
 function Page() {
   const { user } = useAuth();
-  const isAdmin = useIsAdmin(user?.id);
+  const { allowed: isAdmin } = useCanModerate(user?.id, "anuncios");
   const [items, setItems] = useState<Ann[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);

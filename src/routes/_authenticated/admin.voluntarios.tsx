@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth, useIsAdmin } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth";
+import { useCanModerate } from "@/hooks/use-moderator-permissions";
 import { ESTADOS_VE } from "@/lib/venezuela";
 import { Trash2, Pencil, X, Save } from "lucide-react";
 
@@ -25,7 +26,7 @@ type Vol = {
 
 function Page() {
   const { user } = useAuth();
-  const isAdmin = useIsAdmin(user?.id);
+  const { allowed: isAdmin } = useCanModerate(user?.id, "voluntarios");
   const [items, setItems] = useState<Vol[]>([]);
   const [editing, setEditing] = useState<Vol | null>(null);
   const [q, setQ] = useState("");

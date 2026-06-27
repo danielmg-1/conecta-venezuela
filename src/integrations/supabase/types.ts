@@ -341,6 +341,30 @@ export type Database = {
         }
         Relationships: []
       }
+      moderator_permissions: {
+        Row: {
+          created_at: string
+          granted_by: string | null
+          id: string
+          section: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          section: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          section?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       news: {
         Row: {
           author_id: string
@@ -517,6 +541,16 @@ export type Database = {
         Args: { _email: string; _role: Database["public"]["Enums"]["app_role"] }
         Returns: Json
       }
+      admin_list_moderators_with_permissions: {
+        Args: never
+        Returns: {
+          email: string
+          full_name: string
+          granted_at: string
+          sections: string[]
+          user_id: string
+        }[]
+      }
       admin_list_users_by_role: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: {
@@ -529,6 +563,14 @@ export type Database = {
       admin_revoke_role_by_email: {
         Args: { _email: string; _role: Database["public"]["Enums"]["app_role"] }
         Returns: Json
+      }
+      admin_set_moderator_permissions: {
+        Args: { _email: string; _sections: string[] }
+        Returns: Json
+      }
+      has_moderator_permission: {
+        Args: { _section: string; _user_id: string }
+        Returns: boolean
       }
       has_role: {
         Args: {

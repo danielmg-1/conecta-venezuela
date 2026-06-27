@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth, useIsAdmin } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth";
+import { useCanModerate } from "@/hooks/use-moderator-permissions";
 import { AID_TYPES, aidTypeLabel } from "@/lib/aid";
 import { ESTADOS_VE } from "@/lib/venezuela";
 import { Trash2, Save, X, Pencil } from "lucide-react";
@@ -29,7 +30,7 @@ type Aid = {
 
 function Page() {
   const { user } = useAuth();
-  const isAdmin = useIsAdmin(user?.id);
+  const { allowed: isAdmin } = useCanModerate(user?.id, "centros");
   const [items, setItems] = useState<Aid[]>([]);
   const [editing, setEditing] = useState<Aid | null>(null);
   const [q, setQ] = useState("");

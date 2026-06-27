@@ -14,12 +14,49 @@ export type Database = {
   }
   public: {
     Tables: {
+      aid_point_contacts: {
+        Row: {
+          aid_point_id: string
+          created_at: string
+          id: string
+          kind: string
+          label: string | null
+          value: string
+        }
+        Insert: {
+          aid_point_id: string
+          created_at?: string
+          id?: string
+          kind: string
+          label?: string | null
+          value: string
+        }
+        Update: {
+          aid_point_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          label?: string | null
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aid_point_contacts_aid_point_id_fkey"
+            columns: ["aid_point_id"]
+            isOneToOne: false
+            referencedRelation: "aid_points"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       aid_point_hosts: {
         Row: {
           aid_point_id: string
           id: string
           invited_at: string
           invited_by: string | null
+          responded_at: string | null
+          status: string
           user_id: string
         }
         Insert: {
@@ -27,6 +64,8 @@ export type Database = {
           id?: string
           invited_at?: string
           invited_by?: string | null
+          responded_at?: string | null
+          status?: string
           user_id: string
         }
         Update: {
@@ -34,6 +73,8 @@ export type Database = {
           id?: string
           invited_at?: string
           invited_by?: string | null
+          responded_at?: string | null
+          status?: string
           user_id?: string
         }
         Relationships: [
@@ -666,11 +707,29 @@ export type Database = {
           email: string
           full_name: string
           invited_at: string
+          responded_at: string
+          status: string
           user_id: string
+        }[]
+      }
+      aid_point_list_my_invitations: {
+        Args: never
+        Returns: {
+          aid_point_id: string
+          ciudad: string
+          estado: string
+          invited_at: string
+          nombre: string
+          status: string
+          tipo: string
         }[]
       }
       aid_point_remove_host: {
         Args: { _aid_point_id: string; _user_id: string }
+        Returns: undefined
+      }
+      aid_point_respond_invitation: {
+        Args: { _accept: boolean; _aid_point_id: string }
         Returns: undefined
       }
       can_manage_aid_point: {

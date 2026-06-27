@@ -116,6 +116,14 @@ function Page() {
     setOpenId(null);
   }
 
+  async function changeOpenPersonStatus(s: MissingStatus) {
+    if (!openPerson) return;
+    const { error } = await supabase.from("missing_persons").update({ status: s }).eq("id", openPerson.id);
+    if (error) { alert("No se pudo cambiar el estado: " + error.message); return; }
+    setOpenPerson({ ...openPerson, status: s });
+    setRows((prev) => (prev ? prev.map((r) => (r.id === openPerson.id ? { ...r, status: s } : r)) : prev));
+  }
+
   return (
     <Layout>
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -259,6 +267,22 @@ function Page() {
                   </button>
                 )}
               </div>
+              {canManageOpenPerson && (
+                <div className="rounded-2xl border border-border bg-muted/40 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Cambiar estado</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {(["desaparecido","en_busqueda","encontrado"] as MissingStatus[]).filter((s) => s !== openPerson.status).map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => changeOpenPersonStatus(s)}
+                        className="rounded-full border border-border bg-background px-4 py-2 text-sm font-medium hover:bg-muted"
+                      >
+                        Marcar como {s === "en_busqueda" ? "en búsqueda" : s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </>
           )}
         </DialogContent>

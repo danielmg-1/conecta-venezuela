@@ -125,6 +125,7 @@ function Page() {
         {isAdmin && <Link to="/admin/centros" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Centros</Link>}
         {isAdmin && <Link to="/admin/voluntarios" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Voluntarios</Link>}
         {isAdmin && <Link to="/admin/moderadores" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Moderadores</Link>}
+        {isAdmin && <Link to="/admin/usuarios" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Usuarios</Link>}
         {isAdmin && <Link to="/centros-acopio/nuevo" className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90">+ Nuevo centro</Link>}
         <button onClick={() => rows && download(`desaparecidos-${new Date().toISOString().slice(0,10)}.csv`, toCSV(rows))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Exportar desaparecidos CSV</button>
         <button onClick={() => aid && download(`centros-${new Date().toISOString().slice(0,10)}.csv`, toCSV(aid))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Exportar centros CSV</button>

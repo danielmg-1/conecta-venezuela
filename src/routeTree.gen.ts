@@ -20,6 +20,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AsistenteRouteImport } from './routes/asistente'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AsistenteIndexRouteImport } from './routes/asistente.index'
 import { Route as DesaparecidosIdRouteImport } from './routes/desaparecidos.$id'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
@@ -89,6 +90,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AsistenteIndexRoute = AsistenteIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AsistenteRoute,
 } as any)
 const DesaparecidosIdRoute = DesaparecidosIdRouteImport.update({
   id: '/$id',
@@ -179,7 +185,7 @@ const AuthenticatedCentrosAcopioIdEditarRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/asistente': typeof AsistenteRoute
+  '/asistente': typeof AsistenteRouteWithChildren
   '/auth': typeof AuthRoute
   '/centros-acopio': typeof CentrosAcopioRoute
   '/consejos': typeof ConsejosRoute
@@ -192,6 +198,7 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/api/chat': typeof ApiChatRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/asistente/': typeof AsistenteIndexRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/centros': typeof AuthenticatedAdminCentrosRoute
   '/admin/emergencias': typeof AuthenticatedAdminEmergenciasRoute
@@ -206,7 +213,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/asistente': typeof AsistenteRoute
   '/auth': typeof AuthRoute
   '/centros-acopio': typeof CentrosAcopioRoute
   '/consejos': typeof ConsejosRoute
@@ -219,6 +225,7 @@ export interface FileRoutesByTo {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/api/chat': typeof ApiChatRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/asistente': typeof AsistenteIndexRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/centros': typeof AuthenticatedAdminCentrosRoute
   '/admin/emergencias': typeof AuthenticatedAdminEmergenciasRoute
@@ -235,7 +242,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/asistente': typeof AsistenteRoute
+  '/asistente': typeof AsistenteRouteWithChildren
   '/auth': typeof AuthRoute
   '/centros-acopio': typeof CentrosAcopioRoute
   '/consejos': typeof ConsejosRoute
@@ -248,6 +255,7 @@ export interface FileRoutesById {
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/api/chat': typeof ApiChatRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/asistente/': typeof AsistenteIndexRoute
   '/_authenticated/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/_authenticated/admin/centros': typeof AuthenticatedAdminCentrosRoute
   '/_authenticated/admin/emergencias': typeof AuthenticatedAdminEmergenciasRoute
@@ -277,6 +285,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/api/chat'
     | '/desaparecidos/$id'
+    | '/asistente/'
     | '/admin/anuncios'
     | '/admin/centros'
     | '/admin/emergencias'
@@ -291,7 +300,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/asistente'
     | '/auth'
     | '/centros-acopio'
     | '/consejos'
@@ -304,6 +312,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/api/chat'
     | '/desaparecidos/$id'
+    | '/asistente'
     | '/admin/anuncios'
     | '/admin/centros'
     | '/admin/emergencias'
@@ -332,6 +341,7 @@ export interface FileRouteTypes {
     | '/_authenticated/perfil'
     | '/api/chat'
     | '/desaparecidos/$id'
+    | '/asistente/'
     | '/_authenticated/admin/anuncios'
     | '/_authenticated/admin/centros'
     | '/_authenticated/admin/emergencias'
@@ -348,7 +358,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AsistenteRoute: typeof AsistenteRoute
+  AsistenteRoute: typeof AsistenteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CentrosAcopioRoute: typeof CentrosAcopioRoute
   ConsejosRoute: typeof ConsejosRoute
@@ -438,6 +448,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/asistente/': {
+      id: '/asistente/'
+      path: '/'
+      fullPath: '/asistente/'
+      preLoaderRoute: typeof AsistenteIndexRouteImport
+      parentRoute: typeof AsistenteRoute
     }
     '/desaparecidos/$id': {
       id: '/desaparecidos/$id'
@@ -584,6 +601,18 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AsistenteRouteChildren {
+  AsistenteIndexRoute: typeof AsistenteIndexRoute
+}
+
+const AsistenteRouteChildren: AsistenteRouteChildren = {
+  AsistenteIndexRoute: AsistenteIndexRoute,
+}
+
+const AsistenteRouteWithChildren = AsistenteRoute._addFileChildren(
+  AsistenteRouteChildren,
+)
+
 interface DesaparecidosRouteChildren {
   DesaparecidosIdRoute: typeof DesaparecidosIdRoute
 }
@@ -599,7 +628,7 @@ const DesaparecidosRouteWithChildren = DesaparecidosRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AsistenteRoute: AsistenteRoute,
+  AsistenteRoute: AsistenteRouteWithChildren,
   AuthRoute: AuthRoute,
   CentrosAcopioRoute: CentrosAcopioRoute,
   ConsejosRoute: ConsejosRoute,

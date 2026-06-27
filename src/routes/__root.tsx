@@ -84,13 +84,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Conecta Venezuela: reporta y busca personas desaparecidas, encuentra centros de ayuda, voluntarios y números de emergencia tras el terremoto." },
       { name: "author", content: "Conecta Venezuela" },
       { property: "og:title", content: "Conecta Venezuela — Guía de apoyo tras el terremoto" },
-      { property: "og:description", content: "Reporta y busca personas desaparecidas, centros de ayuda y emergencias en Venezuela." },
+      { property: "og:description", content: "Conecta Venezuela: reporta y busca personas desaparecidas, encuentra centros de ayuda, voluntarios y números de emergencia tras el terremoto." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Conecta Venezuela — Guía de apoyo tras el terremoto" },
-      { name: "twitter:description", content: "Reporta y busca personas desaparecidas, centros de ayuda y emergencias en Venezuela." },
+      { name: "twitter:description", content: "Conecta Venezuela: reporta y busca personas desaparecidas, encuentra centros de ayuda, voluntarios y números de emergencia tras el terremoto." },
       { property: "og:image", content: logoAsset.url },
       { name: "twitter:image", content: logoAsset.url },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/19bd93ca-6684-484b-9056-915ae4ccc04c" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/19bd93ca-6684-484b-9056-915ae4ccc04c" },
     ],
     links: [
       {

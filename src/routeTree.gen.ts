@@ -20,6 +20,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AsistenteRouteImport } from './routes/asistente'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DesaparecidosIndexRouteImport } from './routes/desaparecidos.index'
 import { Route as AsistenteIndexRouteImport } from './routes/asistente.index'
 import { Route as DesaparecidosIdRouteImport } from './routes/desaparecidos.$id'
 import { Route as AsistenteThreadIdRouteImport } from './routes/asistente.$threadId'
@@ -93,6 +94,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DesaparecidosIndexRoute = DesaparecidosIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DesaparecidosRoute,
 } as any)
 const AsistenteIndexRoute = AsistenteIndexRouteImport.update({
   id: '/',
@@ -220,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/asistente/$threadId': typeof AsistenteThreadIdRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
   '/asistente/': typeof AsistenteIndexRoute
+  '/desaparecidos/': typeof DesaparecidosIndexRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/centros': typeof AuthenticatedAdminCentrosRoute
   '/admin/emergencias': typeof AuthenticatedAdminEmergenciasRoute
@@ -238,7 +245,6 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/centros-acopio': typeof CentrosAcopioRoute
   '/consejos': typeof ConsejosRoute
-  '/desaparecidos': typeof DesaparecidosRouteWithChildren
   '/emergencias': typeof EmergenciasRoute
   '/mapa': typeof MapaRoute
   '/noticias': typeof NoticiasRoute
@@ -250,6 +256,7 @@ export interface FileRoutesByTo {
   '/asistente/$threadId': typeof AsistenteThreadIdRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
   '/asistente': typeof AsistenteIndexRoute
+  '/desaparecidos': typeof DesaparecidosIndexRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/centros': typeof AuthenticatedAdminCentrosRoute
   '/admin/emergencias': typeof AuthenticatedAdminEmergenciasRoute
@@ -283,6 +290,7 @@ export interface FileRoutesById {
   '/asistente/$threadId': typeof AsistenteThreadIdRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
   '/asistente/': typeof AsistenteIndexRoute
+  '/desaparecidos/': typeof DesaparecidosIndexRoute
   '/_authenticated/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/_authenticated/admin/centros': typeof AuthenticatedAdminCentrosRoute
   '/_authenticated/admin/emergencias': typeof AuthenticatedAdminEmergenciasRoute
@@ -316,6 +324,7 @@ export interface FileRouteTypes {
     | '/asistente/$threadId'
     | '/desaparecidos/$id'
     | '/asistente/'
+    | '/desaparecidos/'
     | '/admin/anuncios'
     | '/admin/centros'
     | '/admin/emergencias'
@@ -334,7 +343,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/centros-acopio'
     | '/consejos'
-    | '/desaparecidos'
     | '/emergencias'
     | '/mapa'
     | '/noticias'
@@ -346,6 +354,7 @@ export interface FileRouteTypes {
     | '/asistente/$threadId'
     | '/desaparecidos/$id'
     | '/asistente'
+    | '/desaparecidos'
     | '/admin/anuncios'
     | '/admin/centros'
     | '/admin/emergencias'
@@ -378,6 +387,7 @@ export interface FileRouteTypes {
     | '/asistente/$threadId'
     | '/desaparecidos/$id'
     | '/asistente/'
+    | '/desaparecidos/'
     | '/_authenticated/admin/anuncios'
     | '/_authenticated/admin/centros'
     | '/_authenticated/admin/emergencias'
@@ -486,6 +496,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/desaparecidos/': {
+      id: '/desaparecidos/'
+      path: '/'
+      fullPath: '/desaparecidos/'
+      preLoaderRoute: typeof DesaparecidosIndexRouteImport
+      parentRoute: typeof DesaparecidosRoute
     }
     '/asistente/': {
       id: '/asistente/'
@@ -679,10 +696,12 @@ const AsistenteRouteWithChildren = AsistenteRoute._addFileChildren(
 
 interface DesaparecidosRouteChildren {
   DesaparecidosIdRoute: typeof DesaparecidosIdRoute
+  DesaparecidosIndexRoute: typeof DesaparecidosIndexRoute
 }
 
 const DesaparecidosRouteChildren: DesaparecidosRouteChildren = {
   DesaparecidosIdRoute: DesaparecidosIdRoute,
+  DesaparecidosIndexRoute: DesaparecidosIndexRoute,
 }
 
 const DesaparecidosRouteWithChildren = DesaparecidosRoute._addFileChildren(

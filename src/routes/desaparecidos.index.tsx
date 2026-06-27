@@ -24,7 +24,7 @@ type Row = {
 type PersonFull = Row & { descripcion: string | null; reporter_id: string };
 type Contact = { id: string; tipo: string; valor: string; codigo_pais: string | null };
 
-export const Route = createFileRoute("/desaparecidos")({
+export const Route = createFileRoute("/desaparecidos/")({
   head: () => ({
     meta: [
       { title: "Personas desaparecidas — Guía de Apoyo Venezuela" },

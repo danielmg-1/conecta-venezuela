@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Search, Map, Phone, User, HeartHandshake, Users, Newspaper, LifeBuoy, Sparkles } from "lucide-react";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
+import { FloatingGuide } from "@/components/FloatingGuide";
 import type { ReactNode } from "react";
 
 const baseNav = [
@@ -92,6 +93,8 @@ export function Layout({ children }: { children: ReactNode }) {
 
       <AnnouncementBanner />
       <main className="mx-auto max-w-6xl px-4 pb-24 pt-6 md:px-6 md:pb-12">{children}</main>
+
+      <FloatingGuide />
 
       {/* Mobile bottom tab bar */}
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border/60 bg-background/95 backdrop-blur-xl md:hidden">

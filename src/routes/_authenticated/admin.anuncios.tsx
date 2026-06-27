@@ -45,6 +45,7 @@ function Page() {
   async function refresh() {
     const { data } = await supabase.from("announcements").select("*").order("created_at", { ascending: false });
     setItems((data ?? []) as Ann[]);
+    window.dispatchEvent(new Event("announcements:changed"));
   }
   useEffect(() => { if (isAdmin) refresh(); }, [isAdmin]);
 

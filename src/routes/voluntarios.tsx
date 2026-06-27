@@ -53,7 +53,7 @@ function Page() {
     if (q.trim()) query = query.or(`profesion.ilike.%${q.trim()}%,habilidades.ilike.%${q.trim()}%,nombre.ilike.%${q.trim()}%`);
     query.then(({ data }) => {
       if (!cancelled) {
-        setItems((data ?? []) as Row[]);
+        setItems(((data ?? []) as unknown) as Row[]);
         setLoading(false);
       }
     });

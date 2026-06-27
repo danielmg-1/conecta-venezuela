@@ -4,8 +4,6 @@ import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { ESTADOS_VE } from "@/lib/venezuela";
 import { MapPin, UserPlus } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
-
 export const Route = createFileRoute("/voluntarios")({
   head: () => ({
     meta: [
@@ -31,7 +29,6 @@ type Row = {
 };
 
 function Page() {
-  const { user } = useAuth();
   const [items, setItems] = useState<Row[]>([]);
   const [estado, setEstado] = useState("");
   const [q, setQ] = useState("");
@@ -56,7 +53,7 @@ function Page() {
       }
     });
     return () => { cancelled = true; };
-  }, [estado, q, user]);
+    }, [estado, q]);
 
   return (
     <Layout>

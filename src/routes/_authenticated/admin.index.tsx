@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
+import { useCanModerate } from "@/hooks/use-moderator-permissions";
 import { StatusBadge, type MissingStatus } from "@/components/StatusBadge";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, CartesianGrid, Legend } from "recharts";
 import { aidTypeLabel } from "@/lib/aid";
@@ -36,13 +37,14 @@ export const Route = createFileRoute("/_authenticated/admin/")({
 function Page() {
   const { user } = useAuth();
   const isAdmin = useIsAdmin(user?.id);
+  const { allowed: canViewReports } = useCanModerate(user?.id, "reportes");
   const [rows, setRows] = useState<Row[] | null>(null);
   const [aid, setAid] = useState<AidRow[] | null>(null);
   const [vols, setVols] = useState<VolRow[] | null>(null);
   const [tips, setTips] = useState<TipRow[] | null>(null);
 
   useEffect(() => {
-    if (!isAdmin) return;
+    if (!canViewReports) return;
     (async () => {
       const [{ data: mp }, { data: ap }, { data: vp }, { data: tp }] = await Promise.all([
         supabase.from("missing_persons").select("id,full_name,status,estado,hidden_by_admin,created_at").order("created_at", { ascending: false }).limit(500),
@@ -55,7 +57,7 @@ function Page() {
       setVols((vp ?? []) as VolRow[]);
       setTips((tp ?? []) as TipRow[]);
     })();
-  }, [isAdmin]);
+  }, [canViewReports]);
 
   async function toggleHide(id: string, hidden: boolean) {
     await supabase.from("missing_persons").update({ hidden_by_admin: !hidden }).eq("id", id);
@@ -108,8 +110,8 @@ function Page() {
     return [...m.entries()].map(([fecha, total]) => ({ fecha: fecha.slice(5), total }));
   }, [rows]);
 
-  if (!isAdmin) {
-    return <Layout><p className="py-20 text-center text-sm text-muted-foreground">Necesitas permisos de administrador.</p></Layout>;
+  if (!canViewReports) {
+    return <Layout><p className="py-20 text-center text-sm text-muted-foreground">No tienes permiso para ver los informes.</p></Layout>;
   }
 
   return (

@@ -1,11 +1,11 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadMissingPhoto } from "@/lib/photo";
 import { ESTADOS_VE } from "@/lib/venezuela";
 import { useAuth } from "@/hooks/use-auth";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Camera, Upload, X } from "lucide-react";
 
 type ContactDraft = { tipo: "telefono" | "whatsapp" | "email" | "instagram" | "otro"; valor: string; codigo_pais: string };
 
@@ -19,8 +19,16 @@ function Page() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [contacts, setContacts] = useState<ContactDraft[]>([{ tipo: "whatsapp", valor: "", codigo_pais: "+58" }]);
   const [consent, setConsent] = useState(false);
+
+  function onPickFile(f: File | null) {
+    setFile(f);
+    if (preview) URL.revokeObjectURL(preview);
+    setPreview(f ? URL.createObjectURL(f) : null);
+  }
 
   function addContact() {
     if (contacts.length >= 4) return;
@@ -84,8 +92,53 @@ function Page() {
 
       <form onSubmit={onSubmit} className="mt-8 grid gap-5 rounded-3xl border border-border bg-card p-6 md:p-8">
         <div className="grid gap-2">
-          <label className="text-sm font-medium">Foto</label>
-          <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="text-sm" />
+          <label className="text-sm font-medium">
+            Foto de la persona <span className="text-muted-foreground font-normal">(recomendado)</span>
+          </label>
+          <p className="text-xs text-muted-foreground -mt-1">
+            Sube una foto clara del rostro. Ayuda muchísimo a que otras personas puedan reconocerla.
+          </p>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={(e) => onPickFile(e.target.files?.[0] ?? null)}
+            className="hidden"
+          />
+          {preview ? (
+            <div className="relative mt-1 w-fit">
+              <img src={preview} alt="Vista previa" className="h-40 w-40 rounded-2xl object-cover border border-border" />
+              <button
+                type="button"
+                onClick={() => { onPickFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
+                className="absolute -right-2 -top-2 grid h-7 w-7 place-items-center rounded-full bg-destructive text-destructive-foreground shadow"
+                aria-label="Quitar foto"
+              >
+                <X className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="mt-2 block text-xs font-medium text-primary hover:underline"
+              >
+                Cambiar foto
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="mt-1 flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-input bg-muted/30 p-6 text-sm text-muted-foreground hover:bg-muted/50 hover:border-primary/50 transition"
+            >
+              <div className="flex gap-3">
+                <Upload className="h-5 w-5" />
+                <Camera className="h-5 w-5" />
+              </div>
+              <span className="font-medium text-foreground">Toca para subir una foto</span>
+              <span className="text-xs">Desde galería o cámara · JPG, PNG (máx. 10MB)</span>
+            </button>
+          )}
         </div>
 
         <Field name="full_name" label="Nombre completo" required />

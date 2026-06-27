@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Search, Map, Phone, User, HeartHandshake, Users, Newspaper, LifeBuoy } from "lucide-react";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
+import { useModeratorPermissions } from "@/hooks/use-moderator-permissions";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { FloatingGuide } from "@/components/FloatingGuide";
 import iconAsset from "@/assets/conecta-icon.png.asset.json";
@@ -24,6 +25,9 @@ export function Layout({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { user } = useAuth();
   const isAdmin = useIsAdmin(user?.id);
+  const { sections: modSections } = useModeratorPermissions(user?.id);
+  const isModerator = !isAdmin && modSections.length > 0;
+  const firstModPath = modSections[0] === "desaparecidos" ? "/admin" : `/admin/${modSections[0] === "centros" ? "centros" : modSections[0]}`;
   const accountItem = user
     ? { to: "/perfil" as const, label: "Perfil", icon: User }
     : { to: "/auth" as const, label: "Cuenta", icon: User };
@@ -70,6 +74,11 @@ export function Layout({ children }: { children: ReactNode }) {
             {isAdmin && (
               <Link to="/admin" className={`rounded-full px-4 py-2 text-sm font-medium ${pathname.startsWith("/admin") ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
                 Admin
+              </Link>
+            )}
+            {isModerator && (
+              <Link to={firstModPath} className={`rounded-full px-4 py-2 text-sm font-medium ${pathname.startsWith("/admin") ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
+                Moderar
               </Link>
             )}
           </nav>

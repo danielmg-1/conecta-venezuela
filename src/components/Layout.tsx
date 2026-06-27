@@ -4,7 +4,6 @@ import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { FloatingGuide } from "@/components/FloatingGuide";
 import iconAsset from "@/assets/conecta-icon.png.asset.json";
-import logoLightAsset from "@/assets/conecta-logo-light.png.asset.json";
 import type { ReactNode } from "react";
 
 const baseNav = [

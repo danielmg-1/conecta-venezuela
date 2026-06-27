@@ -4,18 +4,26 @@ import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 
-const SYSTEM = `Eres el Asistente de la Guía de Apoyo Venezuela, una plataforma para ayudar a las personas afectadas por el terremoto en Venezuela. Respondes SIEMPRE en español, con tono empático, claro y breve.
+const SYSTEM = `Eres Brújula, la guía virtual de Conecta Venezuela. Personalidad cálida, paciente y orientadora. Respondes SIEMPRE en español, con empatía y claridad.
 
-Puedes ayudar a:
-- Buscar personas desaparecidas en la base de datos (usa la herramienta buscar_personas; tolera errores de ortografía y nombres parciales).
-- Listar centros de acopio, hospitales, donaciones y puntos de ayuda (usa listar_centros_ayuda).
-- Indicar las zonas más afectadas según los reportes (usa zonas_mas_afectadas).
-- Compartir consejos de primeros auxilios y cómo actuar antes/durante/después de un sismo (usa consejos_sismo).
-- Compartir números de emergencia oficiales (usa numeros_emergencia).
+REGLA CRÍTICA: NUNCA inventes datos. Para cualquier pregunta sobre contenido de la plataforma (personas, centros, voluntarios, noticias, emergencias, zonas afectadas, consejos), DEBES usar las herramientas para consultar la base de datos antes de responder. Si la herramienta no devuelve resultados, dilo claramente.
 
-Cuando muestres una persona desaparecida, incluye un enlace en formato Markdown a /desaparecidos/{id} para ver el perfil completo. Cuando muestres un centro de ayuda, indica nombre, tipo, dirección y teléfono si existen.
+Herramientas disponibles (úsalas proactivamente):
+- buscar_personas: personas desaparecidas/en búsqueda/encontradas (tolera errores ortográficos y nombres parciales).
+- listar_centros_ayuda: centros de acopio, hospitales, clínicas, donaciones, refugios, primeros auxilios, apoyo psicológico.
+- listar_voluntarios: profesionales voluntarios registrados.
+- listar_noticias: avisos y noticias publicadas en la plataforma.
+- zonas_mas_afectadas: ranking de estados con más reportes.
+- consejos_sismo: qué hacer antes/durante/después de un sismo.
+- numeros_emergencia: números oficiales de emergencia.
 
-Si una herramienta no devuelve resultados, sugiere al usuario crear un reporte en /desaparecidos/nuevo o publicar un centro en /centros-acopio/nuevo. No inventes datos. Si te preguntan algo fuera del alcance (política, opiniones), redirige amablemente al tema de la emergencia.`;
+Formato:
+- Sé breve (2-6 frases) y usa listas cuando enumeres resultados.
+- Para personas, incluye enlace Markdown a /desaparecidos/{id}.
+- Para centros, indica nombre, tipo, dirección y teléfono.
+- Si no hay resultados, sugiere /desaparecidos/nuevo o /centros-acopio/nuevo según corresponda.
+- También puedes orientar sobre cómo usar la plataforma (secciones: /desaparecidos, /mapa, /centros-acopio, /voluntarios, /emergencias, /consejos, /noticias, /perfil).
+- Si te preguntan opiniones o política, redirige al tema de la emergencia.`;
 
 export const Route = createFileRoute("/api/chat")({
   server: {
@@ -163,6 +171,49 @@ export const Route = createFileRoute("/api/chat")({
               ],
               mas_info: "Visita /emergencias para el directorio completo.",
             }),
+          }),
+          listar_noticias: tool({
+            description:
+              "Lista las noticias y avisos publicados en la plataforma. Útil cuando preguntan por novedades, comunicados o actualizaciones.",
+            inputSchema: z.object({
+              buscar: z.string().optional().describe("Palabra clave opcional para filtrar por título o contenido"),
+              limite: z.number().int().min(1).max(20).optional(),
+            }),
+            execute: async ({ buscar, limite }) => {
+              let q = supabase
+                .from("news")
+                .select("id, titulo, contenido, created_at")
+                .eq("published", true)
+                .order("created_at", { ascending: false })
+                .limit(limite ?? 10);
+              if (buscar && buscar.trim()) {
+                q = q.or(`titulo.ilike.%${buscar}%,contenido.ilike.%${buscar}%`);
+              }
+              const { data, error } = await q;
+              if (error) return { error: error.message, noticias: [] };
+              return { noticias: data ?? [] };
+            },
+          }),
+          listar_voluntarios: tool({
+            description:
+              "Lista voluntarios registrados (profesionales que ofrecen ayuda). Filtra por estado o profesión/habilidad.",
+            inputSchema: z.object({
+              estado: z.string().optional(),
+              profesion: z.string().optional().describe("Profesión o habilidad, p. ej. médico, enfermero, psicólogo"),
+            }),
+            execute: async ({ estado, profesion }) => {
+              let q = supabase
+                .from("volunteers")
+                .select("id, full_name, profession, skills, state, city, phone, email")
+                .limit(15);
+              if (estado) q = q.ilike("state", `%${estado}%`);
+              if (profesion) {
+                q = q.or(`profession.ilike.%${profesion}%,skills.ilike.%${profesion}%`);
+              }
+              const { data, error } = await q;
+              if (error) return { error: error.message, voluntarios: [] };
+              return { voluntarios: data ?? [] };
+            },
           }),
         };
 

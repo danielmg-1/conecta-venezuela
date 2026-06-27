@@ -4,7 +4,7 @@ import { DefaultChatTransport, type UIMessage } from "ai";
 import { useRouterState, Link } from "@tanstack/react-router";
 import { History } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { getVisitorId } from "@/lib/visitor";
+import { useAuth } from "@/hooks/use-auth";
 import {
   Sheet,
   SheetContent,
@@ -42,16 +42,24 @@ export function FloatingGuide() {
   const [threadId, setThreadId] = useState<string | null>(null);
   const [initialMessages, setInitialMessages] = useState<UIMessage[] | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (!open || threadId) return;
     let cancelled = false;
     (async () => {
-      const visitorId = getVisitorId();
+      if (!user) {
+        // Anonymous: in-memory chat with a synthetic thread id, no DB persistence
+        if (!cancelled) {
+          setInitialMessages([]);
+          setThreadId(`anon-${Date.now()}`);
+        }
+        return;
+      }
       const { data: existing } = await supabase
         .from("chat_threads")
         .select("id")
-        .eq("visitor_id", visitorId)
+        .eq("user_id", user.id)
         .order("updated_at", { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -59,7 +67,7 @@ export function FloatingGuide() {
       if (!id) {
         const { data: created } = await supabase
           .from("chat_threads")
-          .insert({ visitor_id: visitorId, title: "Nueva conversación" })
+          .insert({ user_id: user.id, visitor_id: user.id, title: "Nueva conversación" })
           .select("id")
           .single();
         id = created?.id as string | undefined;
@@ -82,7 +90,7 @@ export function FloatingGuide() {
     return () => {
       cancelled = true;
     };
-  }, [open, threadId]);
+  }, [open, threadId, user]);
 
   if (pathname.startsWith("/asistente")) return null;
 
@@ -130,6 +138,7 @@ export function FloatingGuide() {
               threadId={threadId}
               initialMessages={initialMessages}
               inputRef={inputRef}
+              persist={!!user}
             />
           ) : (
             <div className="grid flex-1 place-items-center text-sm text-muted-foreground">
@@ -146,10 +155,12 @@ function FloatingChat({
   threadId,
   initialMessages,
   inputRef,
+  persist,
 }: {
   threadId: string;
   initialMessages: UIMessage[];
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
+  persist: boolean;
 }) {
   const persistedIds = useRef<Set<string>>(new Set(initialMessages.map((m) => m.id)));
 
@@ -162,6 +173,7 @@ function FloatingChat({
 
   useEffect(() => {
     if (status !== "ready") return;
+    if (!persist) return;
     const toSave = messages.filter((m) => !persistedIds.current.has(m.id));
     if (toSave.length === 0) return;
     (async () => {
@@ -186,7 +198,7 @@ function FloatingChat({
           .eq("id", threadId);
       }
     })();
-  }, [messages, status, threadId]);
+  }, [messages, status, threadId, persist]);
 
   useEffect(() => {
     const t = setTimeout(() => inputRef.current?.focus(), 100);

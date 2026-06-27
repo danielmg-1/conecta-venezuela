@@ -4,7 +4,7 @@ import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { AID_TYPES, aidTypeLabel } from "@/lib/aid";
 import { ESTADOS_VE } from "@/lib/venezuela";
-import { MapPin, Phone, Plus, Pencil, Lock } from "lucide-react";
+import { MapPin, Phone, Plus, Pencil } from "lucide-react";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/centros-acopio")({
@@ -45,9 +45,7 @@ function Page() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    const cols = user
-      ? "id,owner_id,tipo,nombre,descripcion,direccion,estado,ciudad,telefono,horario,necesidades"
-      : "id,owner_id,tipo,nombre,descripcion,direccion,estado,ciudad,horario,necesidades";
+    const cols = "id,owner_id,tipo,nombre,descripcion,direccion,estado,ciudad,telefono,horario,necesidades";
     let query = supabase
       .from("aid_points")
       .select(cols)
@@ -113,15 +111,11 @@ function Page() {
                 </p>
               )}
               {it.horario && <p className="mt-2 text-xs text-muted-foreground">Horario: {it.horario}</p>}
-              {it.telefono ? (
+              {it.telefono && (
                 <a href={`tel:${it.telefono}`} className="mt-3 inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium">
                   <Phone className="h-3.5 w-3.5" /> {it.telefono}
                 </a>
-              ) : !user ? (
-                <p className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-dashed border-input px-4 py-2 text-xs text-muted-foreground">
-                  <Lock className="h-3 w-3" /> Inicia sesión para ver el teléfono
-                </p>
-              ) : null}
+              )}
               {(user?.id === it.owner_id || isAdmin) && (
                 <Link to="/centros-acopio/$id/editar" params={{ id: it.id }} className="mt-3 ml-2 inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium">
                   <Pencil className="h-3.5 w-3.5" /> Editar

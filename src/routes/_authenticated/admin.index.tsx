@@ -38,6 +38,7 @@ function Page() {
   const { user } = useAuth();
   const isAdmin = useIsAdmin(user?.id);
   const { allowed: canViewReports } = useCanModerate(user?.id, "reportes");
+  const { allowed: canHideMissing } = useCanModerate(user?.id, "desaparecidos");
   const [rows, setRows] = useState<Row[] | null>(null);
   const [aid, setAid] = useState<AidRow[] | null>(null);
   const [vols, setVols] = useState<VolRow[] | null>(null);
@@ -230,7 +231,7 @@ function Page() {
       <div className="mt-3 overflow-hidden rounded-2xl border border-border">
         <table className="w-full text-sm">
           <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
-            <tr><th className="p-3">Nombre</th><th className="p-3">Estado</th><th className="p-3">Status</th><th className="p-3">Visible</th><th className="p-3"></th></tr>
+            <tr><th className="p-3">Nombre</th><th className="p-3">Estado</th><th className="p-3">Status</th><th className="p-3">Visible</th>{canHideMissing && <th className="p-3"></th>}</tr>
           </thead>
           <tbody>
             {rows?.map((r) => (
@@ -239,7 +240,7 @@ function Page() {
                 <td className="p-3 text-muted-foreground">{r.estado}</td>
                 <td className="p-3"><StatusBadge status={r.status} /></td>
                 <td className="p-3">{r.hidden_by_admin ? "Oculto" : "Visible"}</td>
-                <td className="p-3 text-right"><button onClick={() => toggleHide(r.id, r.hidden_by_admin)} className="rounded-full border border-input px-3 py-1 text-xs">{r.hidden_by_admin ? "Mostrar" : "Ocultar"}</button></td>
+                {canHideMissing && <td className="p-3 text-right"><button onClick={() => toggleHide(r.id, r.hidden_by_admin)} className="rounded-full border border-input px-3 py-1 text-xs">{r.hidden_by_admin ? "Mostrar" : "Ocultar"}</button></td>}
               </tr>
             ))}
           </tbody>

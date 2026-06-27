@@ -14,6 +14,88 @@ export type Database = {
   }
   public: {
     Tables: {
+      aid_point_hosts: {
+        Row: {
+          aid_point_id: string
+          id: string
+          invited_at: string
+          invited_by: string | null
+          user_id: string
+        }
+        Insert: {
+          aid_point_id: string
+          id?: string
+          invited_at?: string
+          invited_by?: string | null
+          user_id: string
+        }
+        Update: {
+          aid_point_id?: string
+          id?: string
+          invited_at?: string
+          invited_by?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aid_point_hosts_aid_point_id_fkey"
+            columns: ["aid_point_id"]
+            isOneToOne: false
+            referencedRelation: "aid_points"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      aid_point_needs: {
+        Row: {
+          aid_point_id: string
+          created_at: string
+          created_by: string | null
+          details: string | null
+          fulfilled: boolean
+          fulfilled_at: string | null
+          fulfilled_by: string | null
+          id: string
+          priority: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          aid_point_id: string
+          created_at?: string
+          created_by?: string | null
+          details?: string | null
+          fulfilled?: boolean
+          fulfilled_at?: string | null
+          fulfilled_by?: string | null
+          id?: string
+          priority?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          aid_point_id?: string
+          created_at?: string
+          created_by?: string | null
+          details?: string | null
+          fulfilled?: boolean
+          fulfilled_at?: string | null
+          fulfilled_by?: string | null
+          id?: string
+          priority?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aid_point_needs_aid_point_id_fkey"
+            columns: ["aid_point_id"]
+            isOneToOne: false
+            referencedRelation: "aid_points"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       aid_points: {
         Row: {
           ciudad: string | null
@@ -573,6 +655,27 @@ export type Database = {
       admin_set_moderator_permissions: {
         Args: { _email: string; _sections: string[] }
         Returns: Json
+      }
+      aid_point_add_host_by_email: {
+        Args: { _aid_point_id: string; _email: string }
+        Returns: Json
+      }
+      aid_point_list_hosts: {
+        Args: { _aid_point_id: string }
+        Returns: {
+          email: string
+          full_name: string
+          invited_at: string
+          user_id: string
+        }[]
+      }
+      aid_point_remove_host: {
+        Args: { _aid_point_id: string; _user_id: string }
+        Returns: undefined
+      }
+      can_manage_aid_point: {
+        Args: { _aid_point_id: string; _user_id: string }
+        Returns: boolean
       }
       has_moderator_permission: {
         Args: { _section: string; _user_id: string }

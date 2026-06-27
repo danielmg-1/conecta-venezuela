@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useIsAdmin } from "@/hooks/use-auth";
 
 export type ModSection = "desaparecidos" | "centros" | "voluntarios" | "noticias" | "anuncios" | "emergencias";
 
@@ -32,4 +33,10 @@ export function useModeratorPermissions(userId?: string | null) {
       });
   }, [userId]);
   return { sections, loading };
+}
+
+export function useCanModerate(userId: string | null | undefined, section: ModSection) {
+  const isAdmin = useIsAdmin(userId);
+  const { sections, loading } = useModeratorPermissions(userId);
+  return { allowed: isAdmin || sections.includes(section), loading };
 }

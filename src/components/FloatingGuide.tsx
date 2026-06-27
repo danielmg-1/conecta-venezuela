@@ -61,8 +61,8 @@ export function FloatingGuide() {
         className="fixed bottom-20 right-4 z-50 grid h-14 w-14 place-items-center rounded-full bg-background shadow-lg ring-1 ring-border/60 transition hover:scale-105 hover:shadow-xl md:bottom-6 md:right-6 md:h-16 md:w-16"
       >
         <img src={compassAsset.url} alt="" className="h-10 w-10 md:h-12 md:w-12" />
-        <span className="absolute -top-1 -right-1 grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
-          ?
+        <span className="absolute -top-1 -right-1 grid h-5 min-w-[32px] place-items-center rounded-full bg-primary px-1.5 text-[10px] font-semibold text-primary-foreground shadow-sm">
+          Chat
         </span>
       </button>
 

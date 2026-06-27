@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Search, Map, Phone, User, HeartHandshake, Users, Newspaper, LifeBuoy, Sparkles } from "lucide-react";
+import { Home, Search, Map, Phone, User, HeartHandshake, Users, Newspaper, LifeBuoy } from "lucide-react";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { FloatingGuide } from "@/components/FloatingGuide";
@@ -9,7 +9,6 @@ import type { ReactNode } from "react";
 const baseNav = [
   { to: "/", label: "Inicio", icon: Home },
   { to: "/desaparecidos", label: "Buscar", icon: Search },
-  { to: "/asistente", label: "Asistente", icon: Sparkles },
   { to: "/mapa", label: "Mapa", icon: Map },
   { to: "/centros-acopio", label: "Ayuda", icon: HeartHandshake },
 ] as const;
@@ -68,11 +67,6 @@ export function Layout({ children }: { children: ReactNode }) {
                 </Link>
               );
             })}
-            {user && (
-              <Link to="/perfil" className={`rounded-full px-4 py-2 text-sm font-medium ${pathname.startsWith("/perfil") ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
-                Mi perfil
-              </Link>
-            )}
             {isAdmin && (
               <Link to="/admin" className={`rounded-full px-4 py-2 text-sm font-medium ${pathname.startsWith("/admin") ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
                 Admin
@@ -99,7 +93,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
       {/* Mobile bottom tab bar */}
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border/60 bg-background/95 backdrop-blur-xl md:hidden">
-        <div className="grid grid-cols-6">
+        <div className="grid grid-cols-5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);

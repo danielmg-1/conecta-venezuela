@@ -6,6 +6,7 @@ import { StatusBadge, type MissingStatus } from "@/components/StatusBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { ESTADOS_VE } from "@/lib/venezuela";
+import { formatDateOnly } from "@/lib/utils";
 import { Search, SlidersHorizontal, Plus, MapPin, Calendar, IdCard, Phone, Mail, MessageCircle, Instagram, Share2, Pencil, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 

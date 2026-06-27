@@ -29,6 +29,8 @@ const PAGE_OPTIONS = [
   { value: "/centros-acopio", label: "Centros de ayuda" },
   { value: "/voluntarios", label: "Voluntarios" },
   { value: "/emergencias", label: "Emergencias" },
+  { value: "/consejos", label: "Consejos" },
+  { value: "/asistente", label: "Asistente (Brújula)" },
   { value: "/noticias", label: "Noticias" },
 ];
 

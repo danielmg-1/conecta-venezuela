@@ -188,7 +188,76 @@ function Page() {
           </form>
         )}
       </section>
+
+      {(isOwner || isAdmin) && (
+        <section className="mt-8 rounded-3xl border border-border bg-card p-6 md:p-8">
+          <h2 className="text-xl font-semibold">Historial de cambios</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Solo tú (quien publicó) y el administrador pueden ver esto.</p>
+          {audit.length === 0 ? (
+            <p className="mt-4 text-sm text-muted-foreground">Aún no hay registros.</p>
+          ) : (
+            <ol className="mt-4 space-y-3">
+              {audit.map((a) => <AuditItem key={a.id} a={a} />)}
+            </ol>
+          )}
+        </section>
+      )}
     </Layout>
+  );
+}
+
+const FIELD_LABELS: Record<string, string> = {
+  status: "Estado",
+  photo_path: "Foto",
+  full_name: "Nombre",
+  cedula: "Cédula",
+  birth_date: "Fecha de nacimiento",
+  estado: "Estado (región)",
+  ciudad: "Ciudad",
+  lugar_desaparicion: "Lugar de desaparición",
+  descripcion: "Descripción",
+  hidden_by_admin: "Oculto por admin",
+};
+
+function formatValue(field: string, value: unknown): string {
+  if (value === null || value === undefined || value === "") return "—";
+  if (field === "photo_path") return "imagen";
+  if (field === "status") {
+    const m: Record<string, string> = { desaparecido: "Desaparecido", en_busqueda: "En búsqueda", encontrado: "Encontrado" };
+    return m[String(value)] ?? String(value);
+  }
+  if (field === "hidden_by_admin") return value ? "Sí" : "No";
+  return String(value);
+}
+
+function AuditItem({ a }: { a: AuditRow }) {
+  const when = new Date(a.created_at).toLocaleString("es-VE");
+  const who = a.actor_email ?? "Usuario";
+  const isCreate = a.action === "create";
+  const entries = Object.entries(a.changes ?? {});
+  return (
+    <li className="rounded-2xl border border-border bg-background p-4 text-sm">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="font-medium">{isCreate ? "Reporte creado" : "Actualización"}</span>
+        <span className="text-xs text-muted-foreground">{when}</span>
+      </div>
+      <p className="mt-1 text-xs text-muted-foreground">por {who}</p>
+      {!isCreate && entries.length > 0 && (
+        <ul className="mt-3 space-y-1.5">
+          {entries.map(([field, val]) => {
+            const diff = val as { old?: unknown; new?: unknown };
+            return (
+              <li key={field} className="text-sm">
+                <span className="font-medium">{FIELD_LABELS[field] ?? field}:</span>{" "}
+                <span className="text-muted-foreground line-through">{formatValue(field, diff.old)}</span>
+                {" → "}
+                <span>{formatValue(field, diff.new)}</span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </li>
   );
 }
 

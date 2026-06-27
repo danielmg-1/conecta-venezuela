@@ -100,7 +100,7 @@ function ChatWindow({
         const { error } = await supabase.from("chat_messages").insert({
           thread_id: threadId,
           role: m.role,
-          parts: m.parts as unknown as Record<string, unknown>[],
+          parts: m.parts as unknown as never,
         });
         if (!error) persistedIds.current.add(m.id);
       }

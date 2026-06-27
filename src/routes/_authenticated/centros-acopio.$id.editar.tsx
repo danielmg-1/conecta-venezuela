@@ -6,6 +6,7 @@ import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { AID_TYPES } from "@/lib/aid";
 import { ESTADOS_VE } from "@/lib/venezuela";
 import { MapPicker } from "@/components/MapPicker";
+import { UserPlus, X } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/centros-acopio/$id/editar")({
   ssr: false,
@@ -38,6 +39,7 @@ function Page() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isHost, setIsHost] = useState(false);
 
   useEffect(() => {
     supabase.from("aid_points").select("*").eq("id", id).maybeSingle().then(({ data }) => {
@@ -48,11 +50,20 @@ function Page() {
     });
   }, [id]);
 
+  useEffect(() => {
+    if (!user) { setIsHost(false); return; }
+    supabase.from("aid_point_hosts").select("id").eq("aid_point_id", id).eq("user_id", user.id).maybeSingle().then(({ data }) => {
+      setIsHost(!!data);
+    });
+  }, [user, id]);
+
   if (loading) return <Layout><p className="text-sm text-muted-foreground">Cargando…</p></Layout>;
   if (!row) return <Layout><p className="rounded-3xl border border-border bg-card p-10 text-center text-sm">No se encontró el centro.</p></Layout>;
 
-  const canEdit = !!user && (user.id === row.owner_id || isAdmin);
-  if (!canEdit) return <Layout><p className="rounded-3xl border border-border bg-card p-10 text-center text-sm">Solo quien publicó este centro o el administrador pueden editarlo.</p></Layout>;
+  const isOwner = !!user && user.id === row.owner_id;
+  const canEdit = isOwner || isAdmin || isHost;
+  const canManageHosts = isOwner || isAdmin;
+  if (!canEdit) return <Layout><p className="rounded-3xl border border-border bg-card p-10 text-center text-sm">Solo quien publicó este centro, sus anfitriones o el administrador pueden editarlo.</p></Layout>;
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -129,6 +140,80 @@ function Page() {
           {saving ? "Guardando…" : "Guardar cambios"}
         </button>
       </form>
+
+      {canManageHosts && <HostsSection aidPointId={row.id} />}
     </Layout>
+  );
+}
+
+function HostsSection({ aidPointId }: { aidPointId: string }) {
+  const [hosts, setHosts] = useState<Array<{ user_id: string; email: string; full_name: string | null; invited_at: string }>>([]);
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  async function load() {
+    const { data } = await supabase.rpc("aid_point_list_hosts", { _aid_point_id: aidPointId });
+    setHosts((data ?? []) as never);
+  }
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [aidPointId]);
+
+  async function invite() {
+    setErr(null);
+    if (!email.trim()) return;
+    setBusy(true);
+    const { error } = await supabase.rpc("aid_point_add_host_by_email", { _aid_point_id: aidPointId, _email: email.trim() });
+    setBusy(false);
+    if (error) { setErr(error.message); return; }
+    setEmail("");
+    load();
+  }
+
+  async function remove(uid: string) {
+    if (!confirm("¿Quitar acceso a este anfitrión?")) return;
+    const { error } = await supabase.rpc("aid_point_remove_host", { _aid_point_id: aidPointId, _user_id: uid });
+    if (error) { alert(error.message); return; }
+    load();
+  }
+
+  const full = hosts.length >= 4;
+
+  return (
+    <section className="mt-8 rounded-3xl border border-border bg-card p-6 md:p-8">
+      <h2 className="text-xl font-semibold">Anfitriones</h2>
+      <p className="mt-1 text-sm text-muted-foreground">Hasta 4 personas pueden coadministrar este centro (editar la info y gestionar necesidades). Deben estar registradas en la página.</p>
+
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="correo@ejemplo.com"
+          disabled={full}
+          className="flex-1 rounded-xl border border-input bg-background px-3 py-2.5 text-sm disabled:opacity-50"
+        />
+        <button onClick={invite} disabled={busy || full || !email.trim()} className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50">
+          <UserPlus className="h-4 w-4" /> Invitar
+        </button>
+      </div>
+      {full && <p className="mt-2 text-xs text-amber-700 dark:text-amber-300">Alcanzaste el máximo de 4 anfitriones. Quita a alguien para invitar a otra persona.</p>}
+      {err && <p className="mt-2 text-xs text-destructive">{err}</p>}
+
+      <ul className="mt-4 divide-y divide-border">
+        {hosts.length === 0 ? (
+          <li className="py-3 text-sm text-muted-foreground">Aún no hay anfitriones invitados.</li>
+        ) : hosts.map((h) => (
+          <li key={h.user_id} className="flex items-center justify-between gap-3 py-3">
+            <div className="min-w-0">
+              <p className="text-sm font-medium truncate">{h.full_name || h.email}</p>
+              <p className="text-xs text-muted-foreground truncate">{h.email}</p>
+            </div>
+            <button onClick={() => remove(h.user_id)} className="inline-flex items-center gap-1 rounded-full border border-input px-3 py-1 text-xs text-muted-foreground hover:text-destructive">
+              <X className="h-3 w-3" /> Quitar
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

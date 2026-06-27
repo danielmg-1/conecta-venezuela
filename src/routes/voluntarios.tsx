@@ -3,9 +3,7 @@ import { useEffect, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { ESTADOS_VE } from "@/lib/venezuela";
-import { MapPin, UserPlus, Lock } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
-
+import { MapPin, UserPlus } from "lucide-react";
 export const Route = createFileRoute("/voluntarios")({
   head: () => ({
     meta: [
@@ -31,7 +29,6 @@ type Row = {
 };
 
 function Page() {
-  const { user } = useAuth();
   const [items, setItems] = useState<Row[]>([]);
   const [estado, setEstado] = useState("");
   const [q, setQ] = useState("");
@@ -40,9 +37,7 @@ function Page() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    const cols = user
-      ? "id,nombre,profesion,habilidades,estado,ciudad,descripcion,contacto,disponibilidad"
-      : "id,nombre,profesion,habilidades,estado,ciudad,descripcion,disponibilidad";
+    const cols = "id,nombre,profesion,habilidades,estado,ciudad,descripcion,contacto,disponibilidad";
     let query = supabase
       .from("volunteers")
       .select(cols)
@@ -58,7 +53,7 @@ function Page() {
       }
     });
     return () => { cancelled = true; };
-  }, [estado, q, user]);
+    }, [estado, q]);
 
   return (
     <Layout>
@@ -98,12 +93,8 @@ function Page() {
               {it.habilidades && <p className="mt-2 text-sm"><strong>Habilidades:</strong> {it.habilidades}</p>}
               {it.descripcion && <p className="mt-2 text-sm text-muted-foreground">{it.descripcion}</p>}
               {it.disponibilidad && <p className="mt-2 text-xs text-muted-foreground">Disponibilidad: {it.disponibilidad}</p>}
-              {it.contacto ? (
+              {it.contacto && (
                 <p className="mt-3 rounded-xl bg-muted px-3 py-2 text-sm"><strong>Contacto:</strong> {it.contacto}</p>
-              ) : (
-                <p className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-muted px-3 py-2 text-xs text-muted-foreground">
-                  <Lock className="h-3 w-3" /> Inicia sesión para ver el contacto
-                </p>
               )}
             </article>
           ))

@@ -5,7 +5,7 @@ import { Photo } from "@/components/Photo";
 import { StatusBadge, type MissingStatus } from "@/components/StatusBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { ESTADOS_VE } from "@/lib/venezuela";
-import { Search, SlidersHorizontal, Plus, MapPin, Calendar, IdCard, Phone, Mail, MessageCircle, Instagram, ExternalLink, Share2 } from "lucide-react";
+import { Search, SlidersHorizontal, Plus, MapPin, Calendar, IdCard, Phone, Mail, MessageCircle, Instagram, Share2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 type Row = {
@@ -221,13 +221,6 @@ function Page() {
                 >
                   <Share2 className="h-4 w-4" /> Compartir
                 </button>
-                <Link
-                  to="/desaparecidos/$id"
-                  params={{ id: openPerson.id }}
-                  className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold hover:bg-muted"
-                >
-                  <ExternalLink className="h-4 w-4" /> Ver perfil completo
-                </Link>
               </div>
             </>
           )}

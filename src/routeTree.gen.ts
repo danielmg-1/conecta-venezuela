@@ -20,6 +20,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DesaparecidosIdRouteImport } from './routes/desaparecidos.$id'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedMisReportesRouteImport } from './routes/_authenticated/mis-reportes'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -87,6 +88,11 @@ const DesaparecidosIdRoute = DesaparecidosIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => DesaparecidosRoute,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
   id: '/perfil',
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/voluntarios': typeof VoluntariosRoute
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/api/chat': typeof ApiChatRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/centros': typeof AuthenticatedAdminCentrosRoute
@@ -202,6 +209,7 @@ export interface FileRoutesByTo {
   '/voluntarios': typeof VoluntariosRoute
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/api/chat': typeof ApiChatRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/centros': typeof AuthenticatedAdminCentrosRoute
@@ -229,6 +237,7 @@ export interface FileRoutesById {
   '/voluntarios': typeof VoluntariosRoute
   '/_authenticated/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/api/chat': typeof ApiChatRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
   '/_authenticated/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/_authenticated/admin/centros': typeof AuthenticatedAdminCentrosRoute
@@ -256,6 +265,7 @@ export interface FileRouteTypes {
     | '/voluntarios'
     | '/mis-reportes'
     | '/perfil'
+    | '/api/chat'
     | '/desaparecidos/$id'
     | '/admin/anuncios'
     | '/admin/centros'
@@ -281,6 +291,7 @@ export interface FileRouteTypes {
     | '/voluntarios'
     | '/mis-reportes'
     | '/perfil'
+    | '/api/chat'
     | '/desaparecidos/$id'
     | '/admin/anuncios'
     | '/admin/centros'
@@ -307,6 +318,7 @@ export interface FileRouteTypes {
     | '/voluntarios'
     | '/_authenticated/mis-reportes'
     | '/_authenticated/perfil'
+    | '/api/chat'
     | '/desaparecidos/$id'
     | '/_authenticated/admin/anuncios'
     | '/_authenticated/admin/centros'
@@ -332,6 +344,7 @@ export interface RootRouteChildren {
   MapaRoute: typeof MapaRoute
   NoticiasRoute: typeof NoticiasRoute
   VoluntariosRoute: typeof VoluntariosRoute
+  ApiChatRoute: typeof ApiChatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -412,6 +425,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/desaparecidos/$id'
       preLoaderRoute: typeof DesaparecidosIdRouteImport
       parentRoute: typeof DesaparecidosRoute
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/perfil': {
       id: '/_authenticated/perfil'
@@ -567,6 +587,7 @@ const rootRouteChildren: RootRouteChildren = {
   MapaRoute: MapaRoute,
   NoticiasRoute: NoticiasRoute,
   VoluntariosRoute: VoluntariosRoute,
+  ApiChatRoute: ApiChatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

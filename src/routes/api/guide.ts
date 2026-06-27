@@ -12,7 +12,7 @@ Secciones de la web (úsalas en enlaces Markdown cuando corresponda):
 - "/desaparecidos/nuevo" Reportar persona: formulario para publicar una persona desaparecida (requiere iniciar sesión y consentimiento). Permite subir fotos, datos y hasta 4 métodos de contacto.
 - "/desaparecidos/{id}" Perfil de persona: detalle, envío de pistas y, solo para el autor o admin, cambiar el estatus.
 - "/mapa" Mapa interactivo: muestra zonas más afectadas y capas de "Desaparecidos" y "Centros de ayuda".
-- "/centros-acopio" Ayuda: lista de centros de acopio, hospitales, clínicas, donaciones, refugios y primeros auxilios. Puedes filtrar por estado/tipo.
+- "/centros-acopio" Donaciones: lista de centros de acopio, hospitales, clínicas, donaciones, refugios y primeros auxilios. Puedes filtrar por estado/tipo.
 - "/centros-acopio/nuevo" Publicar centro: registrar un punto de ayuda con ubicación exacta en el mapa (requiere iniciar sesión).
 - "/voluntarios" Voluntarios: directorio de profesionales que ofrecen ayuda, y registro propio.
 - "/emergencias" Emergencias: números oficiales (911, Protección Civil 0800-7248451, Cruz Roja 0241-8214841, Bomberos 171, apoyo psicológico UCAB 0424-1723981).

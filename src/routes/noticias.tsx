@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import DOMPurify from "dompurify";
 import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -15,7 +16,7 @@ export const Route = createFileRoute("/noticias")({
   component: Page,
 });
 
-type News = { id: string; titulo: string; contenido: string; created_at: string };
+type News = { id: string; titulo: string; contenido: string; body_html: string | null; is_html: boolean; created_at: string };
 
 function Page() {
   const [items, setItems] = useState<News[]>([]);
@@ -24,7 +25,7 @@ function Page() {
   useEffect(() => {
     supabase
       .from("news")
-      .select("id,titulo,contenido,created_at")
+      .select("id,titulo,contenido,body_html,is_html,created_at")
       .eq("published", true)
       .order("created_at", { ascending: false })
       .limit(100)
@@ -50,8 +51,20 @@ function Page() {
           items.map((n) => (
             <article key={n.id} className="rounded-3xl border border-border bg-card p-6">
               <time className="text-xs text-muted-foreground">{new Date(n.created_at).toLocaleString("es-VE")}</time>
-              <h2 className="mt-1 text-xl font-semibold">{n.titulo}</h2>
-              <div className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">{n.contenido}</div>
+              <h2 className="mt-1 text-2xl font-semibold">{n.titulo}</h2>
+              {n.is_html && n.body_html ? (
+                <div
+                  className="mt-3 text-sm leading-relaxed text-foreground/90 [&_a]:text-primary [&_a]:underline [&_h2]:mt-4 [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:mt-3 [&_h3]:text-xl [&_h3]:font-semibold [&_img]:my-3 [&_img]:rounded-lg [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-2 [&_blockquote]:border-l-4 [&_blockquote]:border-border [&_blockquote]:pl-4 [&_blockquote]:italic"
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(n.body_html, {
+                    ALLOWED_TAGS: ["h1","h2","h3","h4","p","br","strong","em","b","i","u","ul","ol","li","a","img","blockquote","figure","figcaption","span","div","hr","code","pre"],
+                    ALLOWED_ATTR: ["href","target","rel","src","alt","title","class","style"],
+                    ALLOWED_URI_REGEXP: /^(https?:|mailto:|tel:|\/)/i,
+                    ADD_ATTR: ["target"],
+                  }) }}
+                />
+              ) : (
+                <div className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">{n.contenido}</div>
+              )}
             </article>
           ))
         )}

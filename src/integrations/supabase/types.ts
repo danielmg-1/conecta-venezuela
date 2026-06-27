@@ -368,9 +368,11 @@ export type Database = {
       news: {
         Row: {
           author_id: string
+          body_html: string | null
           contenido: string
           created_at: string
           id: string
+          is_html: boolean
           photo_path: string | null
           published: boolean
           titulo: string
@@ -378,9 +380,11 @@ export type Database = {
         }
         Insert: {
           author_id: string
+          body_html?: string | null
           contenido: string
           created_at?: string
           id?: string
+          is_html?: boolean
           photo_path?: string | null
           published?: boolean
           titulo: string
@@ -388,9 +392,11 @@ export type Database = {
         }
         Update: {
           author_id?: string
+          body_html?: string | null
           contenido?: string
           created_at?: string
           id?: string
+          is_html?: boolean
           photo_path?: string | null
           published?: boolean
           titulo?: string

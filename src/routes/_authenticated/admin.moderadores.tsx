@@ -73,11 +73,14 @@ function Page() {
         </label>
         <fieldset className="grid gap-2">
           <legend className="text-sm font-medium">Secciones que puede moderar</legend>
-          <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+          <div className="grid gap-2 sm:grid-cols-2">
             {ALL_SECTIONS.map((s) => (
-              <label key={s.value} className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition-colors ${selected.includes(s.value) ? "border-primary bg-primary/5" : "border-input"}`}>
-                <input type="checkbox" checked={selected.includes(s.value)} onChange={() => toggleSection(s.value)} className="h-4 w-4" />
-                {s.label}
+              <label key={s.value} className={`flex cursor-pointer items-start gap-2.5 rounded-xl border px-3 py-2.5 text-sm transition-colors ${selected.includes(s.value) ? "border-primary bg-primary/5" : "border-input"}`}>
+                <input type="checkbox" checked={selected.includes(s.value)} onChange={() => toggleSection(s.value)} className="mt-0.5 h-4 w-4" />
+                <span className="flex flex-col gap-0.5">
+                  <span className="font-medium">{s.label}</span>
+                  <span className="text-xs text-muted-foreground">{s.description}</span>
+                </span>
               </label>
             ))}
           </div>

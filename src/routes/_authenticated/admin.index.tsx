@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
+import { useCanModerate } from "@/hooks/use-moderator-permissions";
 import { StatusBadge, type MissingStatus } from "@/components/StatusBadge";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, CartesianGrid, Legend } from "recharts";
 import { aidTypeLabel } from "@/lib/aid";
@@ -36,13 +37,15 @@ export const Route = createFileRoute("/_authenticated/admin/")({
 function Page() {
   const { user } = useAuth();
   const isAdmin = useIsAdmin(user?.id);
+  const { allowed: canViewReports } = useCanModerate(user?.id, "reportes");
+  const { allowed: canHideMissing } = useCanModerate(user?.id, "desaparecidos");
   const [rows, setRows] = useState<Row[] | null>(null);
   const [aid, setAid] = useState<AidRow[] | null>(null);
   const [vols, setVols] = useState<VolRow[] | null>(null);
   const [tips, setTips] = useState<TipRow[] | null>(null);
 
   useEffect(() => {
-    if (!isAdmin) return;
+    if (!canViewReports) return;
     (async () => {
       const [{ data: mp }, { data: ap }, { data: vp }, { data: tp }] = await Promise.all([
         supabase.from("missing_persons").select("id,full_name,status,estado,hidden_by_admin,created_at").order("created_at", { ascending: false }).limit(500),
@@ -55,7 +58,7 @@ function Page() {
       setVols((vp ?? []) as VolRow[]);
       setTips((tp ?? []) as TipRow[]);
     })();
-  }, [isAdmin]);
+  }, [canViewReports]);
 
   async function toggleHide(id: string, hidden: boolean) {
     await supabase.from("missing_persons").update({ hidden_by_admin: !hidden }).eq("id", id);
@@ -108,21 +111,21 @@ function Page() {
     return [...m.entries()].map(([fecha, total]) => ({ fecha: fecha.slice(5), total }));
   }, [rows]);
 
-  if (!isAdmin) {
-    return <Layout><p className="py-20 text-center text-sm text-muted-foreground">Necesitas permisos de administrador.</p></Layout>;
+  if (!canViewReports) {
+    return <Layout><p className="py-20 text-center text-sm text-muted-foreground">No tienes permiso para ver los informes.</p></Layout>;
   }
 
   return (
     <Layout>
-      <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Panel admin</h1>
+      <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{isAdmin ? "Panel admin" : "Informes"}</h1>
       <div className="mt-3 flex flex-wrap gap-2">
-        <Link to="/admin/noticias" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Noticias</Link>
-        <Link to="/admin/anuncios" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Anuncios globales</Link>
-        <Link to="/admin/emergencias" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Emergencias</Link>
-        <Link to="/admin/centros" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Centros</Link>
-        <Link to="/admin/voluntarios" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Voluntarios</Link>
-        <Link to="/admin/moderadores" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Moderadores</Link>
-        <Link to="/centros-acopio/nuevo" className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90">+ Nuevo centro</Link>
+        {isAdmin && <Link to="/admin/noticias" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Noticias</Link>}
+        {isAdmin && <Link to="/admin/anuncios" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Anuncios globales</Link>}
+        {isAdmin && <Link to="/admin/emergencias" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Emergencias</Link>}
+        {isAdmin && <Link to="/admin/centros" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Centros</Link>}
+        {isAdmin && <Link to="/admin/voluntarios" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Voluntarios</Link>}
+        {isAdmin && <Link to="/admin/moderadores" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Moderadores</Link>}
+        {isAdmin && <Link to="/centros-acopio/nuevo" className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90">+ Nuevo centro</Link>}
         <button onClick={() => rows && download(`desaparecidos-${new Date().toISOString().slice(0,10)}.csv`, toCSV(rows))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Exportar desaparecidos CSV</button>
         <button onClick={() => aid && download(`centros-${new Date().toISOString().slice(0,10)}.csv`, toCSV(aid))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Exportar centros CSV</button>
         <button onClick={() => vols && download(`voluntarios-${new Date().toISOString().slice(0,10)}.csv`, toCSV(vols))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Exportar voluntarios CSV</button>
@@ -228,7 +231,7 @@ function Page() {
       <div className="mt-3 overflow-hidden rounded-2xl border border-border">
         <table className="w-full text-sm">
           <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
-            <tr><th className="p-3">Nombre</th><th className="p-3">Estado</th><th className="p-3">Status</th><th className="p-3">Visible</th><th className="p-3"></th></tr>
+            <tr><th className="p-3">Nombre</th><th className="p-3">Estado</th><th className="p-3">Status</th><th className="p-3">Visible</th>{canHideMissing && <th className="p-3"></th>}</tr>
           </thead>
           <tbody>
             {rows?.map((r) => (
@@ -237,7 +240,7 @@ function Page() {
                 <td className="p-3 text-muted-foreground">{r.estado}</td>
                 <td className="p-3"><StatusBadge status={r.status} /></td>
                 <td className="p-3">{r.hidden_by_admin ? "Oculto" : "Visible"}</td>
-                <td className="p-3 text-right"><button onClick={() => toggleHide(r.id, r.hidden_by_admin)} className="rounded-full border border-input px-3 py-1 text-xs">{r.hidden_by_admin ? "Mostrar" : "Ocultar"}</button></td>
+                {canHideMissing && <td className="p-3 text-right"><button onClick={() => toggleHide(r.id, r.hidden_by_admin)} className="rounded-full border border-input px-3 py-1 text-xs">{r.hidden_by_admin ? "Mostrar" : "Ocultar"}</button></td>}
               </tr>
             ))}
           </tbody>

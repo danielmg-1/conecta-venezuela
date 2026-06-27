@@ -2,15 +2,23 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin } from "@/hooks/use-auth";
 
-export type ModSection = "desaparecidos" | "centros" | "voluntarios" | "noticias" | "anuncios" | "emergencias";
+export type ModSection =
+  | "desaparecidos"
+  | "centros"
+  | "voluntarios"
+  | "noticias"
+  | "anuncios"
+  | "emergencias"
+  | "reportes";
 
-export const ALL_SECTIONS: { value: ModSection; label: string }[] = [
-  { value: "desaparecidos", label: "Desaparecidos" },
-  { value: "centros", label: "Centros de ayuda" },
-  { value: "voluntarios", label: "Voluntarios" },
-  { value: "noticias", label: "Noticias" },
-  { value: "anuncios", label: "Anuncios globales" },
-  { value: "emergencias", label: "Emergencias" },
+export const ALL_SECTIONS: { value: ModSection; label: string; description: string }[] = [
+  { value: "desaparecidos", label: "Desaparecidos", description: "Ocultar/mostrar reportes y marcar como verificado." },
+  { value: "centros", label: "Centros de ayuda", description: "Gestionar centros de acopio y donaciones." },
+  { value: "voluntarios", label: "Voluntarios", description: "Gestionar la lista de voluntarios registrados." },
+  { value: "noticias", label: "Noticias", description: "Publicar y editar noticias y artículos." },
+  { value: "anuncios", label: "Anuncios globales", description: "Crear avisos visibles en toda la página." },
+  { value: "emergencias", label: "Emergencias", description: "Agregar y editar números oficiales de emergencia." },
+  { value: "reportes", label: "Reportes e informes", description: "Ver el panel de informes públicos, gráficos y exportar CSV." },
 ];
 
 export function sectionLabel(s: string) {

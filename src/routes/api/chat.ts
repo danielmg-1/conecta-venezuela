@@ -204,11 +204,12 @@ export const Route = createFileRoute("/api/chat")({
             execute: async ({ estado, profesion }) => {
               let q = supabase
                 .from("volunteers")
-                .select("id, full_name, profession, skills, state, city, phone, email")
+                .select("id, nombre, profesion, habilidades, estado, ciudad, contacto, disponibilidad, descripcion")
+                .eq("hidden_by_admin", false)
                 .limit(15);
-              if (estado) q = q.ilike("state", `%${estado}%`);
+              if (estado) q = q.ilike("estado", `%${estado}%`);
               if (profesion) {
-                q = q.or(`profession.ilike.%${profesion}%,skills.ilike.%${profesion}%`);
+                q = q.or(`profesion.ilike.%${profesion}%,habilidades.ilike.%${profesion}%`);
               }
               const { data, error } = await q;
               if (error) return { error: error.message, voluntarios: [] };

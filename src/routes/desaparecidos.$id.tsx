@@ -5,7 +5,7 @@ import { Photo } from "@/components/Photo";
 import { StatusBadge, type MissingStatus } from "@/components/StatusBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
-import { MapPin, Calendar, IdCard, Phone, Mail, MessageCircle, Instagram, Share2, Pencil } from "lucide-react";
+import { MapPin, Calendar, IdCard, Phone, Mail, MessageCircle, Instagram, Share2, Pencil, Trash2 } from "lucide-react";
 
 type Person = {
   id: string;
@@ -166,6 +166,22 @@ function Page() {
                 className="rounded-full border border-destructive/40 bg-destructive/10 px-4 py-2 text-sm text-destructive"
               >
                 Ocultar (admin)
+              </button>
+            )}
+            {(isOwner || isAdmin) && (
+              <button
+                onClick={async () => {
+                  if (!confirm("¿Eliminar este reporte de forma permanente? Esta acción no se puede deshacer.")) return;
+                  if (person.photo_path) {
+                    await supabase.storage.from("missing-photos").remove([person.photo_path]).catch(() => {});
+                  }
+                  const { error } = await supabase.from("missing_persons").delete().eq("id", person.id);
+                  if (error) { alert("No se pudo eliminar: " + error.message); return; }
+                  router.navigate({ to: "/desaparecidos" });
+                }}
+                className="inline-flex items-center gap-2 rounded-full border border-destructive/40 bg-destructive px-4 py-2 text-sm font-semibold text-destructive-foreground"
+              >
+                <Trash2 className="h-4 w-4" /> Eliminar
               </button>
             )}
           </div>

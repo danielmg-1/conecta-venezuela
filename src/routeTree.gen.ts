@@ -13,7 +13,6 @@ import { Route as VoluntariosRouteImport } from './routes/voluntarios'
 import { Route as NoticiasRouteImport } from './routes/noticias'
 import { Route as MapaRouteImport } from './routes/mapa'
 import { Route as EmergenciasRouteImport } from './routes/emergencias'
-import { Route as DesaparecidosRouteImport } from './routes/desaparecidos'
 import { Route as ConsejosRouteImport } from './routes/consejos'
 import { Route as CentrosAcopioRouteImport } from './routes/centros-acopio'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -61,11 +60,6 @@ const EmergenciasRoute = EmergenciasRouteImport.update({
   path: '/emergencias',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DesaparecidosRoute = DesaparecidosRouteImport.update({
-  id: '/desaparecidos',
-  path: '/desaparecidos',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ConsejosRoute = ConsejosRouteImport.update({
   id: '/consejos',
   path: '/consejos',
@@ -96,9 +90,9 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const DesaparecidosIndexRoute = DesaparecidosIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DesaparecidosRoute,
+  id: '/desaparecidos/',
+  path: '/desaparecidos/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AsistenteIndexRoute = AsistenteIndexRouteImport.update({
   id: '/',
@@ -106,9 +100,9 @@ const AsistenteIndexRoute = AsistenteIndexRouteImport.update({
   getParentRoute: () => AsistenteRoute,
 } as any)
 const DesaparecidosIdRoute = DesaparecidosIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => DesaparecidosRoute,
+  id: '/desaparecidos/$id',
+  path: '/desaparecidos/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AsistenteThreadIdRoute = AsistenteThreadIdRouteImport.update({
   id: '/$threadId',
@@ -214,7 +208,6 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/centros-acopio': typeof CentrosAcopioRoute
   '/consejos': typeof ConsejosRoute
-  '/desaparecidos': typeof DesaparecidosRouteWithChildren
   '/emergencias': typeof EmergenciasRoute
   '/mapa': typeof MapaRoute
   '/noticias': typeof NoticiasRoute
@@ -278,7 +271,6 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/centros-acopio': typeof CentrosAcopioRoute
   '/consejos': typeof ConsejosRoute
-  '/desaparecidos': typeof DesaparecidosRouteWithChildren
   '/emergencias': typeof EmergenciasRoute
   '/mapa': typeof MapaRoute
   '/noticias': typeof NoticiasRoute
@@ -312,7 +304,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/centros-acopio'
     | '/consejos'
-    | '/desaparecidos'
     | '/emergencias'
     | '/mapa'
     | '/noticias'
@@ -375,7 +366,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/centros-acopio'
     | '/consejos'
-    | '/desaparecidos'
     | '/emergencias'
     | '/mapa'
     | '/noticias'
@@ -409,13 +399,14 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CentrosAcopioRoute: typeof CentrosAcopioRoute
   ConsejosRoute: typeof ConsejosRoute
-  DesaparecidosRoute: typeof DesaparecidosRouteWithChildren
   EmergenciasRoute: typeof EmergenciasRoute
   MapaRoute: typeof MapaRoute
   NoticiasRoute: typeof NoticiasRoute
   VoluntariosRoute: typeof VoluntariosRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiGuideRoute: typeof ApiGuideRoute
+  DesaparecidosIdRoute: typeof DesaparecidosIdRoute
+  DesaparecidosIndexRoute: typeof DesaparecidosIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -446,13 +437,6 @@ declare module '@tanstack/react-router' {
       path: '/emergencias'
       fullPath: '/emergencias'
       preLoaderRoute: typeof EmergenciasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/desaparecidos': {
-      id: '/desaparecidos'
-      path: '/desaparecidos'
-      fullPath: '/desaparecidos'
-      preLoaderRoute: typeof DesaparecidosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/consejos': {
@@ -499,10 +483,10 @@ declare module '@tanstack/react-router' {
     }
     '/desaparecidos/': {
       id: '/desaparecidos/'
-      path: '/'
+      path: '/desaparecidos'
       fullPath: '/desaparecidos/'
       preLoaderRoute: typeof DesaparecidosIndexRouteImport
-      parentRoute: typeof DesaparecidosRoute
+      parentRoute: typeof rootRouteImport
     }
     '/asistente/': {
       id: '/asistente/'
@@ -513,10 +497,10 @@ declare module '@tanstack/react-router' {
     }
     '/desaparecidos/$id': {
       id: '/desaparecidos/$id'
-      path: '/$id'
+      path: '/desaparecidos/$id'
       fullPath: '/desaparecidos/$id'
       preLoaderRoute: typeof DesaparecidosIdRouteImport
-      parentRoute: typeof DesaparecidosRoute
+      parentRoute: typeof rootRouteImport
     }
     '/asistente/$threadId': {
       id: '/asistente/$threadId'
@@ -694,20 +678,6 @@ const AsistenteRouteWithChildren = AsistenteRoute._addFileChildren(
   AsistenteRouteChildren,
 )
 
-interface DesaparecidosRouteChildren {
-  DesaparecidosIdRoute: typeof DesaparecidosIdRoute
-  DesaparecidosIndexRoute: typeof DesaparecidosIndexRoute
-}
-
-const DesaparecidosRouteChildren: DesaparecidosRouteChildren = {
-  DesaparecidosIdRoute: DesaparecidosIdRoute,
-  DesaparecidosIndexRoute: DesaparecidosIndexRoute,
-}
-
-const DesaparecidosRouteWithChildren = DesaparecidosRoute._addFileChildren(
-  DesaparecidosRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -715,13 +685,14 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CentrosAcopioRoute: CentrosAcopioRoute,
   ConsejosRoute: ConsejosRoute,
-  DesaparecidosRoute: DesaparecidosRouteWithChildren,
   EmergenciasRoute: EmergenciasRoute,
   MapaRoute: MapaRoute,
   NoticiasRoute: NoticiasRoute,
   VoluntariosRoute: VoluntariosRoute,
   ApiChatRoute: ApiChatRoute,
   ApiGuideRoute: ApiGuideRoute,
+  DesaparecidosIdRoute: DesaparecidosIdRoute,
+  DesaparecidosIndexRoute: DesaparecidosIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -3,6 +3,8 @@ import { Home, Search, Map, Phone, User, HeartHandshake, Users, Newspaper, LifeB
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { FloatingGuide } from "@/components/FloatingGuide";
+import iconAsset from "@/assets/conecta-icon.png.asset.json";
+import logoLightAsset from "@/assets/conecta-logo-light.png.asset.json";
 import type { ReactNode } from "react";
 
 const baseNav = [
@@ -35,8 +37,8 @@ export function Layout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-40 hidden border-b border-border/60 bg-background/80 backdrop-blur-xl md:block">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <Link to="/" className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-2xl bg-primary text-primary-foreground font-bold">G</span>
-            <span className="text-lg font-semibold tracking-tight">Guía de Apoyo Venezuela</span>
+            <img src={iconAsset.url} alt="Conecta Venezuela" className="h-9 w-9" />
+            <span className="text-lg font-semibold tracking-tight">Conecta Venezuela</span>
           </Link>
           <nav className="flex items-center gap-1">
             {navItems.map((item) => {
@@ -85,8 +87,8 @@ export function Layout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur-xl md:hidden">
         <div className="flex h-14 items-center justify-between px-4">
           <Link to="/" className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-xl bg-primary text-primary-foreground text-sm font-bold">G</span>
-            <span className="text-sm font-semibold tracking-tight">Guía de Apoyo VE</span>
+            <img src={iconAsset.url} alt="Conecta Venezuela" className="h-8 w-8" />
+            <span className="text-sm font-semibold tracking-tight">Conecta Venezuela</span>
           </Link>
         </div>
       </header>

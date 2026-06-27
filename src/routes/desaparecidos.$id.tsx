@@ -6,6 +6,7 @@ import { StatusBadge, type MissingStatus } from "@/components/StatusBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { MapPin, Calendar, IdCard, Phone, Mail, MessageCircle, Instagram, Share2, Pencil, Trash2 } from "lucide-react";
+import { formatDateOnly } from "@/lib/utils";
 
 type Person = {
   id: string;
@@ -116,7 +117,7 @@ function Page() {
 
           <dl className="mt-6 space-y-3 text-sm">
             {person.cedula && <Row icon={<IdCard className="h-4 w-4" />} label="Cédula" value={person.cedula} />}
-            {person.birth_date && <Row icon={<Calendar className="h-4 w-4" />} label="Fecha de nacimiento" value={new Date(person.birth_date).toLocaleDateString("es-VE")} />}
+            {person.birth_date && <Row icon={<Calendar className="h-4 w-4" />} label="Fecha de nacimiento" value={formatDateOnly(person.birth_date)} />}
             <Row icon={<MapPin className="h-4 w-4" />} label="Última ubicación" value={[person.lugar_desaparicion, person.ciudad, person.estado].filter(Boolean).join(", ")} />
           </dl>
 

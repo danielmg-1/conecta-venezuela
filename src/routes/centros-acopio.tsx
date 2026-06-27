@@ -4,8 +4,9 @@ import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { AID_TYPES, aidTypeLabel } from "@/lib/aid";
 import { ESTADOS_VE } from "@/lib/venezuela";
-import { MapPin, Phone, Plus, Pencil } from "lucide-react";
+import { MapPin, Phone, Plus, Pencil, ListChecks } from "lucide-react";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
+import { NeedsPanel } from "@/components/NeedsPanel";
 
 export const Route = createFileRoute("/centros-acopio")({
   head: () => ({
@@ -41,6 +42,15 @@ function Page() {
   const [tipo, setTipo] = useState<string>("");
   const [estado, setEstado] = useState<string>("");
   const [q, setQ] = useState("");
+  const [hostIds, setHostIds] = useState<Set<string>>(new Set());
+  const [openNeeds, setOpenNeeds] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (!user) { setHostIds(new Set()); return; }
+    supabase.from("aid_point_hosts").select("aid_point_id").eq("user_id", user.id).then(({ data }) => {
+      setHostIds(new Set((data ?? []).map((r) => r.aid_point_id as string)));
+    });
+  }, [user]);
 
   useEffect(() => {
     let cancelled = false;
@@ -116,10 +126,18 @@ function Page() {
                   <Phone className="h-3.5 w-3.5" /> {it.telefono}
                 </a>
               )}
-              {(user?.id === it.owner_id || isAdmin) && (
-                <Link to="/centros-acopio/$id/editar" params={{ id: it.id }} className="mt-3 ml-2 inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium">
-                  <Pencil className="h-3.5 w-3.5" /> Editar
-                </Link>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button onClick={() => setOpenNeeds((s) => ({ ...s, [it.id]: !s[it.id] }))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium">
+                  <ListChecks className="h-3.5 w-3.5" /> {openNeeds[it.id] ? "Ocultar" : "Ver"} necesidades
+                </button>
+                {(user?.id === it.owner_id || isAdmin || hostIds.has(it.id)) && (
+                  <Link to="/centros-acopio/$id/editar" params={{ id: it.id }} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium">
+                    <Pencil className="h-3.5 w-3.5" /> Editar
+                  </Link>
+                )}
+              </div>
+              {openNeeds[it.id] && (
+                <NeedsPanel aidPointId={it.id} canManage={!!user && (user.id === it.owner_id || isAdmin || hostIds.has(it.id))} />
               )}
             </article>
           ))

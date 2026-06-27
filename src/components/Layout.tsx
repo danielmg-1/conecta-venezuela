@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Search, Map, Phone, User, HeartHandshake, Users, Newspaper, LifeBuoy } from "lucide-react";
+import { Home, Search, Map, Phone, User, HeartHandshake, Users, Newspaper, LifeBuoy, Sparkles } from "lucide-react";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import type { ReactNode } from "react";
@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 const baseNav = [
   { to: "/", label: "Inicio", icon: Home },
   { to: "/desaparecidos", label: "Buscar", icon: Search },
+  { to: "/asistente", label: "Asistente", icon: Sparkles },
   { to: "/mapa", label: "Mapa", icon: Map },
   { to: "/centros-acopio", label: "Ayuda", icon: HeartHandshake },
 ] as const;

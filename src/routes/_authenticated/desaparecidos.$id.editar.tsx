@@ -6,6 +6,7 @@ import { uploadMissingPhoto, getSignedPhoto } from "@/lib/photo";
 import { ESTADOS_VE } from "@/lib/venezuela";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { Camera, Upload, X, Trash2, Plus } from "lucide-react";
+import { MapPicker } from "@/components/MapPicker";
 
 type ContactDraft = {
   id?: string;
@@ -48,6 +49,7 @@ function Page() {
 
   const [contacts, setContacts] = useState<ContactDraft[]>([]);
   const [deletedContactIds, setDeletedContactIds] = useState<string[]>([]);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -66,6 +68,7 @@ function Page() {
       });
       setExistingPhotoPath(p.photo_path);
       if (p.photo_path) setExistingPhotoUrl(await getSignedPhoto(p.photo_path));
+      if (p.lat != null && p.lng != null) setCoords({ lat: Number(p.lat), lng: Number(p.lng) });
       const { data: c } = await supabase.from("missing_person_contacts").select("*").eq("person_id", id);
       setContacts(
         ((c ?? []) as any[]).map((x) => ({
@@ -119,6 +122,8 @@ function Page() {
         lugar_desaparicion: string | null;
         descripcion: string | null;
         photo_path?: string | null;
+        lat: number | null;
+        lng: number | null;
       } = {
         full_name: form.full_name.trim(),
         cedula: form.cedula.trim() || null,
@@ -127,6 +132,8 @@ function Page() {
         ciudad: form.ciudad.trim() || null,
         lugar_desaparicion: form.lugar_desaparicion.trim() || null,
         descripcion: form.descripcion.trim() || null,
+        lat: coords?.lat ?? null,
+        lng: coords?.lng ?? null,
       };
       if (photoPath !== undefined) update.photo_path = photoPath;
 
@@ -242,6 +249,12 @@ function Page() {
           <span className="font-medium">Descripción</span>
           <textarea value={form.descripcion} onChange={(e) => setForm({ ...form, descripcion: e.target.value })} rows={3} className="rounded-xl border border-input bg-background px-3 py-2.5" />
         </label>
+
+        <div className="grid gap-1.5 text-sm">
+          <span className="font-medium">Ubicación en el mapa <span className="text-muted-foreground font-normal">(opcional)</span></span>
+          <p className="text-xs text-muted-foreground">Toca el mapa para marcar el lugar exacto.</p>
+          <MapPicker value={coords} onChange={setCoords} />
+        </div>
 
         <div className="rounded-2xl border border-dashed border-border p-4">
           <div className="flex items-center justify-between">

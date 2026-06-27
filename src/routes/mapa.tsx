@@ -137,8 +137,25 @@ function Page() {
           title: a.nombre,
         });
         m.addListener("click", () => {
-          info.setContent(`<div style="font-family:system-ui;font-size:13px"><strong>${a.nombre}</strong><br/>${aidTypeLabel(a.tipo)}<br/><span style="color:#666">${a.ciudad ? a.ciudad + ", " : ""}${a.estado}</span></div>`);
+          const gmaps = `https://www.google.com/maps/search/?api=1&query=${pos.lat},${pos.lng}`;
+          const shareText = encodeURIComponent(`${a.nombre} — ${aidTypeLabel(a.tipo)} (${a.ciudad ? a.ciudad + ", " : ""}${a.estado}): ${gmaps}`);
+          const wa = `https://wa.me/?text=${shareText}`;
+          info.setContent(
+            `<div style="font-family:system-ui;font-size:13px;min-width:200px">
+              <strong>${a.nombre}</strong><br/>${aidTypeLabel(a.tipo)}<br/>
+              <span style="color:#666">${a.ciudad ? a.ciudad + ", " : ""}${a.estado}</span>
+              <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">
+                <a href="${gmaps}" target="_blank" rel="noopener" style="background:#10b981;color:#fff;padding:6px 10px;border-radius:999px;text-decoration:none;font-weight:600">Cómo llegar</a>
+                <a href="${wa}" target="_blank" rel="noopener" style="background:#25D366;color:#fff;padding:6px 10px;border-radius:999px;text-decoration:none;font-weight:600">Compartir</a>
+                <button id="copy-aid-${a.id}" style="background:#f3f4f6;color:#111;padding:6px 10px;border-radius:999px;border:0;font-weight:600;cursor:pointer">Copiar enlace</button>
+              </div>
+            </div>`,
+          );
           info.open({ anchor: m, map });
+          setTimeout(() => {
+            const btn = document.getElementById(`copy-aid-${a.id}`);
+            if (btn) btn.onclick = () => { navigator.clipboard.writeText(gmaps); btn.textContent = "¡Copiado!"; };
+          }, 50);
         });
         markers.push(m);
       });

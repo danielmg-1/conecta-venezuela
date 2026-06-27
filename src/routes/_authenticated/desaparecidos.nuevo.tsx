@@ -6,6 +6,7 @@ import { uploadMissingPhoto } from "@/lib/photo";
 import { ESTADOS_VE } from "@/lib/venezuela";
 import { useAuth } from "@/hooks/use-auth";
 import { Trash2, Plus, Camera, Upload, X } from "lucide-react";
+import { MapPicker } from "@/components/MapPicker";
 
 type ContactDraft = { tipo: "telefono" | "whatsapp" | "email" | "instagram" | "otro"; valor: string; codigo_pais: string };
 
@@ -23,6 +24,7 @@ function Page() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [contacts, setContacts] = useState<ContactDraft[]>([{ tipo: "whatsapp", valor: "", codigo_pais: "+58" }]);
   const [consent, setConsent] = useState(false);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   function onPickFile(f: File | null) {
     setFile(f);
@@ -65,6 +67,8 @@ function Page() {
           lugar_desaparicion: String(fd.get("lugar_desaparicion") || "").trim() || null,
           descripcion: String(fd.get("descripcion") || "").trim() || null,
           photo_path: photoPath,
+          lat: coords?.lat ?? null,
+          lng: coords?.lng ?? null,
           public_consent: true,
           consent_at: new Date().toISOString(),
         })
@@ -159,6 +163,12 @@ function Page() {
         </div>
 
         <Field name="lugar_desaparicion" label="Lugar donde se presume desapareció" placeholder="Av. principal, edificio, sector…" />
+
+        <div className="grid gap-1.5 text-sm">
+          <span className="font-medium">Ubicación en el mapa <span className="text-muted-foreground font-normal">(opcional)</span></span>
+          <p className="text-xs text-muted-foreground">Toca el mapa para marcar el lugar exacto. Ayuda a mostrarla en el mapa en vivo.</p>
+          <MapPicker value={coords} onChange={setCoords} />
+        </div>
 
         <label className="grid gap-1.5 text-sm">
           <span className="font-medium">Descripción (ropa, señas, contexto)</span>

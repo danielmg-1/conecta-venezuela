@@ -5,9 +5,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Photo } from "@/components/Photo";
 import { StatusBadge, type MissingStatus } from "@/components/StatusBadge";
-import { Bell, Pencil } from "lucide-react";
+import { Bell, Pencil, MailQuestion, Check, X } from "lucide-react";
+import { aidTypeLabel } from "@/lib/aid";
 
 type Row = { id: string; full_name: string; status: MissingStatus; photo_path: string | null; estado: string; ciudad: string | null; updated_at: string };
+
+type Invitation = { aid_point_id: string; nombre: string; tipo: string; estado: string; ciudad: string | null; invited_at: string; status: string };
 
 export const Route = createFileRoute("/_authenticated/mis-reportes")({
   component: Page,
@@ -17,6 +20,7 @@ function Page() {
   const { user } = useAuth();
   const [rows, setRows] = useState<Row[] | null>(null);
   const [tips, setTips] = useState<Array<{ id: string; person_id: string; autor_nombre: string; mensaje: string; autor_contacto: string | null; created_at: string }> | null>(null);
+  const [invites, setInvites] = useState<Invitation[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -28,8 +32,16 @@ function Page() {
         const { data: t } = await supabase.from("tips").select("*").in("person_id", ids).order("created_at", { ascending: false });
         setTips((t ?? []) as never);
       } else setTips([]);
+      const { data: inv } = await supabase.rpc("aid_point_list_my_invitations" as never);
+      setInvites(((inv ?? []) as unknown) as Invitation[]);
     })();
   }, [user]);
+
+  async function respond(aidPointId: string, accept: boolean) {
+    const { error } = await supabase.rpc("aid_point_respond_invitation" as never, { _aid_point_id: aidPointId, _accept: accept } as never);
+    if (error) { alert(error.message); return; }
+    setInvites((prev) => prev.map((i) => i.aid_point_id === aidPointId ? { ...i, status: accept ? "accepted" : "declined" } : i));
+  }
 
   const stale = useMemo(() => {
     if (!rows) return [];
@@ -52,6 +64,50 @@ function Page() {
   return (
     <Layout>
       <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Mis reportes</h1>
+
+      {invites.filter((i) => i.status === "pending").length > 0 && (
+        <div className="mt-6 rounded-3xl border border-primary/30 bg-primary/5 p-5">
+          <div className="flex items-start gap-3">
+            <div className="rounded-full bg-primary/15 p-2 text-primary"><MailQuestion className="h-5 w-5" /></div>
+            <div className="flex-1">
+              <h2 className="font-semibold">Invitaciones para coadministrar centros</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Te invitaron a ser anfitrión de estos puntos de ayuda. Si aceptas, podrás editar la información y gestionar necesidades.</p>
+              <ul className="mt-4 space-y-2">
+                {invites.filter((i) => i.status === "pending").map((i) => (
+                  <li key={i.aid_point_id} className="flex flex-wrap items-center gap-3 rounded-2xl bg-background p-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium">{i.nombre}</p>
+                      <p className="text-xs text-muted-foreground">{aidTypeLabel(i.tipo)} · {[i.ciudad, i.estado].filter(Boolean).join(", ")}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => respond(i.aid_point_id, true)} className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700">
+                        <Check className="h-3 w-3" /> Aceptar
+                      </button>
+                      <button onClick={() => respond(i.aid_point_id, false)} className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-semibold hover:bg-muted">
+                        <X className="h-3 w-3" /> Rechazar
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {invites.filter((i) => i.status === "accepted").length > 0 && (
+        <div className="mt-4 rounded-2xl border border-border bg-card p-4">
+          <h3 className="text-sm font-semibold">Centros que coadministras</h3>
+          <ul className="mt-2 grid gap-2 sm:grid-cols-2">
+            {invites.filter((i) => i.status === "accepted").map((i) => (
+              <li key={i.aid_point_id} className="rounded-xl border border-border p-3">
+                <Link to="/centros-acopio/$id/editar" params={{ id: i.aid_point_id }} className="text-sm font-medium hover:underline">{i.nombre}</Link>
+                <p className="text-xs text-muted-foreground">{aidTypeLabel(i.tipo)} · {[i.ciudad, i.estado].filter(Boolean).join(", ")}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {stale.length > 0 && (
         <div className="mt-6 rounded-3xl border border-amber-300/60 bg-amber-50 p-5 dark:border-amber-500/30 dark:bg-amber-950/30">

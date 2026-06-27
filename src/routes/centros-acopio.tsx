@@ -7,6 +7,7 @@ import { ESTADOS_VE } from "@/lib/venezuela";
 import { MapPin, Phone, Plus, Pencil, ListChecks, AlertCircle } from "lucide-react";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { NeedsPanel } from "@/components/NeedsPanel";
+import { contactHref, contactIcon, type ContactKind } from "@/components/AidContactsSection";
 
 export const Route = createFileRoute("/centros-acopio")({
   head: () => ({
@@ -40,6 +41,13 @@ type ActiveNeed = {
   priority: "alta" | "media" | "baja";
 };
 
+type ContactRow = {
+  aid_point_id: string;
+  kind: ContactKind;
+  value: string;
+  label: string | null;
+};
+
 const PRIORITY_DOT: Record<string, string> = {
   alta: "bg-red-500",
   media: "bg-amber-500",
@@ -57,6 +65,7 @@ function Page() {
   const [hostIds, setHostIds] = useState<Set<string>>(new Set());
   const [openNeeds, setOpenNeeds] = useState<Record<string, boolean>>({});
   const [needs, setNeeds] = useState<ActiveNeed[]>([]);
+  const [contacts, setContacts] = useState<ContactRow[]>([]);
   const [onlyPending, setOnlyPending] = useState(false);
   const [needPriority, setNeedPriority] = useState<string>("");
   const [needQ, setNeedQ] = useState("");
@@ -105,8 +114,26 @@ function Page() {
     return () => { cancelled = true; };
   }, [items]);
 
+  useEffect(() => {
+    if (items.length === 0) { setContacts([]); return; }
+    const ids = items.map((i) => i.id);
+    let cancelled = false;
+    supabase
+      .from("aid_point_contacts" as never)
+      .select("aid_point_id,kind,value,label")
+      .in("aid_point_id", ids)
+      .then(({ data }) => {
+        if (!cancelled) setContacts(((data ?? []) as unknown) as ContactRow[]);
+      });
+    return () => { cancelled = true; };
+  }, [items]);
+
   const needsByPoint = needs.reduce<Record<string, ActiveNeed[]>>((acc, n) => {
     (acc[n.aid_point_id] ||= []).push(n);
+    return acc;
+  }, {});
+  const contactsByPoint = contacts.reduce<Record<string, ContactRow[]>>((acc, c) => {
+    (acc[c.aid_point_id] ||= []).push(c);
     return acc;
   }, {});
 
@@ -200,11 +227,34 @@ function Page() {
                 </p>
               )}
               {it.horario && <p className="mt-2 text-xs text-muted-foreground">Horario: {it.horario}</p>}
-              {it.telefono && (
-                <a href={`tel:${it.telefono}`} className="mt-3 inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium">
-                  <Phone className="h-3.5 w-3.5" /> {it.telefono}
-                </a>
-              )}
+              {(() => {
+                const cs = contactsByPoint[it.id] ?? [];
+                if (cs.length === 0) {
+                  return it.telefono ? (
+                    <a href={`tel:${it.telefono}`} className="mt-3 inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium">
+                      <Phone className="h-3.5 w-3.5" /> {it.telefono}
+                    </a>
+                  ) : null;
+                }
+                return (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {cs.map((c, i) => {
+                      const href = contactHref(c);
+                      const inner = (
+                        <>
+                          {contactIcon(c.kind)}
+                          <span className="truncate">{c.value}{c.label ? ` · ${c.label}` : ""}</span>
+                        </>
+                      );
+                      return href ? (
+                        <a key={i} href={href} target={c.kind === "instagram" || c.kind === "whatsapp" ? "_blank" : undefined} rel="noopener noreferrer" className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-input px-3 py-1.5 text-xs font-medium">{inner}</a>
+                      ) : (
+                        <span key={i} className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-input px-3 py-1.5 text-xs">{inner}</span>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
               <div className="mt-3 flex flex-wrap gap-2">
                 <button onClick={() => setOpenNeeds((s) => ({ ...s, [it.id]: !s[it.id] }))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium">
                   <ListChecks className="h-3.5 w-3.5" /> {openNeeds[it.id] ? "Ocultar" : "Ver"} necesidades

@@ -10,9 +10,9 @@ import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 export const Route = createFileRoute("/centros-acopio")({
   head: () => ({
     meta: [
-      { title: "Centros de acopio y ayuda — Guía de Apoyo Venezuela" },
+      { title: "Donaciones — Guía de Apoyo Venezuela" },
       { name: "description", content: "Encuentra centros de acopio, puntos de recaudación, hospitales y servicios de ayuda activos tras el terremoto en Venezuela." },
-      { property: "og:title", content: "Centros de acopio y ayuda" },
+      { property: "og:title", content: "Donaciones" },
       { property: "og:description", content: "Mapa colaborativo de puntos de ayuda en Venezuela." },
     ],
   }),

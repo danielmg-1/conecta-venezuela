@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getVisitorId } from "@/lib/visitor";
+import { useAuth } from "@/hooks/use-auth";
 import { Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/asistente/")({
@@ -10,14 +10,16 @@ export const Route = createFileRoute("/asistente/")({
 
 function AsistenteIndex() {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
+    if (loading) return;
+    if (!user) return;
     (async () => {
-      const visitorId = getVisitorId();
       const { data } = await supabase
         .from("chat_threads")
         .select("id")
-        .eq("visitor_id", visitorId)
+        .eq("user_id", user.id)
         .order("updated_at", { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -27,20 +29,22 @@ function AsistenteIndex() {
       }
       const { data: created } = await supabase
         .from("chat_threads")
-        .insert({ visitor_id: visitorId, title: "Nueva conversación" })
+        .insert({ user_id: user.id, visitor_id: user.id, title: "Nueva conversación" })
         .select("id")
         .single();
       if (created?.id) {
         navigate({ to: "/asistente/$threadId", params: { threadId: created.id }, replace: true });
       }
     })();
-  }, [navigate]);
+  }, [navigate, user, loading]);
 
   return (
     <div className="grid h-full place-items-center text-center">
       <div>
         <Sparkles className="mx-auto h-10 w-10 text-primary" />
-        <p className="mt-3 text-sm text-muted-foreground">Preparando tu conversación…</p>
+        <p className="mt-3 text-sm text-muted-foreground">
+          {user ? "Preparando tu conversación…" : "Inicia sesión para guardar tu conversación. También puedes usar el chat flotante de Brújula sin cuenta."}
+        </p>
       </div>
     </div>
   );

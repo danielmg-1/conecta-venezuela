@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, tool, stepCountIs, type UIMessage } from "ai";
 import { z } from "zod";
-import { createClient } from "@supabase/supabase-js";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 
 const SYSTEM = `Eres Brújula, la guía virtual de Conecta Venezuela. Personalidad cálida, paciente y orientadora. Respondes SIEMPRE en español, con empatía y claridad.
@@ -35,11 +34,7 @@ export const Route = createFileRoute("/api/chat")({
         const apiKey = process.env.LOVABLE_API_KEY;
         if (!apiKey) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 
-        const supabase = createClient(
-          process.env.SUPABASE_URL!,
-          process.env.SUPABASE_PUBLISHABLE_KEY!,
-          { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
-        );
+        const { supabaseAdmin: supabase } = await import("@/integrations/supabase/client.server");
 
         const gateway = createLovableAiGatewayProvider(apiKey);
 
@@ -56,13 +51,13 @@ export const Route = createFileRoute("/api/chat")({
             execute: async ({ nombre, cedula, estado_lugar, status }) => {
               let q = supabase
                 .from("missing_persons")
-                .select("id, full_name, cedula, status, last_seen_state, last_seen_location, photo_url, birth_date")
+                .select("id, full_name, cedula, status, estado, ciudad, lugar_desaparicion, photo_path, birth_date")
                 .limit(10);
               if (cedula) q = q.ilike("cedula", `%${cedula.replace(/\D/g, "")}%`);
               if (status) q = q.eq("status", status);
               if (estado_lugar) {
                 q = q.or(
-                  `last_seen_state.ilike.%${estado_lugar}%,last_seen_location.ilike.%${estado_lugar}%`,
+                  `estado.ilike.%${estado_lugar}%,ciudad.ilike.%${estado_lugar}%,lugar_desaparicion.ilike.%${estado_lugar}%`,
                 );
               }
               if (nombre) {
@@ -114,13 +109,13 @@ export const Route = createFileRoute("/api/chat")({
             execute: async () => {
               const { data, error } = await supabase
                 .from("missing_persons")
-                .select("last_seen_state, status")
+                .select("estado, status")
                 .in("status", ["desaparecido", "en_busqueda"])
                 .limit(1000);
               if (error) return { error: error.message, zonas: [] };
               const counts = new Map<string, number>();
               for (const r of data ?? []) {
-                const k = (r.last_seen_state || "Sin especificar").trim();
+                const k = (r.estado || "Sin especificar").trim();
                 counts.set(k, (counts.get(k) ?? 0) + 1);
               }
               const zonas = Array.from(counts.entries())

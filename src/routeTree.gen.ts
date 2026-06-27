@@ -17,9 +17,13 @@ import { Route as DesaparecidosRouteImport } from './routes/desaparecidos'
 import { Route as ConsejosRouteImport } from './routes/consejos'
 import { Route as CentrosAcopioRouteImport } from './routes/centros-acopio'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AsistenteRouteImport } from './routes/asistente'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AsistenteIndexRouteImport } from './routes/asistente.index'
 import { Route as DesaparecidosIdRouteImport } from './routes/desaparecidos.$id'
+import { Route as AsistenteThreadIdRouteImport } from './routes/asistente.$threadId'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedMisReportesRouteImport } from './routes/_authenticated/mis-reportes'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -74,6 +78,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AsistenteRoute = AsistenteRouteImport.update({
+  id: '/asistente',
+  path: '/asistente',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -83,10 +92,25 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AsistenteIndexRoute = AsistenteIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AsistenteRoute,
+} as any)
 const DesaparecidosIdRoute = DesaparecidosIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => DesaparecidosRoute,
+} as any)
+const AsistenteThreadIdRoute = AsistenteThreadIdRouteImport.update({
+  id: '/$threadId',
+  path: '/$threadId',
+  getParentRoute: () => AsistenteRoute,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
   id: '/perfil',
@@ -167,6 +191,7 @@ const AuthenticatedCentrosAcopioIdEditarRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/asistente': typeof AsistenteRouteWithChildren
   '/auth': typeof AuthRoute
   '/centros-acopio': typeof CentrosAcopioRoute
   '/consejos': typeof ConsejosRoute
@@ -177,7 +202,10 @@ export interface FileRoutesByFullPath {
   '/voluntarios': typeof VoluntariosRoute
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/api/chat': typeof ApiChatRoute
+  '/asistente/$threadId': typeof AsistenteThreadIdRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/asistente/': typeof AsistenteIndexRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/centros': typeof AuthenticatedAdminCentrosRoute
   '/admin/emergencias': typeof AuthenticatedAdminEmergenciasRoute
@@ -202,7 +230,10 @@ export interface FileRoutesByTo {
   '/voluntarios': typeof VoluntariosRoute
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/api/chat': typeof ApiChatRoute
+  '/asistente/$threadId': typeof AsistenteThreadIdRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/asistente': typeof AsistenteIndexRoute
   '/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/admin/centros': typeof AuthenticatedAdminCentrosRoute
   '/admin/emergencias': typeof AuthenticatedAdminEmergenciasRoute
@@ -219,6 +250,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/asistente': typeof AsistenteRouteWithChildren
   '/auth': typeof AuthRoute
   '/centros-acopio': typeof CentrosAcopioRoute
   '/consejos': typeof ConsejosRoute
@@ -229,7 +261,10 @@ export interface FileRoutesById {
   '/voluntarios': typeof VoluntariosRoute
   '/_authenticated/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/api/chat': typeof ApiChatRoute
+  '/asistente/$threadId': typeof AsistenteThreadIdRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
+  '/asistente/': typeof AsistenteIndexRoute
   '/_authenticated/admin/anuncios': typeof AuthenticatedAdminAnunciosRoute
   '/_authenticated/admin/centros': typeof AuthenticatedAdminCentrosRoute
   '/_authenticated/admin/emergencias': typeof AuthenticatedAdminEmergenciasRoute
@@ -246,6 +281,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/asistente'
     | '/auth'
     | '/centros-acopio'
     | '/consejos'
@@ -256,7 +292,10 @@ export interface FileRouteTypes {
     | '/voluntarios'
     | '/mis-reportes'
     | '/perfil'
+    | '/api/chat'
+    | '/asistente/$threadId'
     | '/desaparecidos/$id'
+    | '/asistente/'
     | '/admin/anuncios'
     | '/admin/centros'
     | '/admin/emergencias'
@@ -281,7 +320,10 @@ export interface FileRouteTypes {
     | '/voluntarios'
     | '/mis-reportes'
     | '/perfil'
+    | '/api/chat'
+    | '/asistente/$threadId'
     | '/desaparecidos/$id'
+    | '/asistente'
     | '/admin/anuncios'
     | '/admin/centros'
     | '/admin/emergencias'
@@ -297,6 +339,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/asistente'
     | '/auth'
     | '/centros-acopio'
     | '/consejos'
@@ -307,7 +350,10 @@ export interface FileRouteTypes {
     | '/voluntarios'
     | '/_authenticated/mis-reportes'
     | '/_authenticated/perfil'
+    | '/api/chat'
+    | '/asistente/$threadId'
     | '/desaparecidos/$id'
+    | '/asistente/'
     | '/_authenticated/admin/anuncios'
     | '/_authenticated/admin/centros'
     | '/_authenticated/admin/emergencias'
@@ -324,6 +370,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AsistenteRoute: typeof AsistenteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CentrosAcopioRoute: typeof CentrosAcopioRoute
   ConsejosRoute: typeof ConsejosRoute
@@ -332,6 +379,7 @@ export interface RootRouteChildren {
   MapaRoute: typeof MapaRoute
   NoticiasRoute: typeof NoticiasRoute
   VoluntariosRoute: typeof VoluntariosRoute
+  ApiChatRoute: typeof ApiChatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -392,6 +440,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/asistente': {
+      id: '/asistente'
+      path: '/asistente'
+      fullPath: '/asistente'
+      preLoaderRoute: typeof AsistenteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -406,12 +461,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/asistente/': {
+      id: '/asistente/'
+      path: '/'
+      fullPath: '/asistente/'
+      preLoaderRoute: typeof AsistenteIndexRouteImport
+      parentRoute: typeof AsistenteRoute
+    }
     '/desaparecidos/$id': {
       id: '/desaparecidos/$id'
       path: '/$id'
       fullPath: '/desaparecidos/$id'
       preLoaderRoute: typeof DesaparecidosIdRouteImport
       parentRoute: typeof DesaparecidosRoute
+    }
+    '/asistente/$threadId': {
+      id: '/asistente/$threadId'
+      path: '/$threadId'
+      fullPath: '/asistente/$threadId'
+      preLoaderRoute: typeof AsistenteThreadIdRouteImport
+      parentRoute: typeof AsistenteRoute
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/perfil': {
       id: '/_authenticated/perfil'
@@ -544,6 +620,20 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AsistenteRouteChildren {
+  AsistenteThreadIdRoute: typeof AsistenteThreadIdRoute
+  AsistenteIndexRoute: typeof AsistenteIndexRoute
+}
+
+const AsistenteRouteChildren: AsistenteRouteChildren = {
+  AsistenteThreadIdRoute: AsistenteThreadIdRoute,
+  AsistenteIndexRoute: AsistenteIndexRoute,
+}
+
+const AsistenteRouteWithChildren = AsistenteRoute._addFileChildren(
+  AsistenteRouteChildren,
+)
+
 interface DesaparecidosRouteChildren {
   DesaparecidosIdRoute: typeof DesaparecidosIdRoute
 }
@@ -559,6 +649,7 @@ const DesaparecidosRouteWithChildren = DesaparecidosRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AsistenteRoute: AsistenteRouteWithChildren,
   AuthRoute: AuthRoute,
   CentrosAcopioRoute: CentrosAcopioRoute,
   ConsejosRoute: ConsejosRoute,
@@ -567,6 +658,7 @@ const rootRouteChildren: RootRouteChildren = {
   MapaRoute: MapaRoute,
   NoticiasRoute: NoticiasRoute,
   VoluntariosRoute: VoluntariosRoute,
+  ApiChatRoute: ApiChatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

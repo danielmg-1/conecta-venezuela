@@ -23,6 +23,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AsistenteIndexRouteImport } from './routes/asistente.index'
 import { Route as DesaparecidosIdRouteImport } from './routes/desaparecidos.$id'
 import { Route as AsistenteThreadIdRouteImport } from './routes/asistente.$threadId'
+import { Route as ApiGuideRouteImport } from './routes/api/guide'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedMisReportesRouteImport } from './routes/_authenticated/mis-reportes'
@@ -106,6 +107,11 @@ const AsistenteThreadIdRoute = AsistenteThreadIdRouteImport.update({
   id: '/$threadId',
   path: '/$threadId',
   getParentRoute: () => AsistenteRoute,
+} as any)
+const ApiGuideRoute = ApiGuideRouteImport.update({
+  id: '/api/guide',
+  path: '/api/guide',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
@@ -203,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/guide': typeof ApiGuideRoute
   '/asistente/$threadId': typeof AsistenteThreadIdRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
   '/asistente/': typeof AsistenteIndexRoute
@@ -231,6 +238,7 @@ export interface FileRoutesByTo {
   '/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/guide': typeof ApiGuideRoute
   '/asistente/$threadId': typeof AsistenteThreadIdRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
   '/asistente': typeof AsistenteIndexRoute
@@ -262,6 +270,7 @@ export interface FileRoutesById {
   '/_authenticated/mis-reportes': typeof AuthenticatedMisReportesRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/guide': typeof ApiGuideRoute
   '/asistente/$threadId': typeof AsistenteThreadIdRoute
   '/desaparecidos/$id': typeof DesaparecidosIdRoute
   '/asistente/': typeof AsistenteIndexRoute
@@ -293,6 +302,7 @@ export interface FileRouteTypes {
     | '/mis-reportes'
     | '/perfil'
     | '/api/chat'
+    | '/api/guide'
     | '/asistente/$threadId'
     | '/desaparecidos/$id'
     | '/asistente/'
@@ -321,6 +331,7 @@ export interface FileRouteTypes {
     | '/mis-reportes'
     | '/perfil'
     | '/api/chat'
+    | '/api/guide'
     | '/asistente/$threadId'
     | '/desaparecidos/$id'
     | '/asistente'
@@ -351,6 +362,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mis-reportes'
     | '/_authenticated/perfil'
     | '/api/chat'
+    | '/api/guide'
     | '/asistente/$threadId'
     | '/desaparecidos/$id'
     | '/asistente/'
@@ -380,6 +392,7 @@ export interface RootRouteChildren {
   NoticiasRoute: typeof NoticiasRoute
   VoluntariosRoute: typeof VoluntariosRoute
   ApiChatRoute: typeof ApiChatRoute
+  ApiGuideRoute: typeof ApiGuideRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -481,6 +494,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/asistente/$threadId'
       preLoaderRoute: typeof AsistenteThreadIdRouteImport
       parentRoute: typeof AsistenteRoute
+    }
+    '/api/guide': {
+      id: '/api/guide'
+      path: '/api/guide'
+      fullPath: '/api/guide'
+      preLoaderRoute: typeof ApiGuideRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
       id: '/api/chat'
@@ -659,6 +679,7 @@ const rootRouteChildren: RootRouteChildren = {
   NoticiasRoute: NoticiasRoute,
   VoluntariosRoute: VoluntariosRoute,
   ApiChatRoute: ApiChatRoute,
+  ApiGuideRoute: ApiGuideRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

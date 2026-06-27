@@ -62,7 +62,7 @@ function Page() {
       }
     });
     return () => { cancelled = true; };
-  }, [tipo, estado, q, user]);
+  }, [tipo, estado, q]);
 
   return (
     <Layout>

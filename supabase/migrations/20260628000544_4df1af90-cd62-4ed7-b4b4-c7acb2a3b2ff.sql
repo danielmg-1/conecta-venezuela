@@ -1,0 +1,2 @@
+ALTER TABLE public.moderator_permissions DROP CONSTRAINT moderator_permissions_section_check;
+ALTER TABLE public.moderator_permissions ADD CONSTRAINT moderator_permissions_section_check CHECK (section = ANY (ARRAY['desaparecidos','centros','voluntarios','noticias','anuncios','emergencias','reportes']));

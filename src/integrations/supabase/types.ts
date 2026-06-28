@@ -157,6 +157,9 @@ export type Database = {
           telefono: string | null
           tipo: Database["public"]["Enums"]["aid_point_type"]
           updated_at: string
+          verified: boolean
+          verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
           ciudad?: string | null
@@ -177,6 +180,9 @@ export type Database = {
           telefono?: string | null
           tipo: Database["public"]["Enums"]["aid_point_type"]
           updated_at?: string
+          verified?: boolean
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
           ciudad?: string | null
@@ -197,6 +203,9 @@ export type Database = {
           telefono?: string | null
           tipo?: Database["public"]["Enums"]["aid_point_type"]
           updated_at?: string
+          verified?: boolean
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: []
       }
@@ -298,6 +307,48 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
           visitor_id?: string
+        }
+        Relationships: []
+      }
+      content_reports: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          details: string | null
+          id: string
+          reason: string
+          reporter_id: string | null
+          resolution_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason: string
+          reporter_id?: string | null
+          resolution_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason?: string
+          reporter_id?: string | null
+          resolution_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
         }
         Relationships: []
       }
@@ -424,6 +475,9 @@ export type Database = {
           reporter_id: string
           status: Database["public"]["Enums"]["missing_status"]
           updated_at: string
+          verified: boolean
+          verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
           birth_date?: string | null
@@ -444,6 +498,9 @@ export type Database = {
           reporter_id: string
           status?: Database["public"]["Enums"]["missing_status"]
           updated_at?: string
+          verified?: boolean
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
           birth_date?: string | null
@@ -464,6 +521,9 @@ export type Database = {
           reporter_id?: string
           status?: Database["public"]["Enums"]["missing_status"]
           updated_at?: string
+          verified?: boolean
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: []
       }
@@ -503,6 +563,9 @@ export type Database = {
           published: boolean
           titulo: string
           updated_at: string
+          verified: boolean
+          verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
           author_id: string
@@ -515,6 +578,9 @@ export type Database = {
           published?: boolean
           titulo: string
           updated_at?: string
+          verified?: boolean
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
           author_id?: string
@@ -527,6 +593,9 @@ export type Database = {
           published?: boolean
           titulo?: string
           updated_at?: string
+          verified?: boolean
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: []
       }
@@ -810,6 +879,14 @@ export type Database = {
       notification_enabled: {
         Args: { _type: string; _user_id: string }
         Returns: boolean
+      }
+      resolve_content_report: {
+        Args: { _note: string; _report_id: string; _status: string }
+        Returns: undefined
+      }
+      set_content_verified: {
+        Args: { _id: string; _type: string; _verified: boolean }
+        Returns: undefined
       }
     }
     Enums: {

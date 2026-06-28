@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { sanitizeNewsHtml, NEWS_PROSE_CLASS } from "@/components/NewsPreview";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { ReportContentButton } from "@/components/ReportContentButton";
 
 export const Route = createFileRoute("/noticias")({
   head: () => ({
@@ -16,7 +18,7 @@ export const Route = createFileRoute("/noticias")({
   component: Page,
 });
 
-type News = { id: string; titulo: string; contenido: string; body_html: string | null; is_html: boolean; created_at: string };
+type News = { id: string; titulo: string; contenido: string; body_html: string | null; is_html: boolean; created_at: string; verified: boolean };
 
 function Page() {
   const [items, setItems] = useState<News[]>([]);
@@ -26,7 +28,7 @@ function Page() {
   useEffect(() => {
     supabase
       .from("news")
-      .select("id,titulo,contenido,body_html,is_html,created_at")
+      .select("id,titulo,contenido,body_html,is_html,created_at,verified")
       .eq("published", true)
       .order("created_at", { ascending: false })
       .limit(100)
@@ -76,7 +78,10 @@ function Page() {
           items.map((n) => (
             <article key={n.id} className="rounded-3xl border border-border bg-card p-6">
               <time className="text-xs text-muted-foreground">{new Date(n.created_at).toLocaleString("es-VE")}</time>
-              <h2 className="mt-1 text-2xl font-semibold">{n.titulo}</h2>
+              <h2 className="mt-1 flex flex-wrap items-center gap-2 text-2xl font-semibold">
+                {n.titulo}
+                {n.verified && <VerifiedBadge />}
+              </h2>
               {n.is_html && n.body_html ? (
                 <div
                   className={`mt-3 ${NEWS_PROSE_CLASS}`}
@@ -85,6 +90,9 @@ function Page() {
               ) : (
                 <div className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">{n.contenido}</div>
               )}
+              <div className="mt-4 flex justify-end">
+                <ReportContentButton contentType="news" contentId={n.id} variant="ghost" />
+              </div>
             </article>
           ))
         )}

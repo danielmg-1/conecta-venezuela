@@ -10,6 +10,8 @@ import { NeedsPanel } from "@/components/NeedsPanel";
 import { contactHref, contactIcon, type ContactKind } from "@/components/AidContactsSection";
 import { getSignedAidPhoto } from "@/lib/photo";
 import { AidPointPreviewDialog, type AidPreviewData } from "@/components/AidPointPreview";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { ReportContentButton } from "@/components/ReportContentButton";
 
 export const Route = createFileRoute("/centros-acopio")({
   head: () => ({
@@ -47,6 +49,7 @@ type Row = {
   horario: string | null;
   necesidades: string | null;
   cover_photo: string | null;
+  verified?: boolean;
 };
 
 type ActiveNeed = {
@@ -95,7 +98,7 @@ function Page() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    const cols = "id,owner_id,tipo,nombre,descripcion,direccion,estado,ciudad,telefono,horario,necesidades,cover_photo";
+    const cols = "id,owner_id,tipo,nombre,descripcion,direccion,estado,ciudad,telefono,horario,necesidades,cover_photo,verified";
     let query = supabase
       .from("aid_points")
       .select(cols)
@@ -252,7 +255,10 @@ function Page() {
               <button type="button" onClick={() => openPreview(it)} className="block w-full text-left">
                 {it.cover_photo && <AidThumb path={it.cover_photo} alt={it.nombre} />}
                 <span className="inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">{aidTypeLabel(it.tipo)}</span>
-                <h3 className="mt-2 text-lg font-semibold hover:text-primary">{it.nombre}</h3>
+                <h3 className="mt-2 text-lg font-semibold hover:text-primary">
+                  {it.nombre}
+                  {it.verified && <span className="ml-2 align-middle"><VerifiedBadge /></span>}
+                </h3>
               </button>
               <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
                 <MapPin className="h-3.5 w-3.5" /> {it.ciudad ? `${it.ciudad}, ` : ""}{it.estado}
@@ -316,6 +322,7 @@ function Page() {
                     <Pencil className="h-3.5 w-3.5" /> Editar
                   </Link>
                 )}
+                <ReportContentButton contentType="aid_point" contentId={it.id} variant="ghost" />
               </div>
               {openNeeds[it.id] && (
                 <NeedsPanel aidPointId={it.id} canManage={!!user && (user.id === it.owner_id || isAdmin || hostIds.has(it.id))} />

@@ -9,6 +9,8 @@ import { ESTADOS_VE } from "@/lib/venezuela";
 import { formatDateOnly } from "@/lib/utils";
 import { Search, SlidersHorizontal, Plus, MapPin, Calendar, IdCard, Phone, Mail, MessageCircle, Instagram, Share2, Pencil, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { ReportContentButton } from "@/components/ReportContentButton";
 
 type Row = {
   id: string;
@@ -21,9 +23,10 @@ type Row = {
   status: MissingStatus;
   photo_path: string | null;
   created_at: string;
+  verified?: boolean;
 };
 
-type PersonFull = Row & { descripcion: string | null; reporter_id: string };
+type PersonFull = Row & { descripcion: string | null; reporter_id: string; verified?: boolean };
 type Contact = { id: string; tipo: string; valor: string; codigo_pais: string | null };
 
 export const Route = createFileRoute("/desaparecidos/")({
@@ -76,7 +79,7 @@ function Page() {
     (async () => {
       const { data } = await supabase
         .from("missing_persons")
-        .select("id,full_name,cedula,birth_date,estado,ciudad,lugar_desaparicion,status,photo_path,created_at")
+        .select("id,full_name,cedula,birth_date,estado,ciudad,lugar_desaparicion,status,photo_path,created_at,verified")
         .eq("hidden_by_admin", false)
         .order("created_at", { ascending: false })
         .limit(500);
@@ -201,6 +204,7 @@ function Page() {
                   {[r.ciudad, r.estado].filter(Boolean).join(", ")}
                 </p>
                 {r.cedula && <p className="mt-1 text-xs text-muted-foreground">CI: {r.cedula}</p>}
+                {r.verified && <div className="mt-2"><VerifiedBadge /></div>}
               </div>
             </button>
           ))}
@@ -222,7 +226,10 @@ function Page() {
                   <Photo path={openPerson.photo_path} alt={openPerson.full_name} className="aspect-square w-full object-cover" />
                 </div>
                 <div className="space-y-3 text-sm">
-                  <StatusBadge status={openPerson.status} />
+                  <div className="flex flex-wrap items-center gap-2">
+                    <StatusBadge status={openPerson.status} />
+                    {openPerson.verified && <VerifiedBadge />}
+                  </div>
                   {openPerson.cedula && <DRow icon={<IdCard className="h-4 w-4" />} label="Cédula" value={openPerson.cedula} />}
                   {openPerson.birth_date && <DRow icon={<Calendar className="h-4 w-4" />} label="Fecha de nacimiento" value={formatDateOnly(openPerson.birth_date)} />}
                   <DRow icon={<MapPin className="h-4 w-4" />} label="Última ubicación" value={[openPerson.lugar_desaparicion, openPerson.ciudad, openPerson.estado].filter(Boolean).join(", ") || "—"} />
@@ -267,6 +274,7 @@ function Page() {
                     <Trash2 className="h-4 w-4" /> Eliminar
                   </button>
                 )}
+                <ReportContentButton contentType="missing_person" contentId={openPerson.id} variant="outline" />
               </div>
               {canManageOpenPerson && (
                 <div className="rounded-2xl border border-border bg-muted/40 p-3">

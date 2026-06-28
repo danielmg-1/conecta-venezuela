@@ -139,6 +139,7 @@ function Page() {
         {canViewReports && <button onClick={() => rows && download(`desaparecidos-${new Date().toISOString().slice(0,10)}.csv`, toCSV(rows))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Exportar desaparecidos CSV</button>}
         {canViewReports && <button onClick={() => aid && download(`centros-${new Date().toISOString().slice(0,10)}.csv`, toCSV(aid))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Exportar centros CSV</button>}
         {canViewReports && <button onClick={() => vols && download(`voluntarios-${new Date().toISOString().slice(0,10)}.csv`, toCSV(vols))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Exportar voluntarios CSV</button>}
+        {canViewReports && <Link to="/admin/reportes-contenido" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Reportes de contenido</Link>}
       </div>
 
       {canViewReports && counts && (

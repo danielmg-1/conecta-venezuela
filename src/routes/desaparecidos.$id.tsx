@@ -7,6 +7,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { MapPin, Calendar, IdCard, Phone, Mail, MessageCircle, Instagram, Share2, Pencil, Trash2 } from "lucide-react";
 import { formatDateOnly } from "@/lib/utils";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { ReportContentButton } from "@/components/ReportContentButton";
+import { useCanModerate } from "@/hooks/use-moderator-permissions";
 
 type Person = {
   id: string;
@@ -21,6 +24,7 @@ type Person = {
   descripcion: string | null;
   status: MissingStatus;
   created_at: string;
+  verified?: boolean;
 };
 type Contact = { id: string; tipo: string; valor: string; codigo_pais: string | null };
 type AuditRow = {
@@ -40,6 +44,7 @@ function Page() {
   const router = useRouter();
   const { user } = useAuth();
   const isAdmin = useIsAdmin(user?.id);
+  const { allowed: canVerify } = useCanModerate(user?.id, "desaparecidos");
   const [person, setPerson] = useState<Person | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [audit, setAudit] = useState<AuditRow[]>([]);
@@ -112,7 +117,10 @@ function Page() {
         </div>
 
         <div>
-          <StatusBadge status={person.status} />
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusBadge status={person.status} />
+            {person.verified && <VerifiedBadge />}
+          </div>
           <h1 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">{person.full_name}</h1>
 
           <dl className="mt-6 space-y-3 text-sm">
@@ -185,6 +193,19 @@ function Page() {
                 <Trash2 className="h-4 w-4" /> Eliminar
               </button>
             )}
+            {canVerify && (
+              <button
+                onClick={async () => {
+                  const { error } = await supabase.rpc("set_content_verified", { _type: "missing_person", _id: person.id, _verified: !person.verified });
+                  if (error) { alert(error.message); return; }
+                  setPerson({ ...person, verified: !person.verified });
+                }}
+                className="rounded-full border border-blue-500/40 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-700 dark:text-blue-300"
+              >
+                {person.verified ? "Quitar verificación" : "Marcar como verificado"}
+              </button>
+            )}
+            <ReportContentButton contentType="missing_person" contentId={person.id} variant="outline" />
           </div>
         </div>
       </div>

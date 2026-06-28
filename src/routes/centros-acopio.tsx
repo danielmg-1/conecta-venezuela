@@ -207,7 +207,7 @@ function Page() {
         </Link>
       </div>
 
-      <div className="mt-6 grid gap-3 rounded-3xl border border-border bg-card p-4 md:grid-cols-3">
+      <div className="mt-6 grid gap-3 rounded-3xl border border-border bg-card p-4 md:grid-cols-2 lg:grid-cols-3">
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nombre…" className="rounded-xl border border-input bg-background px-3 py-2.5 text-sm" />
         <select value={tipo} onChange={(e) => setTipo(e.target.value)} className="rounded-xl border border-input bg-background px-3 py-2.5 text-sm">
           <option value="">Todos los tipos</option>
@@ -217,9 +217,6 @@ function Page() {
           <option value="">Todos los estados</option>
           {ESTADOS_VE.map((e) => <option key={e} value={e}>{e}</option>)}
         </select>
-      </div>
-
-      <div className="mt-3 grid gap-3 rounded-3xl border border-border bg-card p-4 md:grid-cols-3">
         <input
           value={needQ}
           onChange={(e) => setNeedQ(e.target.value)}

@@ -20,6 +20,7 @@ function Page() {
   const [error, setError] = useState<string | null>(null);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [contacts, setContacts] = useState<DraftContact[]>([]);
+  const [direccion, setDireccion] = useState("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -90,11 +91,24 @@ function Page() {
           <Field name="ciudad" label="Ciudad" />
         </div>
 
-        <Field name="direccion" label="Dirección" placeholder="Av., edificio, sector…" />
+        <label className="grid gap-1.5 text-sm">
+          <span className="font-medium">Dirección</span>
+          <input
+            name="direccion"
+            value={direccion}
+            onChange={(e) => setDireccion(e.target.value)}
+            placeholder="Av., edificio, sector…"
+            className="rounded-xl border border-input bg-background px-3 py-2.5"
+          />
+        </label>
         <div className="grid gap-1.5 text-sm">
           <span className="font-medium">Ubicación en el mapa</span>
           <p className="text-xs text-muted-foreground">Toca el mapa para marcar el punto exacto. Puedes arrastrar el marcador para ajustarlo.</p>
-          <MapPicker value={coords} onChange={setCoords} />
+          <MapPicker
+            value={coords}
+            onChange={setCoords}
+            onAddressChange={(addr) => { if (!direccion.trim()) setDireccion(addr); }}
+          />
         </div>
         <Field name="horario" label="Horario" placeholder="L-V 8am-5pm" />
 

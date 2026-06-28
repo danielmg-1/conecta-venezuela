@@ -103,10 +103,9 @@ function Page() {
       .select(cols)
       .eq("hidden_by_admin", false)
       .order("created_at", { ascending: false })
-      .limit(200);
+    .limit(200);
     if (tipo) query = query.eq("tipo", tipo as never);
     if (estado) query = query.eq("estado", estado);
-    if (q.trim()) query = query.ilike("nombre", `%${q.trim()}%`);
     query.then(({ data }) => {
       if (!cancelled) {
         setItems(((data ?? []) as unknown) as Row[]);

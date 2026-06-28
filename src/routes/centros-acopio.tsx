@@ -8,6 +8,7 @@ import { MapPin, Phone, Plus, Pencil, ListChecks, AlertCircle } from "lucide-rea
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { NeedsPanel } from "@/components/NeedsPanel";
 import { contactHref, contactIcon, type ContactKind } from "@/components/AidContactsSection";
+import { getSignedAidPhoto } from "@/lib/photo";
 
 export const Route = createFileRoute("/centros-acopio")({
   head: () => ({
@@ -33,6 +34,7 @@ type Row = {
   telefono: string | null;
   horario: string | null;
   necesidades: string | null;
+  cover_photo: string | null;
 };
 
 type ActiveNeed = {
@@ -80,7 +82,7 @@ function Page() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    const cols = "id,owner_id,tipo,nombre,descripcion,direccion,estado,ciudad,telefono,horario,necesidades";
+    const cols = "id,owner_id,tipo,nombre,descripcion,direccion,estado,ciudad,telefono,horario,necesidades,cover_photo";
     let query = supabase
       .from("aid_points")
       .select(cols)
@@ -203,6 +205,7 @@ function Page() {
             list.forEach((n) => { counts[n.priority]++; });
             return (
             <article key={it.id} className="rounded-3xl border border-border bg-card p-5">
+              {it.cover_photo && <AidThumb path={it.cover_photo} alt={it.nombre} />}
               <span className="inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">{aidTypeLabel(it.tipo)}</span>
               <h3 className="mt-2 text-lg font-semibold">{it.nombre}</h3>
               <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">

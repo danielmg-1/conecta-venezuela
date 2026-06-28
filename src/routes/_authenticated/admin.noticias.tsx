@@ -1,12 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import DOMPurify from "dompurify";
 import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useCanModerate } from "@/hooks/use-moderator-permissions";
-import { Trash2, Bold, Italic, Heading2, Heading3, Link as LinkIcon, Image as ImageIcon, List, Eye, Pencil, AlignLeft, AlignCenter, AlignRight, X } from "lucide-react";
+import {
+  Trash2, Bold, Italic, Underline, Heading2, Heading3, Link as LinkIcon, Image as ImageIcon,
+  List, ListOrdered, Eye, AlignLeft, AlignCenter, AlignRight, AlignJustify,
+  Quote, Minus, Undo2, Redo2, Table as TableIcon, Code, X, Maximize2,
+} from "lucide-react";
 import { optimizeImage } from "@/lib/image-optimize";
+import { sanitizeNewsHtml, NewsPreviewDialog } from "@/components/NewsPreview";
 
 export const Route = createFileRoute("/_authenticated/admin/noticias")({
   component: Page,
@@ -62,11 +66,12 @@ function Page() {
   const [items, setItems] = useState<News[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [richMode, setRichMode] = useState(false);
+  const [richMode, setRichMode] = useState(true);
   const [titulo, setTitulo] = useState("");
   const [plainContent, setPlainContent] = useState("");
   const [htmlContent, setHtmlContent] = useState("");
   const [showPreview, setShowPreview] = useState(false);
+  const [fullPreview, setFullPreview] = useState(false);
   const [uploadingImg, setUploadingImg] = useState(false);
   const [selectedFigure, setSelectedFigure] = useState<HTMLElement | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
@@ -101,6 +106,27 @@ function Page() {
         a.setAttribute("rel", "noopener noreferrer");
       });
     }
+    syncHtml();
+  }
+
+  function insertTable() {
+    const rowsStr = prompt("¿Cuántas filas? (incluyendo encabezado)", "3");
+    if (!rowsStr) return;
+    const colsStr = prompt("¿Cuántas columnas?", "3");
+    if (!colsStr) return;
+    const rows = Math.max(2, Math.min(20, parseInt(rowsStr, 10) || 3));
+    const cols = Math.max(1, Math.min(10, parseInt(colsStr, 10) || 3));
+    let html = '<table style="width:100%;border-collapse:collapse"><thead><tr>';
+    for (let c = 0; c < cols; c++) html += `<th style="border:1px solid #d1d5db;padding:8px;background:#f3f4f6;text-align:left">Encabezado ${c + 1}</th>`;
+    html += "</tr></thead><tbody>";
+    for (let r = 1; r < rows; r++) {
+      html += "<tr>";
+      for (let c = 0; c < cols; c++) html += '<td style="border:1px solid #d1d5db;padding:8px">&nbsp;</td>';
+      html += "</tr>";
+    }
+    html += "</tbody></table><p><br/></p>";
+    editorRef.current?.focus();
+    document.execCommand("insertHTML", false, html);
     syncHtml();
   }
 
@@ -190,11 +216,7 @@ function Page() {
     setError(null);
     setSubmitting(true);
     try {
-      const cleanHtml = richMode ? DOMPurify.sanitize(htmlContent, {
-        ALLOWED_TAGS: ["h1","h2","h3","h4","p","br","strong","em","b","i","u","ul","ol","li","a","img","blockquote","figure","figcaption","span","div","hr","code","pre"],
-        ALLOWED_ATTR: ["href","target","rel","src","alt","title","class","style","data-size","data-align","loading","decoding","width","height"],
-        ALLOWED_URI_REGEXP: /^(https?:|mailto:|tel:|\/)/i,
-      }) : null;
+      const cleanHtml = richMode ? sanitizeNewsHtml(htmlContent) : null;
       const plainFromHtml = richMode ? (editorRef.current?.innerText?.trim() ?? "") : plainContent.trim();
       if (!titulo.trim() || !plainFromHtml) throw new Error("Título y contenido son obligatorios");
       const { error: insErr } = await supabase.from("news").insert({
@@ -240,9 +262,10 @@ function Page() {
       <form onSubmit={onSubmit} className="mt-6 grid gap-4 rounded-3xl border border-border bg-card p-6">
         <div className="flex items-center justify-between gap-3">
           <span className="text-sm font-medium">Modo de redacción</span>
-          <button type="button" onClick={() => { setRichMode((v) => !v); setShowPreview(false); }} className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${richMode ? "border-primary bg-primary/10 text-primary" : "border-input"}`}>
-            {richMode ? "✓ Editor enriquecido (HTML)" : "Texto plano"}
-          </button>
+          <div className="inline-flex items-center rounded-full border border-input p-0.5 text-xs font-medium">
+            <button type="button" onClick={() => { setRichMode(true); setShowPreview(false); }} className={`rounded-full px-3 py-1 ${richMode ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>Editor enriquecido (HTML)</button>
+            <button type="button" onClick={() => { setRichMode(false); setShowPreview(false); }} className={`rounded-full px-3 py-1 ${!richMode ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>Texto plano</button>
+          </div>
         </div>
 
         <label className="grid gap-1.5 text-sm">
@@ -262,20 +285,38 @@ function Page() {
             <div className="flex flex-wrap items-center gap-1 rounded-xl border border-input bg-background p-1">
               <ToolbarBtn onClick={() => exec("bold")} title="Negrita"><Bold className="h-4 w-4" /></ToolbarBtn>
               <ToolbarBtn onClick={() => exec("italic")} title="Cursiva"><Italic className="h-4 w-4" /></ToolbarBtn>
+              <ToolbarBtn onClick={() => exec("underline")} title="Subrayado"><Underline className="h-4 w-4" /></ToolbarBtn>
               <span className="mx-1 h-5 w-px bg-border" />
               <ToolbarBtn onClick={() => exec("formatBlock", "<h2>")} title="Título"><Heading2 className="h-4 w-4" /></ToolbarBtn>
               <ToolbarBtn onClick={() => exec("formatBlock", "<h3>")} title="Subtítulo"><Heading3 className="h-4 w-4" /></ToolbarBtn>
               <ToolbarBtn onClick={() => exec("formatBlock", "<p>")} title="Párrafo">¶</ToolbarBtn>
               <span className="mx-1 h-5 w-px bg-border" />
-              <ToolbarBtn onClick={() => exec("insertUnorderedList")} title="Lista"><List className="h-4 w-4" /></ToolbarBtn>
+              <ToolbarBtn onClick={() => exec("justifyLeft")} title="Alinear a la izquierda"><AlignLeft className="h-4 w-4" /></ToolbarBtn>
+              <ToolbarBtn onClick={() => exec("justifyCenter")} title="Centrar"><AlignCenter className="h-4 w-4" /></ToolbarBtn>
+              <ToolbarBtn onClick={() => exec("justifyRight")} title="Alinear a la derecha"><AlignRight className="h-4 w-4" /></ToolbarBtn>
+              <ToolbarBtn onClick={() => exec("justifyFull")} title="Justificar"><AlignJustify className="h-4 w-4" /></ToolbarBtn>
+              <span className="mx-1 h-5 w-px bg-border" />
+              <ToolbarBtn onClick={() => exec("insertUnorderedList")} title="Lista con viñetas"><List className="h-4 w-4" /></ToolbarBtn>
+              <ToolbarBtn onClick={() => exec("insertOrderedList")} title="Lista numerada"><ListOrdered className="h-4 w-4" /></ToolbarBtn>
+              <ToolbarBtn onClick={() => exec("formatBlock", "<blockquote>")} title="Cita"><Quote className="h-4 w-4" /></ToolbarBtn>
+              <ToolbarBtn onClick={() => exec("formatBlock", "<pre>")} title="Bloque de código"><Code className="h-4 w-4" /></ToolbarBtn>
+              <ToolbarBtn onClick={() => exec("insertHorizontalRule")} title="Separador"><Minus className="h-4 w-4" /></ToolbarBtn>
+              <span className="mx-1 h-5 w-px bg-border" />
               <ToolbarBtn onClick={insertLink} title="Enlace externo (abre en nueva pestaña)"><LinkIcon className="h-4 w-4" /></ToolbarBtn>
+              <ToolbarBtn onClick={insertTable} title="Insertar tabla"><TableIcon className="h-4 w-4" /></ToolbarBtn>
               <ToolbarBtn onClick={() => fileRef.current?.click()} title="Insertar imagen (se optimiza automáticamente)">
                 {uploadingImg ? <span className="text-xs">…</span> : <ImageIcon className="h-4 w-4" />}
               </ToolbarBtn>
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageUpload(f); e.target.value = ""; }} />
+              <span className="mx-1 h-5 w-px bg-border" />
+              <ToolbarBtn onClick={() => exec("undo")} title="Deshacer"><Undo2 className="h-4 w-4" /></ToolbarBtn>
+              <ToolbarBtn onClick={() => exec("redo")} title="Rehacer"><Redo2 className="h-4 w-4" /></ToolbarBtn>
               <span className="ml-auto" />
-              <ToolbarBtn onClick={() => setShowPreview((v) => !v)} title={showPreview ? "Editar" : "Vista previa"}>
-                {showPreview ? <Pencil className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              <ToolbarBtn onClick={() => setShowPreview((v) => !v)} title={showPreview ? "Editar" : "Vista previa rápida"}>
+                <Eye className="h-4 w-4" />
+              </ToolbarBtn>
+              <ToolbarBtn onClick={() => setFullPreview(true)} title="Vista previa a pantalla completa">
+                <Maximize2 className="h-4 w-4" />
               </ToolbarBtn>
             </div>
             {selectedFigure && !showPreview && (
@@ -315,10 +356,10 @@ function Page() {
                 onInput={syncHtml}
                 onBlur={syncHtml}
                 onClick={onEditorClick}
-                className="prose prose-sm dark:prose-invert min-h-[240px] max-w-none rounded-xl border border-input bg-background p-4 focus:outline-none [&_a]:text-primary [&_a]:underline [&_h2]:mt-3 [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:mt-2 [&_h3]:text-xl [&_h3]:font-semibold [&_img]:my-3 [&_img]:rounded-lg [&_ul]:list-disc [&_ul]:pl-6 [&_p]:my-2"
+                className="prose prose-sm dark:prose-invert min-h-[240px] max-w-none rounded-xl border border-input bg-background p-4 focus:outline-none [&_a]:text-primary [&_a]:underline [&_h2]:mt-3 [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:mt-2 [&_h3]:text-xl [&_h3]:font-semibold [&_img]:my-3 [&_img]:rounded-lg [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-2 [&_table]:my-3 [&_table]:w-full [&_table]:border-collapse [&_th]:border [&_th]:border-border [&_th]:bg-muted [&_th]:px-3 [&_th]:py-2 [&_td]:border [&_td]:border-border [&_td]:px-3 [&_td]:py-2 [&_blockquote]:border-l-4 [&_blockquote]:border-border [&_blockquote]:pl-4 [&_blockquote]:italic"
               />
             ) : (
-              <div className="min-h-[240px] rounded-xl border border-dashed border-input bg-muted/30 p-4 [&_a]:text-primary [&_a]:underline [&_h2]:mt-3 [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:mt-2 [&_h3]:text-xl [&_h3]:font-semibold [&_img]:my-3 [&_img]:rounded-lg [&_ul]:list-disc [&_ul]:pl-6 [&_p]:my-2" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(htmlContent) }} />
+              <div className="min-h-[240px] rounded-xl border border-dashed border-input bg-muted/30 p-4 [&_a]:text-primary [&_a]:underline [&_h2]:mt-3 [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:mt-2 [&_h3]:text-xl [&_h3]:font-semibold [&_img]:my-3 [&_img]:rounded-lg [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-2 [&_table]:my-3 [&_table]:w-full [&_table]:border-collapse [&_th]:border [&_th]:border-border [&_th]:bg-muted [&_th]:px-3 [&_th]:py-2 [&_td]:border [&_td]:border-border [&_td]:px-3 [&_td]:py-2" dangerouslySetInnerHTML={{ __html: sanitizeNewsHtml(htmlContent) }} />
             )}
             <p className="text-xs text-muted-foreground">
               Las imágenes se comprimen automáticamente para que carguen rápido. <strong>Haz clic sobre una imagen</strong> para cambiar su tamaño, alineación o texto alternativo. Los enlaces externos abren en una pestaña nueva.
@@ -327,10 +368,24 @@ function Page() {
         )}
 
         {error && <p className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}
-        <button disabled={submitting} className="inline-flex items-center justify-center self-start rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50">
-          {submitting ? "Publicando…" : "Publicar noticia"}
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button disabled={submitting} className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50">
+            {submitting ? "Publicando…" : "Publicar noticia"}
+          </button>
+          <button type="button" onClick={() => setFullPreview(true)} className="inline-flex items-center gap-2 rounded-full border border-input px-5 py-3 text-sm font-semibold">
+            <Eye className="h-4 w-4" /> Vista previa en pantalla completa
+          </button>
+        </div>
       </form>
+
+      <NewsPreviewDialog
+        open={fullPreview}
+        onOpenChange={setFullPreview}
+        titulo={titulo}
+        html={htmlContent}
+        plain={plainContent}
+        isHtml={richMode}
+      />
 
       <h2 className="mt-10 text-xl font-semibold">Publicadas</h2>
       <div className="mt-4 space-y-3">

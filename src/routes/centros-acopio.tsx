@@ -85,7 +85,6 @@ function Page() {
   const [contacts, setContacts] = useState<ContactRow[]>([]);
   const [onlyPending, setOnlyPending] = useState(false);
   const [needPriority, setNeedPriority] = useState<string>("");
-  const [needQ, setNeedQ] = useState("");
   const [previewData, setPreviewData] = useState<AidPreviewData | null>(null);
 
   useEffect(() => {

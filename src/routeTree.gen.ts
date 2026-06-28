@@ -29,6 +29,7 @@ import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedMisReportesRouteImport } from './routes/_authenticated/mis-reportes'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as ApiPublicPersonasRouteImport } from './routes/api/public/personas'
+import { Route as ApiPublicCentrosRouteImport } from './routes/api/public/centros'
 import { Route as AuthenticatedVoluntariosRegistrarmeRouteImport } from './routes/_authenticated/voluntarios.registrarme'
 import { Route as AuthenticatedDesaparecidosNuevoRouteImport } from './routes/_authenticated/desaparecidos.nuevo'
 import { Route as AuthenticatedCentrosAcopioNuevoRouteImport } from './routes/_authenticated/centros-acopio.nuevo'
@@ -142,6 +143,11 @@ const ApiPublicPersonasRoute = ApiPublicPersonasRouteImport.update({
   path: '/api/public/personas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCentrosRoute = ApiPublicCentrosRouteImport.update({
+  id: '/api/public/centros',
+  path: '/api/public/centros',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedVoluntariosRegistrarmeRoute =
   AuthenticatedVoluntariosRegistrarmeRouteImport.update({
     id: '/voluntarios/registrarme',
@@ -243,6 +249,7 @@ export interface FileRoutesByFullPath {
   '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
+  '/api/public/centros': typeof ApiPublicCentrosRoute
   '/api/public/personas': typeof ApiPublicPersonasRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/centros-acopio/$id/editar': typeof AuthenticatedCentrosAcopioIdEditarRoute
@@ -275,6 +282,7 @@ export interface FileRoutesByTo {
   '/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
+  '/api/public/centros': typeof ApiPublicCentrosRoute
   '/api/public/personas': typeof ApiPublicPersonasRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/centros-acopio/$id/editar': typeof AuthenticatedCentrosAcopioIdEditarRoute
@@ -310,6 +318,7 @@ export interface FileRoutesById {
   '/_authenticated/centros-acopio/nuevo': typeof AuthenticatedCentrosAcopioNuevoRoute
   '/_authenticated/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/_authenticated/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
+  '/api/public/centros': typeof ApiPublicCentrosRoute
   '/api/public/personas': typeof ApiPublicPersonasRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/centros-acopio/$id/editar': typeof AuthenticatedCentrosAcopioIdEditarRoute
@@ -345,6 +354,7 @@ export interface FileRouteTypes {
     | '/centros-acopio/nuevo'
     | '/desaparecidos/nuevo'
     | '/voluntarios/registrarme'
+    | '/api/public/centros'
     | '/api/public/personas'
     | '/admin/'
     | '/centros-acopio/$id/editar'
@@ -377,6 +387,7 @@ export interface FileRouteTypes {
     | '/centros-acopio/nuevo'
     | '/desaparecidos/nuevo'
     | '/voluntarios/registrarme'
+    | '/api/public/centros'
     | '/api/public/personas'
     | '/admin'
     | '/centros-acopio/$id/editar'
@@ -411,6 +422,7 @@ export interface FileRouteTypes {
     | '/_authenticated/centros-acopio/nuevo'
     | '/_authenticated/desaparecidos/nuevo'
     | '/_authenticated/voluntarios/registrarme'
+    | '/api/public/centros'
     | '/api/public/personas'
     | '/_authenticated/admin/'
     | '/_authenticated/centros-acopio/$id/editar'
@@ -432,6 +444,7 @@ export interface RootRouteChildren {
   ApiGuideRoute: typeof ApiGuideRoute
   DesaparecidosIdRoute: typeof DesaparecidosIdRoute
   DesaparecidosIndexRoute: typeof DesaparecidosIndexRoute
+  ApiPublicCentrosRoute: typeof ApiPublicCentrosRoute
   ApiPublicPersonasRoute: typeof ApiPublicPersonasRoute
 }
 
@@ -575,6 +588,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/personas'
       fullPath: '/api/public/personas'
       preLoaderRoute: typeof ApiPublicPersonasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/centros': {
+      id: '/api/public/centros'
+      path: '/api/public/centros'
+      fullPath: '/api/public/centros'
+      preLoaderRoute: typeof ApiPublicCentrosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/voluntarios/registrarme': {
@@ -735,6 +755,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiGuideRoute: ApiGuideRoute,
   DesaparecidosIdRoute: DesaparecidosIdRoute,
   DesaparecidosIndexRoute: DesaparecidosIndexRoute,
+  ApiPublicCentrosRoute: ApiPublicCentrosRoute,
   ApiPublicPersonasRoute: ApiPublicPersonasRoute,
 }
 export const routeTree = rootRouteImport

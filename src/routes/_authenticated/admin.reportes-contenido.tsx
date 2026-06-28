@@ -81,7 +81,7 @@ function Page() {
   useEffect(() => { if (allowed) void load(); /* eslint-disable-next-line */ }, [allowed, filter]);
 
   async function resolve(id: string, status: "reviewed" | "dismissed") {
-    const { error } = await supabase.rpc("resolve_content_report", { _report_id: id, _status: status, _note: null });
+    const { error } = await supabase.rpc("resolve_content_report", { _report_id: id, _status: status, _note: "" });
     if (error) { toast.error(error.message); return; }
     toast.success(status === "reviewed" ? "Reporte marcado como revisado" : "Reporte descartado");
     await load();

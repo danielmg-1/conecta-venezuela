@@ -85,7 +85,6 @@ function Page() {
   const [contacts, setContacts] = useState<ContactRow[]>([]);
   const [onlyPending, setOnlyPending] = useState(false);
   const [needPriority, setNeedPriority] = useState<string>("");
-  const [needQ, setNeedQ] = useState("");
   const [previewData, setPreviewData] = useState<AidPreviewData | null>(null);
 
   useEffect(() => {
@@ -104,10 +103,9 @@ function Page() {
       .select(cols)
       .eq("hidden_by_admin", false)
       .order("created_at", { ascending: false })
-      .limit(200);
+    .limit(200);
     if (tipo) query = query.eq("tipo", tipo as never);
     if (estado) query = query.eq("estado", estado);
-    if (q.trim()) query = query.ilike("nombre", `%${q.trim()}%`);
     query.then(({ data }) => {
       if (!cancelled) {
         setItems(((data ?? []) as unknown) as Row[]);
@@ -186,12 +184,21 @@ function Page() {
     return acc;
   }, {});
 
-  const needQLower = needQ.trim().toLowerCase();
+  const qLower = q.trim().toLowerCase();
   const filteredItems = items.filter((it) => {
     const list = needsByPoint[it.id] ?? [];
     if (onlyPending && list.length === 0) return false;
     if (needPriority && !list.some((n) => n.priority === needPriority)) return false;
-    if (needQLower && !list.some((n) => n.title.toLowerCase().includes(needQLower))) return false;
+    if (qLower) {
+      const inName = it.nombre.toLowerCase().includes(qLower);
+      const inDesc = it.descripcion?.toLowerCase().includes(qLower) ?? false;
+      const inAddress = it.direccion?.toLowerCase().includes(qLower) ?? false;
+      const inCity = it.ciudad?.toLowerCase().includes(qLower) ?? false;
+      const inState = it.estado.toLowerCase().includes(qLower);
+      const inLegacyNeeds = it.necesidades?.toLowerCase().includes(qLower) ?? false;
+      const inNeeds = list.some((n) => n.title.toLowerCase().includes(qLower));
+      if (!(inName || inDesc || inAddress || inCity || inState || inLegacyNeeds || inNeeds)) return false;
+    }
     return true;
   });
 
@@ -208,7 +215,7 @@ function Page() {
       </div>
 
       <div className="mt-6 grid gap-3 rounded-3xl border border-border bg-card p-4 md:grid-cols-2 lg:grid-cols-3">
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nombre…" className="rounded-xl border border-input bg-background px-3 py-2.5 text-sm" />
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nombre, necesidad o ubicación…" className="rounded-xl border border-input bg-background px-3 py-2.5 text-sm" />
         <select value={tipo} onChange={(e) => setTipo(e.target.value)} className="rounded-xl border border-input bg-background px-3 py-2.5 text-sm">
           <option value="">Todos los tipos</option>
           {AID_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
@@ -217,12 +224,6 @@ function Page() {
           <option value="">Todos los estados</option>
           {ESTADOS_VE.map((e) => <option key={e} value={e}>{e}</option>)}
         </select>
-        <input
-          value={needQ}
-          onChange={(e) => setNeedQ(e.target.value)}
-          placeholder="Buscar por necesidad (ej. agua, pañales)…"
-          className="rounded-xl border border-input bg-background px-3 py-2.5 text-sm"
-        />
         <select value={needPriority} onChange={(e) => setNeedPriority(e.target.value)} className="rounded-xl border border-input bg-background px-3 py-2.5 text-sm">
           <option value="">Cualquier prioridad</option>
           <option value="alta">Prioridad alta</option>

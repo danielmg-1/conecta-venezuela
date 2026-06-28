@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Bell, CheckCheck, X } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useNotifications, type Notification } from "@/hooks/use-notifications";
@@ -19,6 +19,7 @@ function timeAgo(iso: string) {
 
 export function NotificationBell() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const { items, unread, markRead, markAllRead, remove } = useNotifications(user?.id, 10);
 
@@ -27,6 +28,7 @@ export function NotificationBell() {
   async function onItemClick(n: Notification) {
     if (!n.read_at) await markRead(n.id);
     setOpen(false);
+    if (n.link) navigate({ to: n.link as never });
   }
 
   return (
@@ -79,17 +81,13 @@ export function NotificationBell() {
                 );
                 return (
                   <li key={n.id} className={n.read_at ? "" : "bg-muted/30"}>
-                    {n.link ? (
-                      <Link
-                        to={n.link}
-                        onClick={() => onItemClick(n)}
-                        className="block px-4 py-3 hover:bg-muted/50"
-                      >
-                        {content}
-                      </Link>
-                    ) : (
-                      <div className="px-4 py-3">{content}</div>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => onItemClick(n)}
+                      className="block w-full text-left px-4 py-3 hover:bg-muted/50"
+                    >
+                      {content}
+                    </button>
                   </li>
                 );
               })}

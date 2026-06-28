@@ -28,16 +28,8 @@ export function Layout({ children }: { children: ReactNode }) {
   const isAdmin = useIsAdmin(user?.id);
   const { sections: modSections } = useModeratorPermissions(user?.id);
   const isModerator = !isAdmin && modSections.length > 0;
-  const modLandingByPriority: { section: string; to: "/admin" | "/admin/centros" | "/admin/voluntarios" | "/admin/noticias" | "/admin/anuncios" | "/admin/emergencias" | "/desaparecidos" }[] = [
-    { section: "reportes", to: "/admin" },
-    { section: "desaparecidos", to: "/desaparecidos" },
-    { section: "centros", to: "/admin/centros" },
-    { section: "voluntarios", to: "/admin/voluntarios" },
-    { section: "noticias", to: "/admin/noticias" },
-    { section: "anuncios", to: "/admin/anuncios" },
-    { section: "emergencias", to: "/admin/emergencias" },
-  ];
-  const firstModPath = modLandingByPriority.find((m) => modSections.includes(m.section as never))?.to ?? "/";
+  const firstModPath = "/admin" as const;
+  void modSections;
   const accountItem = user
     ? { to: "/perfil" as const, label: "Perfil", icon: User }
     : { to: "/auth" as const, label: "Cuenta", icon: User };
@@ -87,7 +79,7 @@ export function Layout({ children }: { children: ReactNode }) {
               </Link>
             )}
             {isModerator && (
-              <Link to={firstModPath as "/admin"} className={`rounded-full px-4 py-2 text-sm font-medium ${pathname.startsWith("/admin") ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
+              <Link to={firstModPath} className={`rounded-full px-4 py-2 text-sm font-medium ${pathname.startsWith("/admin") ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
                 Moderar
               </Link>
             )}

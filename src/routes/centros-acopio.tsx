@@ -14,9 +14,9 @@ import { AidPointPreviewDialog, type AidPreviewData } from "@/components/AidPoin
 export const Route = createFileRoute("/centros-acopio")({
   head: () => ({
     meta: [
-      { title: "Donaciones — Guía de Apoyo Venezuela" },
-      { name: "description", content: "Encuentra centros de acopio, puntos de recaudación, hospitales y servicios de ayuda activos tras el terremoto en Venezuela." },
-      { property: "og:title", content: "Donaciones" },
+      { title: "Centros de ayuda — Guía de Apoyo Venezuela" },
+      { name: "description", content: "Encuentra centros de ayuda, puntos de recaudación, hospitales y servicios de ayuda activos tras el terremoto en Venezuela." },
+      { property: "og:title", content: "Centros de ayuda" },
       { property: "og:description", content: "Mapa colaborativo de puntos de ayuda en Venezuela." },
     ],
   }),

@@ -184,12 +184,21 @@ function Page() {
     return acc;
   }, {});
 
-  const needQLower = needQ.trim().toLowerCase();
+  const qLower = q.trim().toLowerCase();
   const filteredItems = items.filter((it) => {
     const list = needsByPoint[it.id] ?? [];
     if (onlyPending && list.length === 0) return false;
     if (needPriority && !list.some((n) => n.priority === needPriority)) return false;
-    if (needQLower && !list.some((n) => n.title.toLowerCase().includes(needQLower))) return false;
+    if (qLower) {
+      const inName = it.nombre.toLowerCase().includes(qLower);
+      const inDesc = it.descripcion?.toLowerCase().includes(qLower) ?? false;
+      const inAddress = it.direccion?.toLowerCase().includes(qLower) ?? false;
+      const inCity = it.ciudad?.toLowerCase().includes(qLower) ?? false;
+      const inState = it.estado.toLowerCase().includes(qLower);
+      const inLegacyNeeds = it.necesidades?.toLowerCase().includes(qLower) ?? false;
+      const inNeeds = list.some((n) => n.title.toLowerCase().includes(qLower));
+      if (!(inName || inDesc || inAddress || inCity || inState || inLegacyNeeds || inNeeds)) return false;
+    }
     return true;
   });
 

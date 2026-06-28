@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { Layout } from "@/components/Layout";
-import { Search, Map, Phone, AlertCircle, MessageSquare, HeartHandshake, Users, Newspaper, Clock, Building2, ArrowRight } from "lucide-react";
+import { Search, Map, Phone, MessageSquare, HeartHandshake, Users, Newspaper, Clock } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -28,7 +28,7 @@ function Index() {
           Organizemos la ayuda para Venezuela.
         </h1>
         <p className="mt-4 max-w-2xl text-lg text-primary-foreground/85 md:text-xl">
-          Esta no es una emergencia de un fin de semana. La magnitud de esta catástrofe nos necesitará durante semanas e incluso meses. Conecta Venezuela une a afectados, donantes, centros de acopio, voluntarios e instituciones en un solo lugar para que la ayuda llegue de forma organizada y llegue a quien más la necesita.
+          No es una emergencia de un fin de semana. Conectamos afectados, donantes y voluntarios para que la ayuda llegue organizada y a quien más la necesita.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link to="/centros-acopio" className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-primary shadow hover:bg-white/95">
@@ -40,96 +40,42 @@ function Index() {
         </div>
       </section>
 
-      {/* Mission statement */}
-      <section className="mt-10 rounded-3xl border border-border bg-card p-6 md:p-10">
-        <div className="grid gap-8 md:grid-cols-2 md:items-center">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Una plataforma para el corto, mediano y largo plazo</h2>
-            <p className="mt-3 text-muted-foreground">
-              El país está recibiendo una enorme cantidad de ayuda — lo cual nos alegra — pero sin organización esa ayuda puede no llegar a quienes más la necesitan. Aquí centros de acopio, hospitales, organizaciones y voluntarios se registran y permanecen visibles durante todo el tiempo que sea necesario.
-            </p>
-            <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                Publica o encuentra centros de acopio y puntos de donación activos.
-              </li>
-              <li className="flex items-start gap-2">
-                <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                Hospitales y clínicas publican sus ubicaciones y necesidades.
-              </li>
-              <li className="flex items-start gap-2">
-                <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                Voluntarios y profesionales se ofrecen por estado y especialidad.
-              </li>
-              <li className="flex items-start gap-2">
-                <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                Reportes de personas desaparecidas con búsqueda activa y actualización de estado.
-              </li>
-            </ul>
-          </div>
-          <div className="grid gap-4">
-            <div className="rounded-2xl bg-muted/50 p-5">
-              <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
-                  <Building2 className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="font-semibold">Registra tu centro o institución</p>
-                  <p className="text-sm text-muted-foreground">Permanece visible mientras dure la necesidad.</p>
-                </div>
-              </div>
-            </div>
-            <div className="rounded-2xl bg-muted/50 p-5">
-              <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
-                  <HeartHandshake className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="font-semibold">Dona de forma organizada</p>
-                  <p className="text-sm text-muted-foreground">Encuentra dónde se necesita agua, medicinas, ropa y alimentos.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Feature grid */}
       <section className="mt-10 grid gap-4 md:grid-cols-3">
         <FeatureCard
           icon={<HeartHandshake className="h-5 w-5" />}
           title="Centros de ayuda"
-          desc="Centros de acopio, puntos de recaudación, hospitales y clínicas con ubicación exacta y necesidades actualizadas."
+          desc="Ubicación exacta y necesidades actualizadas de cada centro."
           to="/centros-acopio"
         />
         <FeatureCard
           icon={<Search className="h-5 w-5" />}
           title="Buscador con filtros"
-          desc="Encuentra por nombre, cédula, fecha de nacimiento o estado. Comparte el enlace con tus filtros."
+          desc="Encuentra por nombre, cédula o fecha de nacimiento."
           to="/desaparecidos"
         />
         <FeatureCard
           icon={<Map className="h-5 w-5" />}
           title="Mapa en vivo"
-          desc="Visualiza las zonas más afectadas según los reportes. Pines por estado de búsqueda y centros de ayuda."
+          desc="Zonas afectadas, búsquedas activas y centros de ayuda."
           to="/mapa"
         />
         <FeatureCard
           icon={<Users className="h-5 w-5" />}
           title="Voluntarios"
-          desc="Profesionales y voluntarios listos para ayudar — médicos, psicólogos, ingenieros, conductores."
+          desc="Médicos, psicólogos, ingenieros y conductores disponibles."
           to="/voluntarios"
         />
         <FeatureCard
           icon={<Phone className="h-5 w-5" />}
           title="Emergencias"
-          desc="Números oficiales: bomberos, Protección Civil, Cruz Roja, primeros auxilios psicológicos."
+          desc="Números oficiales: bomberos, Protección Civil, Cruz Roja."
           to="/emergencias"
         />
         <FeatureCard
           icon={<Newspaper className="h-5 w-5" />}
           title="Noticias y avisos"
-          desc="Información verificada y actualizaciones del equipo de la plataforma."
+          desc="Información verificada y actualizaciones oficiales."
           to="/noticias"
         />
       </section>
@@ -138,9 +84,9 @@ function Index() {
       <section className="mt-12 rounded-3xl border border-border bg-card p-6 md:p-10">
         <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Cómo funciona</h2>
         <div className="mt-6 grid gap-6 md:grid-cols-3">
-          <Step n={1} title="Publica o encuentra ayuda" desc="Registra tu centro de acopio, ofrece tus habilidades como voluntario o busca dónde donar. También puedes crear un reporte de búsqueda." />
-          <Step n={2} title="Comparte la información" desc="Cada publicación tiene su URL para compartir. Mientras más personas conozcan los puntos activos, mejor fluye la ayuda." />
-          <Step n={3} title="Mantén todo actualizado" desc="Los centros y reportes se actualizan en tiempo real. Así evitamos donar donde ya no se necesita o buscar a alguien que ya fue encontrado." />
+          <Step n={1} title="Publica o encuentra" desc="Centros, voluntarios o reportes de búsqueda." />
+          <Step n={2} title="Comparte" desc="Cada publicación tiene su enlace para difundir." />
+          <Step n={3} title="Actualiza" desc="Mantén la info al día para que la ayuda llegue bien." />
         </div>
       </section>
 

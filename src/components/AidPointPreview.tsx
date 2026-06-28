@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { MapPin, Phone, Clock, AlertCircle, Globe, X } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { aidTypeLabel } from "@/lib/aid";
 import { getSignedAidPhoto } from "@/lib/photo";
 import { contactHref, contactIcon, type ContactKind, type DraftContact } from "@/components/AidContactsSection";
@@ -144,10 +143,8 @@ export function AidPointPreviewDialog({ open, onOpenChange, data, title = "Vista
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[95vh] w-[95vw] max-w-3xl overflow-y-auto sm:rounded-3xl">
-        <VisuallyHidden>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>Información del punto de ayuda</DialogDescription>
-        </VisuallyHidden>
+        <DialogTitle className="sr-only">{title}</DialogTitle>
+        <DialogDescription className="sr-only">Información del punto de ayuda</DialogDescription>
         {data ? <AidPointPreviewContent data={data} /> : <p className="text-sm text-muted-foreground">Cargando…</p>}
       </DialogContent>
     </Dialog>

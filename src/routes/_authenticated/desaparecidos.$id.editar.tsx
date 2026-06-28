@@ -253,7 +253,13 @@ function Page() {
         <div className="grid gap-1.5 text-sm">
           <span className="font-medium">Ubicación en el mapa <span className="text-muted-foreground font-normal">(opcional)</span></span>
           <p className="text-xs text-muted-foreground">Toca el mapa para marcar el lugar exacto.</p>
-          <MapPicker value={coords} onChange={setCoords} />
+          <MapPicker
+            value={coords}
+            onChange={setCoords}
+            onAddressChange={(addr) => {
+              if (!form.lugar_desaparicion.trim()) setForm((f) => ({ ...f, lugar_desaparicion: addr }));
+            }}
+          />
         </div>
 
         <div className="rounded-2xl border border-dashed border-border p-4">

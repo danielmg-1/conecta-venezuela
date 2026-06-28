@@ -37,6 +37,7 @@ function Page() {
   const router = useRouter();
   const [row, setRow] = useState<Row | null>(null);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [direccion, setDireccion] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +48,7 @@ function Page() {
       const r = data as Row | null;
       setRow(r);
       if (r?.lat != null && r?.lng != null) setCoords({ lat: r.lat, lng: r.lng });
+      if (r) setDireccion(r.direccion ?? "");
       setLoading(false);
     });
   }, [id]);
@@ -121,12 +123,24 @@ function Page() {
           <label className="grid gap-1.5 text-sm"><span className="font-medium">Ciudad</span><input name="ciudad" defaultValue={row.ciudad ?? ""} className="rounded-xl border border-input bg-background px-3 py-2.5" /></label>
         </div>
 
-        <label className="grid gap-1.5 text-sm"><span className="font-medium">Dirección</span><input name="direccion" defaultValue={row.direccion ?? ""} className="rounded-xl border border-input bg-background px-3 py-2.5" /></label>
+        <label className="grid gap-1.5 text-sm">
+          <span className="font-medium">Dirección</span>
+          <input
+            name="direccion"
+            value={direccion}
+            onChange={(e) => setDireccion(e.target.value)}
+            className="rounded-xl border border-input bg-background px-3 py-2.5"
+          />
+        </label>
 
         <div className="grid gap-1.5 text-sm">
           <span className="font-medium">Ubicación en el mapa</span>
           <p className="text-xs text-muted-foreground">Toca el mapa para ajustar el punto exacto. Arrastra el marcador para moverlo.</p>
-          <MapPicker value={coords} onChange={setCoords} />
+          <MapPicker
+            value={coords}
+            onChange={setCoords}
+            onAddressChange={(addr) => { if (!direccion.trim()) setDireccion(addr); }}
+          />
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">

@@ -1,50 +1,66 @@
-## Qué resolver
+## Problema
 
-1. **Métodos de contacto al publicar un centro**: hoy solo aparece un único campo "Teléfono" al crear el centro. La sección para agregar hasta 4 métodos (teléfono, WhatsApp, correo, Instagram, otro) solo existe al editar. Hay que mostrarla también al publicar y como aclaración en la pantalla de edición para que sea obvia.
-2. **Notificaciones**: no existen. Hay que crearlas desde cero, guardarlas en la base de datos, mostrarlas en el perfil y en una campanita con popup en el encabezado.
+Hoy el `MapPicker` solo permite tocar el mapa o usar "mi ubicación". No hay forma de escribir una dirección y que el mapa salte al punto exacto, y el centro inicial es Venezuela completa (zoom 6), así que el usuario termina arrastrando el marcador a ojo. En una emergencia eso lleva a coordenadas imprecisas.
 
-## Métodos de contacto
+Además, al publicar un centro de acopio o un reporte de desaparecido, el campo "Dirección" (texto libre) y las coordenadas del mapa son independientes: uno puede escribir una dirección y olvidar marcar el punto, o marcar el punto y dejar la dirección vacía.
 
-- En el formulario "Publicar punto de ayuda" reemplazo el campo único "Teléfono" por la misma sección de hasta 4 métodos de contacto que usa la edición (teléfono, WhatsApp, correo, Instagram, otro), cada uno con etiqueta opcional como "María, encargada".
-- Al guardar, primero se crea el centro y luego se insertan los contactos asociados. Si no agrega ninguno, queda igual que hoy (sin contactos).
-- En la pantalla de edición, mover la sección de contactos justo debajo de los campos principales y añadir un título claro ("Métodos de contacto — hasta 4") para que se note.
+## Objetivo
 
-## Notificaciones
+Que cualquier usuario pueda fijar una ubicación exacta en segundos, ya sea:
+1. Escribiendo la dirección y eligiendo de una lista de sugerencias (autocompletar).
+2. Tocando el mapa.
+3. Usando su ubicación actual con mejor precisión.
+4. Pegando un enlace de Google Maps.
 
-Tipos que se generarán automáticamente:
-- **Reporte sobre tu familiar**: cuando alguien deja una pista (`tips`) sobre una persona que tú publicaste como desaparecida.
-- **Cambios en una persona que publicaste**: cuando un moderador o admin edita o cambia el estado del reporte de un desaparecido tuyo.
-- **Invitación a anfitrión**: cuando te invitan a coadministrar un centro de acopio.
-- **Cambios en un centro donde eres anfitrión o dueño**: cuando otra persona con permisos edita el centro o marca una necesidad como abastecida.
-- **Respuesta a tu invitación**: cuando un anfitrión acepta o rechaza tu invitación (te notifica como dueño).
+Y que la dirección textual y las coordenadas queden sincronizadas.
 
-Cada notificación guarda: destinatario, tipo, título, mensaje corto, enlace al recurso (perfil del desaparecido, centro, etc.), si está leída y cuándo se creó.
+## Cambios
 
-Dónde se ven:
-- **Campana en el encabezado** (escritorio y móvil): icono con un punto rojo y el número de no leídas. Al tocar, abre un popup con las últimas 10 notificaciones, botón "Marcar todas como leídas" y enlace "Ver todas". Se actualiza en vivo (realtime) sin recargar.
-- **Sección en `/perfil` → "Notificaciones"**: lista completa con filtros por leídas/no leídas y por tipo, paginada.
+### 1. `MapPicker` con búsqueda de direcciones (Places API New)
 
-Comportamiento:
-- Al abrir una notificación se marca como leída y navega al recurso.
-- Solo cada persona ve sus propias notificaciones; nadie más, ni siquiera admin.
-- El usuario podrá silenciar tipos específicos desde su perfil (preferencias guardadas por usuario).
+- Agregar una barra de búsqueda arriba del mapa usando **Places API (New) Autocomplete** restringida a Venezuela (`includedRegionCodes: ['ve']`), vía `AutocompleteSuggestion.fetchAutocompleteSuggestions` (la API legacy `places.Autocomplete` está prohibida por las reglas del conector).
+- Al elegir una sugerencia: centrar el mapa, hacer zoom 17, colocar el marcador y devolver `{ lat, lng, address, placeId }` al formulario padre.
+- Cuando el usuario toca el mapa o arrastra el marcador, hacer **reverse geocoding** vía el gateway (`/maps/api/geocode/json?latlng=...`) para obtener la dirección formateada y devolverla también.
+- Permitir pegar un enlace de Google Maps (`maps.app.goo.gl/...` o `google.com/maps/...?q=lat,lng`): extraer coordenadas si están en la URL; si es un enlace corto, mostrar mensaje pidiendo abrirlo y copiar las coordenadas (no podemos seguir redirects desde el navegador de forma fiable).
+- Mejorar el centro inicial: si no hay valor, intentar `navigator.geolocation` silenciosamente al montar (con timeout corto) para centrar cerca del usuario; si falla, usar Caracas con zoom 11 en lugar de zoom 6.
+- Subir el zoom de "Usar mi ubicación" a 17 y mostrar el `accuracy` (radio en metros) como círculo translúcido para que el usuario sepa qué tan precisa es la lectura del GPS.
+- Mostrar la dirección formateada bajo el mapa cuando exista, con botón "Copiar coordenadas".
+
+### 2. Sincronización con el campo "Dirección" del formulario
+
+- En `centros-acopio.nuevo.tsx`, `centros-acopio.$id.editar.tsx`, `desaparecidos.nuevo.tsx` y `desaparecidos.$id.editar.tsx`:
+  - Convertir el input de "Dirección" en estado controlado.
+  - Cuando el `MapPicker` devuelva una dirección (por autocompletar o reverse geocode), prellenar el campo si está vacío; si el usuario ya escribió algo, no sobrescribir sin confirmar (mostrar botón "Usar dirección del mapa").
+  - Validación suave: si hay dirección sin coordenadas al enviar, mostrar aviso "Te recomendamos marcar el punto en el mapa para mayor precisión" (no bloqueante).
+
+### 3. Geocodificación en backend (server function)
+
+- Crear `src/lib/geocode.functions.ts` con `geocodeAddress` y `reverseGeocode` usando el gateway de Google Maps (`Authorization: Bearer LOVABLE_API_KEY` + `X-Connection-Api-Key`). El navegador no puede llamar a Geocoding directamente (la clave del navegador solo cubre Maps JS + Places New).
+- El `MapPicker` invoca `reverseGeocode` mediante `useServerFn` tras cada cambio de coordenadas (debounced 400 ms).
+
+### 4. Vista del mapa público (`/mapa`) y popups
+
+- Cuando un punto tenga `lat/lng` exactos guardados, dejar de aplicarles el "jitter" aleatorio (`Math.random()` en `mapa.tsx`) que actualmente desplaza los marcadores hasta ~30 km. El jitter solo aplica al fallback por estado.
+
+### 5. Conexión Google Maps
+
+- Verificar que la conexión `google_maps` esté linkeada al proyecto y que `LOVABLE_API_KEY` y `GOOGLE_MAPS_API_KEY` estén disponibles en el runtime de servidor. Si falta, pedir al usuario que la conecte.
 
 ## Detalles técnicos
 
-Base de datos:
-- Nueva tabla `notifications` (`user_id`, `type`, `title`, `body`, `link`, `read_at`, `meta` jsonb) con RLS para que cada quien solo lea/actualice las suyas; service role para inserciones desde triggers.
-- Nueva tabla `notification_preferences` (`user_id`, `type`, `enabled`).
-- Triggers en `tips` (después de insertar), `missing_persons` (después de actualizar, reutilizando el log de auditoría existente), `aid_point_hosts` (al insertar invitación y al cambiar estado), `aid_points` (después de actualizar para avisar a dueño y anfitriones distintos del autor) y `aid_point_needs` (al marcar abastecido). Los triggers respetan las preferencias del usuario antes de insertar.
-- Habilitar realtime en `notifications` para empujar el cambio al cliente.
-
-Frontend:
-- `src/hooks/use-notifications.tsx`: suscripción realtime, conteo de no leídas, cargar últimas, marcar leídas.
-- `src/components/NotificationBell.tsx`: campana con popover (usa `@/components/ui/popover` ya disponible) y badge de no leídas. Se monta en `Layout.tsx` tanto en el header de escritorio como en el barra móvil superior, solo si el usuario está autenticado.
-- `src/routes/_authenticated/perfil.tsx`: añadir pestaña/sección "Notificaciones" con lista completa, filtros y preferencias por tipo.
-
-Sin cambios en cómo se crean los demás recursos; solo se agregan los disparadores de notificaciones.
+- Componentes/archivos a tocar:
+  - `src/components/MapPicker.tsx` — reescritura para añadir búsqueda + reverse geocode + mejor UX inicial.
+  - `src/lib/geocode.functions.ts` *(nuevo)* — server functions con el gateway.
+  - `src/routes/_authenticated/centros-acopio.nuevo.tsx` y `.editar.tsx` — dirección controlada + sincronización.
+  - `src/routes/_authenticated/desaparecidos.nuevo.tsx` y `.editar.tsx` — idem.
+  - `src/routes/mapa.tsx` — quitar jitter cuando hay coords reales.
+- No hay cambios de base de datos. Las columnas `lat`, `lng`, `direccion` ya existen.
+- Se usa exclusivamente Places API (New) en el navegador (`AutocompleteSuggestion`), nunca la clase legacy.
+- El reverse geocoding va por server function (gateway), no por la clave del navegador.
+- Sin nuevas dependencias npm.
 
 ## Fuera de alcance
 
-- Envío de correo o push del navegador (solo notificaciones dentro de la app).
-- Notificaciones para visitantes anónimos.
+- No se cambia el modelo de datos ni se añade un sistema de "direcciones verificadas".
+- No se toca el chat de IA ni las notificaciones.
+- No se rediseña la página `/mapa`, solo se corrige el jitter.

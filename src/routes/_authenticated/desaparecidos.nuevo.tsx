@@ -25,6 +25,7 @@ function Page() {
   const [contacts, setContacts] = useState<ContactDraft[]>([{ tipo: "whatsapp", valor: "", codigo_pais: "+58" }]);
   const [consent, setConsent] = useState(false);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [lugar, setLugar] = useState("");
 
   function onPickFile(f: File | null) {
     setFile(f);
@@ -162,12 +163,25 @@ function Page() {
           <Field name="ciudad" label="Ciudad" />
         </div>
 
-        <Field name="lugar_desaparicion" label="Lugar donde se presume desapareció" placeholder="Av. principal, edificio, sector…" />
+        <label className="grid gap-1.5 text-sm">
+          <span className="font-medium">Lugar donde se presume desapareció</span>
+          <input
+            name="lugar_desaparicion"
+            value={lugar}
+            onChange={(e) => setLugar(e.target.value)}
+            placeholder="Av. principal, edificio, sector…"
+            className="rounded-xl border border-input bg-background px-3 py-2.5"
+          />
+        </label>
 
         <div className="grid gap-1.5 text-sm">
           <span className="font-medium">Ubicación en el mapa <span className="text-muted-foreground font-normal">(opcional)</span></span>
           <p className="text-xs text-muted-foreground">Toca el mapa para marcar el lugar exacto. Ayuda a mostrarla en el mapa en vivo.</p>
-          <MapPicker value={coords} onChange={setCoords} />
+          <MapPicker
+            value={coords}
+            onChange={setCoords}
+            onAddressChange={(addr) => { if (!lugar.trim()) setLugar(addr); }}
+          />
         </div>
 
         <label className="grid gap-1.5 text-sm">

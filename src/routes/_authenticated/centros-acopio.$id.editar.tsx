@@ -9,6 +9,8 @@ import { MapPicker } from "@/components/MapPicker";
 import { UserPlus, X } from "lucide-react";
 import { AidContactsSection } from "@/components/AidContactsSection";
 import { AidCoverPhotoInput } from "@/components/AidCoverPhotoInput";
+import { AidPointPreviewDialog, type AidPreviewData } from "@/components/AidPointPreview";
+import { Eye } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/centros-acopio/$id/editar")({
   ssr: false,
@@ -45,6 +47,9 @@ function Page() {
   const [error, setError] = useState<string | null>(null);
   const [isHost, setIsHost] = useState(false);
   const [coverPhoto, setCoverPhoto] = useState<string | null>(null);
+  const [preview, setPreview] = useState(false);
+  const [previewData, setPreviewData] = useState<AidPreviewData | null>(null);
+  const [formEl, setFormEl] = useState<HTMLFormElement | null>(null);
 
   useEffect(() => {
     supabase.from("aid_points").select("*").eq("id", id).maybeSingle().then(({ data }) => {
@@ -71,6 +76,31 @@ function Page() {
   const canEdit = isOwner || isAdmin || isHost;
   const canManageHosts = isOwner || isAdmin;
   if (!canEdit) return <Layout><p className="rounded-3xl border border-border bg-card p-10 text-center text-sm">Solo quien publicó este centro, sus anfitriones o el administrador pueden editarlo.</p></Layout>;
+
+  async function openPreview() {
+    if (!row) return;
+    const fd = formEl ? new FormData(formEl) : null;
+    const base: AidPreviewData = {
+      tipo: (fd?.get("tipo") as string) || row.tipo,
+      nombre: (fd?.get("nombre") as string) || row.nombre,
+      descripcion: (fd?.get("descripcion") as string) || null,
+      estado: (fd?.get("estado") as string) || row.estado,
+      ciudad: (fd?.get("ciudad") as string) || row.ciudad,
+      direccion: direccion || null,
+      horario: (fd?.get("horario") as string) || null,
+      necesidades: (fd?.get("necesidades") as string) || null,
+      cover_photo: coverPhoto,
+      lat: coords?.lat ?? null,
+      lng: coords?.lng ?? null,
+    };
+    setPreviewData(base);
+    setPreview(true);
+    const [{ data: contactsData }, { data: needsData }] = await Promise.all([
+      supabase.from("aid_point_contacts" as never).select("kind,value,label").eq("aid_point_id", row.id),
+      supabase.from("aid_point_needs").select("id,title,details,priority,fulfilled").eq("aid_point_id", row.id).eq("fulfilled", false),
+    ]);
+    setPreviewData((p) => p ? { ...p, contacts: (contactsData ?? []) as never, needs: (needsData ?? []) as never } : p);
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -107,7 +137,7 @@ function Page() {
       <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Editar punto de ayuda</h1>
       <p className="mt-1 text-muted-foreground">Solo tú (quien lo publicó) o el administrador pueden modificarlo.</p>
 
-      <form onSubmit={onSubmit} className="mt-8 grid gap-5 rounded-3xl border border-border bg-card p-6 md:p-8">
+      <form ref={setFormEl} onSubmit={onSubmit} className="mt-8 grid gap-5 rounded-3xl border border-border bg-card p-6 md:p-8">
         <label className="grid gap-1.5 text-sm">
           <span className="font-medium">Tipo *</span>
           <select name="tipo" required defaultValue={row.tipo} className="rounded-xl border border-input bg-background px-3 py-2.5">
@@ -116,6 +146,11 @@ function Page() {
         </label>
 
         <label className="grid gap-1.5 text-sm"><span className="font-medium">Nombre *</span><input name="nombre" required defaultValue={row.nombre} className="rounded-xl border border-input bg-background px-3 py-2.5" /></label>
+
+        {user && (
+          <AidCoverPhotoInput userId={user.id} value={coverPhoto} onChange={setCoverPhoto} />
+        )}
+
         <label className="grid gap-1.5 text-sm"><span className="font-medium">Descripción</span><textarea name="descripcion" rows={3} defaultValue={row.descripcion ?? ""} className="rounded-xl border border-input bg-background px-3 py-2.5" /></label>
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -155,18 +190,21 @@ function Page() {
 
         <label className="grid gap-1.5 text-sm"><span className="font-medium">Necesidades</span><textarea name="necesidades" rows={2} defaultValue={row.necesidades ?? ""} className="rounded-xl border border-input bg-background px-3 py-2.5" /></label>
 
-        {user && (
-          <AidCoverPhotoInput userId={user.id} value={coverPhoto} onChange={setCoverPhoto} />
-        )}
-
         {error && <p className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}
-        <button disabled={saving} className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50">
-          {saving ? "Guardando…" : "Guardar cambios"}
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button disabled={saving} className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50">
+            {saving ? "Guardando…" : "Guardar cambios"}
+          </button>
+          <button type="button" onClick={openPreview} className="inline-flex items-center gap-2 rounded-full border border-input px-5 py-3 text-sm font-semibold">
+            <Eye className="h-4 w-4" /> Vista previa
+          </button>
+        </div>
       </form>
 
       {canManageHosts && <HostsSection aidPointId={row.id} />}
       <AidContactsSection aidPointId={row.id} canManage={canEdit} />
+
+      <AidPointPreviewDialog open={preview} onOpenChange={setPreview} data={previewData} />
     </Layout>
   );
 }

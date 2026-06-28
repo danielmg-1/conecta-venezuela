@@ -8,6 +8,8 @@ import { ESTADOS_VE } from "@/lib/venezuela";
 import { MapPicker } from "@/components/MapPicker";
 import { AidContactDraftEditor, type DraftContact } from "@/components/AidContactsSection";
 import { AidCoverPhotoInput } from "@/components/AidCoverPhotoInput";
+import { AidPointPreviewDialog } from "@/components/AidPointPreview";
+import { Eye } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/centros-acopio/nuevo")({
   ssr: false,
@@ -23,6 +25,26 @@ function Page() {
   const [contacts, setContacts] = useState<DraftContact[]>([]);
   const [direccion, setDireccion] = useState("");
   const [coverPhoto, setCoverPhoto] = useState<string | null>(null);
+  const [preview, setPreview] = useState(false);
+  const [formEl, setFormEl] = useState<HTMLFormElement | null>(null);
+
+  function buildPreviewData() {
+    const fd = formEl ? new FormData(formEl) : null;
+    return {
+      tipo: (fd?.get("tipo") as string) || "centro_acopio",
+      nombre: (fd?.get("nombre") as string) || "",
+      descripcion: (fd?.get("descripcion") as string) || null,
+      estado: (fd?.get("estado") as string) || "",
+      ciudad: (fd?.get("ciudad") as string) || null,
+      direccion: direccion || null,
+      horario: (fd?.get("horario") as string) || null,
+      necesidades: (fd?.get("necesidades") as string) || null,
+      cover_photo: coverPhoto,
+      contacts,
+      lat: coords?.lat ?? null,
+      lng: coords?.lng ?? null,
+    };
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -69,7 +91,7 @@ function Page() {
       <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Publicar punto de ayuda</h1>
       <p className="mt-1 text-muted-foreground">Centro de acopio, recaudación, hospital, primeros auxilios o apoyo psicológico.</p>
 
-      <form onSubmit={onSubmit} className="mt-8 grid gap-5 rounded-3xl border border-border bg-card p-6 md:p-8">
+      <form ref={setFormEl} onSubmit={onSubmit} className="mt-8 grid gap-5 rounded-3xl border border-border bg-card p-6 md:p-8">
         <label className="grid gap-1.5 text-sm">
           <span className="font-medium">Tipo *</span>
           <select name="tipo" required defaultValue="centro_acopio" className="rounded-xl border border-input bg-background px-3 py-2.5">
@@ -78,6 +100,11 @@ function Page() {
         </label>
 
         <Field name="nombre" label="Nombre" required />
+
+        {user && (
+          <AidCoverPhotoInput userId={user.id} value={coverPhoto} onChange={setCoverPhoto} />
+        )}
+
         <label className="grid gap-1.5 text-sm">
           <span className="font-medium">Descripción</span>
           <textarea name="descripcion" rows={3} className="rounded-xl border border-input bg-background px-3 py-2.5" />
@@ -115,10 +142,6 @@ function Page() {
         </div>
         <Field name="horario" label="Horario" placeholder="L-V 8am-5pm" />
 
-        {user && (
-          <AidCoverPhotoInput userId={user.id} value={coverPhoto} onChange={setCoverPhoto} />
-        )}
-
         <div className="grid gap-1.5 text-sm">
           <AidContactDraftEditor value={contacts} onChange={setContacts} />
         </div>
@@ -129,10 +152,17 @@ function Page() {
         </label>
 
         {error && <p className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}
-        <button disabled={submitting} className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50">
-          {submitting ? "Publicando…" : "Publicar"}
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button disabled={submitting} className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50">
+            {submitting ? "Publicando…" : "Publicar"}
+          </button>
+          <button type="button" onClick={() => setPreview(true)} className="inline-flex items-center gap-2 rounded-full border border-input px-5 py-3 text-sm font-semibold">
+            <Eye className="h-4 w-4" /> Vista previa
+          </button>
+        </div>
       </form>
+
+      <AidPointPreviewDialog open={preview} onOpenChange={setPreview} data={preview ? buildPreviewData() : null} />
     </Layout>
   );
 }

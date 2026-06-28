@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import DOMPurify from "dompurify";
 import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
+import { sanitizeNewsHtml, NEWS_PROSE_CLASS } from "@/components/NewsPreview";
 
 export const Route = createFileRoute("/noticias")({
   head: () => ({
@@ -79,13 +79,8 @@ function Page() {
               <h2 className="mt-1 text-2xl font-semibold">{n.titulo}</h2>
               {n.is_html && n.body_html ? (
                 <div
-                  className="mt-3 text-sm leading-relaxed text-foreground/90 [&_a]:text-primary [&_a]:underline [&_h2]:mt-4 [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:mt-3 [&_h3]:text-xl [&_h3]:font-semibold [&_img]:my-3 [&_img]:rounded-lg [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-2 [&_blockquote]:border-l-4 [&_blockquote]:border-border [&_blockquote]:pl-4 [&_blockquote]:italic"
-                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(n.body_html, {
-                    ALLOWED_TAGS: ["h1","h2","h3","h4","p","br","strong","em","b","i","u","ul","ol","li","a","img","blockquote","figure","figcaption","span","div","hr","code","pre"],
-                    ALLOWED_ATTR: ["href","target","rel","src","alt","title","class","style","data-size","data-align","loading","decoding","width","height","fetchpriority"],
-                    ALLOWED_URI_REGEXP: /^(https?:|mailto:|tel:|\/)/i,
-                    ADD_ATTR: ["target"],
-                  }) }}
+                  className={`mt-3 ${NEWS_PROSE_CLASS}`}
+                  dangerouslySetInnerHTML={{ __html: sanitizeNewsHtml(n.body_html) }}
                 />
               ) : (
                 <div className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">{n.contenido}</div>

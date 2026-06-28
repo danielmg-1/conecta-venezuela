@@ -9,6 +9,7 @@ import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { NeedsPanel } from "@/components/NeedsPanel";
 import { contactHref, contactIcon, type ContactKind } from "@/components/AidContactsSection";
 import { getSignedAidPhoto } from "@/lib/photo";
+import { AidPointPreviewDialog, type AidPreviewData } from "@/components/AidPointPreview";
 
 export const Route = createFileRoute("/centros-acopio")({
   head: () => ({
@@ -82,6 +83,7 @@ function Page() {
   const [onlyPending, setOnlyPending] = useState(false);
   const [needPriority, setNeedPriority] = useState<string>("");
   const [needQ, setNeedQ] = useState("");
+  const [previewData, setPreviewData] = useState<AidPreviewData | null>(null);
 
   useEffect(() => {
     if (!user) { setHostIds(new Set()); return; }
@@ -145,6 +147,37 @@ function Page() {
     (acc[n.aid_point_id] ||= []).push(n);
     return acc;
   }, {});
+
+  async function openPreview(it: Row) {
+    // Build initial preview from already-loaded data, then fetch full needs detail.
+    const baseContacts = (contactsByPoint[it.id] ?? []).map((c) => ({ kind: c.kind, value: c.value, label: c.label }));
+    const baseNeeds = (needsByPoint[it.id] ?? []).map((n) => ({ title: n.title, priority: n.priority }));
+    setPreviewData({
+      tipo: it.tipo,
+      nombre: it.nombre,
+      descripcion: it.descripcion,
+      estado: it.estado,
+      ciudad: it.ciudad,
+      direccion: it.direccion,
+      horario: it.horario,
+      telefono: it.telefono,
+      necesidades: it.necesidades,
+      cover_photo: it.cover_photo,
+      contacts: baseContacts,
+      needs: baseNeeds,
+    });
+    // Fetch full needs (with details) and lat/lng asynchronously
+    const [{ data: fullNeeds }, { data: full }] = await Promise.all([
+      supabase.from("aid_point_needs").select("id,title,details,priority,fulfilled").eq("aid_point_id", it.id).eq("fulfilled", false),
+      supabase.from("aid_points").select("lat,lng").eq("id", it.id).maybeSingle(),
+    ]);
+    setPreviewData((prev) => prev ? {
+      ...prev,
+      needs: (fullNeeds ?? []) as never,
+      lat: (full as { lat?: number | null } | null)?.lat ?? null,
+      lng: (full as { lng?: number | null } | null)?.lng ?? null,
+    } : prev);
+  }
   const contactsByPoint = contacts.reduce<Record<string, ContactRow[]>>((acc, c) => {
     (acc[c.aid_point_id] ||= []).push(c);
     return acc;
@@ -216,9 +249,11 @@ function Page() {
             list.forEach((n) => { counts[n.priority]++; });
             return (
             <article key={it.id} className="rounded-3xl border border-border bg-card p-5">
-              {it.cover_photo && <AidThumb path={it.cover_photo} alt={it.nombre} />}
-              <span className="inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">{aidTypeLabel(it.tipo)}</span>
-              <h3 className="mt-2 text-lg font-semibold">{it.nombre}</h3>
+              <button type="button" onClick={() => openPreview(it)} className="block w-full text-left">
+                {it.cover_photo && <AidThumb path={it.cover_photo} alt={it.nombre} />}
+                <span className="inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">{aidTypeLabel(it.tipo)}</span>
+                <h3 className="mt-2 text-lg font-semibold hover:text-primary">{it.nombre}</h3>
+              </button>
               <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
                 <MapPin className="h-3.5 w-3.5" /> {it.ciudad ? `${it.ciudad}, ` : ""}{it.estado}
               </p>
@@ -270,6 +305,9 @@ function Page() {
                 );
               })()}
               <div className="mt-3 flex flex-wrap gap-2">
+                <button onClick={() => openPreview(it)} className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">
+                  Ver ficha
+                </button>
                 <button onClick={() => setOpenNeeds((s) => ({ ...s, [it.id]: !s[it.id] }))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium">
                   <ListChecks className="h-3.5 w-3.5" /> {openNeeds[it.id] ? "Ocultar" : "Ver"} necesidades
                 </button>
@@ -287,6 +325,8 @@ function Page() {
           })
         )}
       </div>
+
+      <AidPointPreviewDialog open={!!previewData} onOpenChange={(o) => !o && setPreviewData(null)} data={previewData} title="Ficha del punto de ayuda" />
     </Layout>
   );
 }

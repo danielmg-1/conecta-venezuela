@@ -13,7 +13,7 @@ export type ModSection =
 
 export const ALL_SECTIONS: { value: ModSection; label: string; description: string }[] = [
   { value: "desaparecidos", label: "Desaparecidos", description: "Ocultar/mostrar reportes y marcar como verificado." },
-  { value: "centros", label: "Centros de ayuda", description: "Gestionar centros de acopio y donaciones." },
+  { value: "centros", label: "Centros de ayuda", description: "Gestionar centros de ayuda y puntos de recaudación." },
   { value: "voluntarios", label: "Voluntarios", description: "Gestionar la lista de voluntarios registrados." },
   { value: "noticias", label: "Noticias", description: "Publicar y editar noticias y artículos." },
   { value: "anuncios", label: "Anuncios globales", description: "Crear avisos visibles en toda la página." },

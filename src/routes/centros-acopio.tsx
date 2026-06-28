@@ -14,9 +14,9 @@ import { AidPointPreviewDialog, type AidPreviewData } from "@/components/AidPoin
 export const Route = createFileRoute("/centros-acopio")({
   head: () => ({
     meta: [
-      { title: "Donaciones — Guía de Apoyo Venezuela" },
-      { name: "description", content: "Encuentra centros de acopio, puntos de recaudación, hospitales y servicios de ayuda activos tras el terremoto en Venezuela." },
-      { property: "og:title", content: "Donaciones" },
+      { title: "Centros de ayuda — Guía de Apoyo Venezuela" },
+      { name: "description", content: "Encuentra centros de ayuda, puntos de recaudación, hospitales y servicios de ayuda activos tras el terremoto en Venezuela." },
+      { property: "og:title", content: "Centros de ayuda" },
       { property: "og:description", content: "Mapa colaborativo de puntos de ayuda en Venezuela." },
     ],
   }),
@@ -196,7 +196,7 @@ function Page() {
     <Layout>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Donaciones</h1>
+          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Centros de ayuda</h1>
           <p className="mt-1 text-muted-foreground">Acopio, recaudación, hospitales, primeros auxilios y apoyo psicológico.</p>
         </div>
         <Link to="/centros-acopio/nuevo" className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">

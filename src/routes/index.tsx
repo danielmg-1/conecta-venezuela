@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
       { title: "Conecta Venezuela — Ayuda organizada para Venezuela tras el terremoto" },
       { name: "description", content: "Plataforma ciudadana para conectar afectados, donantes, centros de acopio y voluntarios. Ayuda de corto, mediano y largo plazo tras el terremoto en Venezuela." },
       { property: "og:title", content: "Conecta Venezuela" },
-      { property: "og:description", content: "Conectamos a quienes necesitan ayuda con quienes pueden ofrecerla. Centros de acopio, donaciones, búsqueda de personas y voluntarios." },
+      { property: "og:description", content: "Conectamos a quienes necesitan ayuda con quienes pueden ofrecerla. Centros de ayuda, búsqueda de personas y voluntarios." },
     ],
   }),
   component: Index,

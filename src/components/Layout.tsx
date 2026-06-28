@@ -4,6 +4,7 @@ import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { useModeratorPermissions } from "@/hooks/use-moderator-permissions";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { FloatingGuide } from "@/components/FloatingGuide";
+import { NotificationBell } from "@/components/NotificationBell";
 import iconAsset from "@/assets/conecta-icon.png.asset.json";
 import type { ReactNode } from "react";
 
@@ -90,6 +91,7 @@ export function Layout({ children }: { children: ReactNode }) {
                 Moderar
               </Link>
             )}
+            {user && <NotificationBell />}
           </nav>
         </div>
       </header>
@@ -101,6 +103,7 @@ export function Layout({ children }: { children: ReactNode }) {
             <img src={iconAsset.url} alt="Conecta Venezuela" className="h-8 w-8" />
             <span className="text-sm font-semibold tracking-tight">Conecta Venezuela</span>
           </Link>
+          {user && <NotificationBell />}
         </div>
       </header>
 

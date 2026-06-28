@@ -1,55 +1,50 @@
-## Anfitriones y bitácora de necesidades en centros de acopio
+## Qué resolver
 
-Dos mejoras nuevas para los puntos de ayuda (`aid_points`):
+1. **Métodos de contacto al publicar un centro**: hoy solo aparece un único campo "Teléfono" al crear el centro. La sección para agregar hasta 4 métodos (teléfono, WhatsApp, correo, Instagram, otro) solo existe al editar. Hay que mostrarla también al publicar y como aclaración en la pantalla de edición para que sea obvia.
+2. **Notificaciones**: no existen. Hay que crearlas desde cero, guardarlas en la base de datos, mostrarlas en el perfil y en una campanita con popup en el encabezado.
 
-### 1. Anfitriones (hasta 4 por centro)
+## Métodos de contacto
 
-El admin y la persona que publicó el centro podrán otorgar acceso de **anfitrión** a hasta 4 personas (por correo). Los anfitriones podrán editar la información del centro y publicar/marcar necesidades, igual que el propietario.
+- En el formulario "Publicar punto de ayuda" reemplazo el campo único "Teléfono" por la misma sección de hasta 4 métodos de contacto que usa la edición (teléfono, WhatsApp, correo, Instagram, otro), cada uno con etiqueta opcional como "María, encargada".
+- Al guardar, primero se crea el centro y luego se insertan los contactos asociados. Si no agrega ninguno, queda igual que hoy (sin contactos).
+- En la pantalla de edición, mover la sección de contactos justo debajo de los campos principales y añadir un título claro ("Métodos de contacto — hasta 4") para que se note.
 
-**Base de datos**
-- Nueva tabla `aid_point_hosts`:
-  - `aid_point_id` (referencia al centro)
-  - `user_id` (referencia al usuario)
-  - `invited_by`, `invited_at`
-  - Único por (aid_point_id, user_id)
-  - Trigger que rechaza el INSERT si ya hay 4 anfitriones para ese centro.
-  - GRANT a `authenticated` y `service_role`; RLS:
-    - El anfitrión ve sus propios accesos.
-    - El propietario y admin ven todos los anfitriones del centro.
-    - Solo propietario/admin pueden insertar o borrar.
-- Función `can_manage_aid_point(_user_id uuid, _aid_point_id uuid)` (security definer) → true si es admin, dueño o anfitrión.
-- RPC `aid_point_add_host_by_email(_aid_point_id, _email)` y `aid_point_remove_host(_aid_point_id, _user_id)` con validación de permiso y límite de 4.
-- Actualizar políticas UPDATE de `aid_points` para usar `can_manage_aid_point(auth.uid(), id)` en vez de solo `owner_id = auth.uid()`.
+## Notificaciones
 
-**Cambios en la app**
-- En la lista y ficha de centros: el botón "Editar" aparece también si el usuario es anfitrión.
-- En `/centros-acopio/$id/editar`: nueva sección "Anfitriones" (solo visible para dueño/admin):
-  - Input de correo + botón "Invitar anfitrión".
-  - Lista de anfitriones actuales con su nombre/correo y botón "Quitar".
-  - Mensaje si ya se alcanzó el máximo de 4.
+Tipos que se generarán automáticamente:
+- **Reporte sobre tu familiar**: cuando alguien deja una pista (`tips`) sobre una persona que tú publicaste como desaparecida.
+- **Cambios en una persona que publicaste**: cuando un moderador o admin edita o cambia el estado del reporte de un desaparecido tuyo.
+- **Invitación a anfitrión**: cuando te invitan a coadministrar un centro de acopio.
+- **Cambios en un centro donde eres anfitrión o dueño**: cuando otra persona con permisos edita el centro o marca una necesidad como abastecida.
+- **Respuesta a tu invitación**: cuando un anfitrión acepta o rechaza tu invitación (te notifica como dueño).
 
-### 2. Bitácora de necesidades
+Cada notificación guarda: destinatario, tipo, título, mensaje corto, enlace al recurso (perfil del desaparecido, centro, etc.), si está leída y cuándo se creó.
 
-Cada centro tendrá un historial de "qué necesitamos ahora" que se puede marcar como **abastecido** para que la lista no se acumule visualmente.
+Dónde se ven:
+- **Campana en el encabezado** (escritorio y móvil): icono con un punto rojo y el número de no leídas. Al tocar, abre un popup con las últimas 10 notificaciones, botón "Marcar todas como leídas" y enlace "Ver todas". Se actualiza en vivo (realtime) sin recargar.
+- **Sección en `/perfil` → "Notificaciones"**: lista completa con filtros por leídas/no leídas y por tipo, paginada.
 
-**Base de datos**
-- Nueva tabla `aid_point_needs`:
-  - `aid_point_id`, `created_by`, `title` (ej. "Agua potable"), `details` (opcional), `priority` (`alta`|`media`|`baja`, default `media`).
-  - `fulfilled` (bool, default false), `fulfilled_at`, `fulfilled_by`.
-  - GRANT a `authenticated` y `service_role`; lectura pública (anon SELECT) para que cualquiera pueda ver qué hace falta.
-  - RLS: insertar/editar/borrar solo si `can_manage_aid_point(auth.uid(), aid_point_id)`.
+Comportamiento:
+- Al abrir una notificación se marca como leída y navega al recurso.
+- Solo cada persona ve sus propias notificaciones; nadie más, ni siquiera admin.
+- El usuario podrá silenciar tipos específicos desde su perfil (preferencias guardadas por usuario).
 
-**Cambios en la app**
-- En la ficha pública del centro (dentro de `centros-acopio.tsx` como popup/sección expandible): mostrar lista de necesidades **activas** (no abastecidas) con su prioridad y fecha; debajo, un acordeón "Historial abastecido" colapsado por defecto.
-- Para anfitriones/dueño/admin:
-  - Formulario rápido "Agregar necesidad" (título, detalle, prioridad).
-  - Botón "Marcar como abastecido" en cada necesidad activa (registra `fulfilled_at` y quién).
-  - Botón "Reabrir" en el historial por si se equivocaron.
+## Detalles técnicos
 
-### Layout y navegación
-- Reusar el modal/popup actual del centro (similar al de desaparecidos) para mostrar necesidades + acciones, evitando crear otra ruta.
-- Sin cambios en el menú principal.
+Base de datos:
+- Nueva tabla `notifications` (`user_id`, `type`, `title`, `body`, `link`, `read_at`, `meta` jsonb) con RLS para que cada quien solo lea/actualice las suyas; service role para inserciones desde triggers.
+- Nueva tabla `notification_preferences` (`user_id`, `type`, `enabled`).
+- Triggers en `tips` (después de insertar), `missing_persons` (después de actualizar, reutilizando el log de auditoría existente), `aid_point_hosts` (al insertar invitación y al cambiar estado), `aid_points` (después de actualizar para avisar a dueño y anfitriones distintos del autor) y `aid_point_needs` (al marcar abastecido). Los triggers respetan las preferencias del usuario antes de insertar.
+- Habilitar realtime en `notifications` para empujar el cambio al cliente.
 
-### Fuera de alcance
-- Notificaciones por correo a los anfitriones invitados (solo se les agrega al sistema; verán el acceso al iniciar sesión).
-- Edición de necesidades ya creadas (solo crear, marcar abastecido o reabrir, para mantenerlo simple).
+Frontend:
+- `src/hooks/use-notifications.tsx`: suscripción realtime, conteo de no leídas, cargar últimas, marcar leídas.
+- `src/components/NotificationBell.tsx`: campana con popover (usa `@/components/ui/popover` ya disponible) y badge de no leídas. Se monta en `Layout.tsx` tanto en el header de escritorio como en el barra móvil superior, solo si el usuario está autenticado.
+- `src/routes/_authenticated/perfil.tsx`: añadir pestaña/sección "Notificaciones" con lista completa, filtros y preferencias por tipo.
+
+Sin cambios en cómo se crean los demás recursos; solo se agregan los disparadores de notificaciones.
+
+## Fuera de alcance
+
+- Envío de correo o push del navegador (solo notificaciones dentro de la app).
+- Notificaciones para visitantes anónimos.

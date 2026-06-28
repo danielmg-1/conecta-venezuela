@@ -6,7 +6,9 @@ import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { Photo } from "@/components/Photo";
 import { uploadMissingPhoto } from "@/lib/photo";
 import { toast } from "sonner";
-import { Camera, FileText, HeartHandshake, Users, LogOut, ShieldCheck } from "lucide-react";
+import { Camera, FileText, HeartHandshake, Users, LogOut, ShieldCheck, Bell, Trash2, CheckCheck } from "lucide-react";
+import { useNotifications, NOTIFICATION_TYPES, notificationTypeLabel, type Notification } from "@/hooks/use-notifications";
+import { useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   component: Page,
@@ -17,6 +19,7 @@ type Profile = { id: string; full_name: string | null; avatar_url: string | null
 function Page() {
   const { user } = useAuth();
   const isAdmin = useIsAdmin(user?.id);
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -187,6 +190,8 @@ function Page() {
           </button>
         </section>
       </div>
+
+      <NotificationsPanel userId={user?.id ?? null} navigate={navigate} />
     </Layout>
   );
 }
@@ -210,5 +215,119 @@ function ShortcutCard({ to, icon, title, description, cta }: { to: string; icon:
       </div>
       <span className="rounded-full bg-foreground px-3 py-1.5 text-xs font-semibold text-background">{cta}</span>
     </Link>
+  );
+}
+
+function timeAgo(iso: string) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "Ahora";
+  if (m < 60) return `Hace ${m} min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `Hace ${h} h`;
+  const d = Math.floor(h / 24);
+  if (d < 7) return `Hace ${d} d`;
+  return new Date(iso).toLocaleDateString();
+}
+
+function NotificationsPanel({ userId, navigate }: { userId: string | null; navigate: ReturnType<typeof useNavigate> }) {
+  const { items, unread, markRead, markAllRead, remove } = useNotifications(userId, 50);
+  const [filter, setFilter] = useState<"all" | "unread">("all");
+  const [showPrefs, setShowPrefs] = useState(false);
+  const [prefs, setPrefs] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (!userId) return;
+    supabase.from("notification_preferences").select("type,enabled").eq("user_id", userId).then(({ data }) => {
+      const map: Record<string, boolean> = {};
+      (data ?? []).forEach((r) => { map[(r as { type: string }).type] = (r as { enabled: boolean }).enabled; });
+      setPrefs(map);
+    });
+  }, [userId]);
+
+  async function togglePref(type: string, enabled: boolean) {
+    if (!userId) return;
+    setPrefs((p) => ({ ...p, [type]: enabled }));
+    await supabase.from("notification_preferences").upsert({ user_id: userId, type, enabled, updated_at: new Date().toISOString() });
+  }
+
+  function open(n: Notification) {
+    if (!n.read_at) markRead(n.id);
+    if (n.link) navigate({ to: n.link as never });
+  }
+
+  const visible = filter === "unread" ? items.filter((n) => !n.read_at) : items;
+
+  return (
+    <section id="notificaciones" className="mt-10 rounded-3xl border border-border bg-card p-6 md:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Bell className="h-5 w-5 text-foreground" />
+          <h2 className="text-xl font-semibold">Notificaciones</h2>
+          {unread > 0 && <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">{unread} sin leer</span>}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="inline-flex rounded-full border border-border bg-background p-0.5 text-xs">
+            <button onClick={() => setFilter("all")} className={`rounded-full px-3 py-1 ${filter === "all" ? "bg-foreground text-background" : "text-muted-foreground"}`}>Todas</button>
+            <button onClick={() => setFilter("unread")} className={`rounded-full px-3 py-1 ${filter === "unread" ? "bg-foreground text-background" : "text-muted-foreground"}`}>Sin leer</button>
+          </div>
+          {unread > 0 && (
+            <button onClick={markAllRead} className="inline-flex items-center gap-1 rounded-full border border-input px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground">
+              <CheckCheck className="h-3.5 w-3.5" /> Marcar todas leídas
+            </button>
+          )}
+          <button onClick={() => setShowPrefs((s) => !s)} className="rounded-full border border-input px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground">
+            {showPrefs ? "Ocultar" : "Preferencias"}
+          </button>
+        </div>
+      </div>
+
+      {showPrefs && (
+        <div className="mt-4 grid gap-2 rounded-2xl border border-border bg-background p-4">
+          <p className="text-sm font-medium">Tipos de notificaciones</p>
+          <p className="text-xs text-muted-foreground">Activa o silencia cada tipo. Si está apagado, no se generarán nuevas notificaciones de ese tipo para ti.</p>
+          <ul className="mt-2 grid gap-2 sm:grid-cols-2">
+            {NOTIFICATION_TYPES.map((t) => {
+              const enabled = prefs[t.value] ?? true;
+              return (
+                <li key={t.value} className="flex items-start justify-between gap-3 rounded-xl border border-input p-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium">{t.label}</p>
+                    <p className="text-xs text-muted-foreground">{t.description}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => togglePref(t.value, !enabled)}
+                    role="switch"
+                    aria-checked={enabled}
+                    className={`relative h-6 w-11 flex-none rounded-full transition-colors ${enabled ? "bg-foreground" : "bg-muted"}`}
+                  >
+                    <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-background shadow transition-all ${enabled ? "left-[22px]" : "left-0.5"}`} />
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      <ul className="mt-4 divide-y divide-border">
+        {visible.length === 0 ? (
+          <li className="py-6 text-center text-sm text-muted-foreground">{filter === "unread" ? "No tienes notificaciones sin leer." : "Aún no tienes notificaciones."}</li>
+        ) : visible.map((n) => (
+          <li key={n.id} className={`flex items-start gap-3 py-3 ${n.read_at ? "" : "bg-muted/20 -mx-3 px-3 rounded-lg"}`}>
+            <span className={`mt-1.5 h-2 w-2 flex-none rounded-full ${n.read_at ? "bg-transparent" : "bg-primary"}`} />
+            <button onClick={() => open(n)} className="min-w-0 flex-1 text-left">
+              <p className={`text-sm ${n.read_at ? "font-medium" : "font-semibold"}`}>{n.title}</p>
+              {n.body && <p className="mt-0.5 text-xs text-muted-foreground">{n.body}</p>}
+              <p className="mt-1 text-[11px] text-muted-foreground">{notificationTypeLabel(n.type)} · {timeAgo(n.created_at)}</p>
+            </button>
+            <button onClick={() => remove(n.id)} aria-label="Eliminar" className="flex-none text-muted-foreground hover:text-destructive">
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

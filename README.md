@@ -48,4 +48,10 @@ bun dev
 
 ## Licencia
 
-MIT — ver [LICENSE](LICENSE).
+**GNU AGPL-3.0** — ver [LICENSE](LICENSE).
+
+Cualquier fork, derivado o servicio web basado en este código debe permanecer
+abierto bajo la misma licencia. Ver [NOTICE](NOTICE) y [TRADEMARK.md](TRADEMARK.md)
+para autoría y política de marca. Para contribuir, leer [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Copyright (c) 2026 Angel Daguier Ortiz Vasquez.

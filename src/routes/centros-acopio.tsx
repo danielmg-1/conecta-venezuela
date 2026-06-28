@@ -22,6 +22,17 @@ export const Route = createFileRoute("/centros-acopio")({
   component: Page,
 });
 
+function AidThumb({ path, alt }: { path: string; alt: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    getSignedAidPhoto(path).then((u) => { if (!cancelled) setUrl(u); });
+    return () => { cancelled = true; };
+  }, [path]);
+  if (!url) return null;
+  return <img src={url} alt={alt} loading="lazy" decoding="async" className="mb-3 aspect-video w-full rounded-2xl object-cover" />;
+}
+
 type Row = {
   id: string;
   owner_id: string;

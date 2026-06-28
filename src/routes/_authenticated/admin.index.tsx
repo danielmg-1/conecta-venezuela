@@ -39,6 +39,12 @@ function Page() {
   const isAdmin = useIsAdmin(user?.id);
   const { allowed: canViewReports } = useCanModerate(user?.id, "reportes");
   const { allowed: canHideMissing } = useCanModerate(user?.id, "desaparecidos");
+  const { allowed: canNoticias } = useCanModerate(user?.id, "noticias");
+  const { allowed: canAnuncios } = useCanModerate(user?.id, "anuncios");
+  const { allowed: canEmergencias } = useCanModerate(user?.id, "emergencias");
+  const { allowed: canCentros } = useCanModerate(user?.id, "centros");
+  const { allowed: canVoluntarios } = useCanModerate(user?.id, "voluntarios");
+  const hasAnyAccess = isAdmin || canViewReports || canHideMissing || canNoticias || canAnuncios || canEmergencias || canCentros || canVoluntarios;
   const [rows, setRows] = useState<Row[] | null>(null);
   const [aid, setAid] = useState<AidRow[] | null>(null);
   const [vols, setVols] = useState<VolRow[] | null>(null);
@@ -111,28 +117,31 @@ function Page() {
     return [...m.entries()].map(([fecha, total]) => ({ fecha: fecha.slice(5), total }));
   }, [rows]);
 
-  if (!canViewReports) {
-    return <Layout><p className="py-20 text-center text-sm text-muted-foreground">No tienes permiso para ver los informes.</p></Layout>;
+  if (!hasAnyAccess) {
+    return <Layout><p className="py-20 text-center text-sm text-muted-foreground">No tienes permisos de moderación asignados.</p></Layout>;
   }
 
   return (
     <Layout>
-      <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{isAdmin ? "Panel admin" : "Informes"}</h1>
+      <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{isAdmin ? "Panel admin" : "Panel de moderación"}</h1>
+      {!isAdmin && (
+        <p className="mt-1 text-sm text-muted-foreground">Tienes acceso a las secciones que el administrador te asignó.</p>
+      )}
       <div className="mt-3 flex flex-wrap gap-2">
-        {isAdmin && <Link to="/admin/noticias" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Noticias</Link>}
-        {isAdmin && <Link to="/admin/anuncios" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Anuncios globales</Link>}
-        {isAdmin && <Link to="/admin/emergencias" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Emergencias</Link>}
-        {isAdmin && <Link to="/admin/centros" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Centros</Link>}
-        {isAdmin && <Link to="/admin/voluntarios" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Voluntarios</Link>}
+        {canNoticias && <Link to="/admin/noticias" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Noticias</Link>}
+        {canAnuncios && <Link to="/admin/anuncios" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Anuncios globales</Link>}
+        {canEmergencias && <Link to="/admin/emergencias" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Emergencias</Link>}
+        {canCentros && <Link to="/admin/centros" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Centros</Link>}
+        {canVoluntarios && <Link to="/admin/voluntarios" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Voluntarios</Link>}
         {isAdmin && <Link to="/admin/moderadores" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Moderadores</Link>}
         {isAdmin && <Link to="/admin/usuarios" className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Usuarios</Link>}
-        {isAdmin && <Link to="/centros-acopio/nuevo" className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90">+ Nuevo centro</Link>}
-        <button onClick={() => rows && download(`desaparecidos-${new Date().toISOString().slice(0,10)}.csv`, toCSV(rows))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Exportar desaparecidos CSV</button>
-        <button onClick={() => aid && download(`centros-${new Date().toISOString().slice(0,10)}.csv`, toCSV(aid))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Exportar centros CSV</button>
-        <button onClick={() => vols && download(`voluntarios-${new Date().toISOString().slice(0,10)}.csv`, toCSV(vols))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Exportar voluntarios CSV</button>
+        {(isAdmin || canCentros) && <Link to="/centros-acopio/nuevo" className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90">+ Nuevo centro</Link>}
+        {canViewReports && <button onClick={() => rows && download(`desaparecidos-${new Date().toISOString().slice(0,10)}.csv`, toCSV(rows))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Exportar desaparecidos CSV</button>}
+        {canViewReports && <button onClick={() => aid && download(`centros-${new Date().toISOString().slice(0,10)}.csv`, toCSV(aid))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Exportar centros CSV</button>}
+        {canViewReports && <button onClick={() => vols && download(`voluntarios-${new Date().toISOString().slice(0,10)}.csv`, toCSV(vols))} className="inline-flex items-center gap-2 rounded-full border border-input px-4 py-2 text-sm font-medium hover:bg-muted">Exportar voluntarios CSV</button>}
       </div>
 
-      {counts && (
+      {canViewReports && counts && (
         <div className="mt-6 grid gap-3 grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
           {[
             ["Reportes", counts.total],
@@ -151,6 +160,8 @@ function Page() {
         </div>
       )}
 
+      {canViewReports && (
+      <>
       <div className="mt-8 grid gap-4 lg:grid-cols-2">
         <div className="rounded-2xl border border-border bg-card p-4">
           <h3 className="text-sm font-semibold">Reportes por estado (top 10)</h3>
@@ -247,6 +258,8 @@ function Page() {
           </tbody>
         </table>
       </div>
+      </>
+      )}
     </Layout>
   );
 }

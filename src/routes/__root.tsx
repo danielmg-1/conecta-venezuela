@@ -91,8 +91,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:description", content: "Esta no es una emergencia de un fin de semana. La magnitud de esta catástrofe nos necesitará durante semanas e incluso meses." },
       { property: "og:image", content: logoAsset.url },
       { name: "twitter:image", content: logoAsset.url },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/19bd93ca-6684-484b-9056-915ae4ccc04c" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/19bd93ca-6684-484b-9056-915ae4ccc04c" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/5a97fc1b-d8b1-4968-9b2c-29ca7d9c9554" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/5a97fc1b-d8b1-4968-9b2c-29ca7d9c9554" },
     ],
     links: [
       {

@@ -30,6 +30,7 @@ import { Route as AuthenticatedMisReportesRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as ApiPublicPersonasRouteImport } from './routes/api/public/personas'
 import { Route as ApiPublicNoticiasRouteImport } from './routes/api/public/noticias'
+import { Route as ApiPublicEmergenciasRouteImport } from './routes/api/public/emergencias'
 import { Route as ApiPublicCentrosRouteImport } from './routes/api/public/centros'
 import { Route as AuthenticatedVoluntariosRegistrarmeRouteImport } from './routes/_authenticated/voluntarios.registrarme'
 import { Route as AuthenticatedDesaparecidosNuevoRouteImport } from './routes/_authenticated/desaparecidos.nuevo'
@@ -149,6 +150,11 @@ const ApiPublicNoticiasRoute = ApiPublicNoticiasRouteImport.update({
   path: '/api/public/noticias',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicEmergenciasRoute = ApiPublicEmergenciasRouteImport.update({
+  id: '/api/public/emergencias',
+  path: '/api/public/emergencias',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCentrosRoute = ApiPublicCentrosRouteImport.update({
   id: '/api/public/centros',
   path: '/api/public/centros',
@@ -256,6 +262,7 @@ export interface FileRoutesByFullPath {
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
   '/api/public/centros': typeof ApiPublicCentrosRoute
+  '/api/public/emergencias': typeof ApiPublicEmergenciasRoute
   '/api/public/noticias': typeof ApiPublicNoticiasRoute
   '/api/public/personas': typeof ApiPublicPersonasRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -290,6 +297,7 @@ export interface FileRoutesByTo {
   '/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
   '/api/public/centros': typeof ApiPublicCentrosRoute
+  '/api/public/emergencias': typeof ApiPublicEmergenciasRoute
   '/api/public/noticias': typeof ApiPublicNoticiasRoute
   '/api/public/personas': typeof ApiPublicPersonasRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -327,6 +335,7 @@ export interface FileRoutesById {
   '/_authenticated/desaparecidos/nuevo': typeof AuthenticatedDesaparecidosNuevoRoute
   '/_authenticated/voluntarios/registrarme': typeof AuthenticatedVoluntariosRegistrarmeRoute
   '/api/public/centros': typeof ApiPublicCentrosRoute
+  '/api/public/emergencias': typeof ApiPublicEmergenciasRoute
   '/api/public/noticias': typeof ApiPublicNoticiasRoute
   '/api/public/personas': typeof ApiPublicPersonasRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -364,6 +373,7 @@ export interface FileRouteTypes {
     | '/desaparecidos/nuevo'
     | '/voluntarios/registrarme'
     | '/api/public/centros'
+    | '/api/public/emergencias'
     | '/api/public/noticias'
     | '/api/public/personas'
     | '/admin/'
@@ -398,6 +408,7 @@ export interface FileRouteTypes {
     | '/desaparecidos/nuevo'
     | '/voluntarios/registrarme'
     | '/api/public/centros'
+    | '/api/public/emergencias'
     | '/api/public/noticias'
     | '/api/public/personas'
     | '/admin'
@@ -434,6 +445,7 @@ export interface FileRouteTypes {
     | '/_authenticated/desaparecidos/nuevo'
     | '/_authenticated/voluntarios/registrarme'
     | '/api/public/centros'
+    | '/api/public/emergencias'
     | '/api/public/noticias'
     | '/api/public/personas'
     | '/_authenticated/admin/'
@@ -457,6 +469,7 @@ export interface RootRouteChildren {
   DesaparecidosIdRoute: typeof DesaparecidosIdRoute
   DesaparecidosIndexRoute: typeof DesaparecidosIndexRoute
   ApiPublicCentrosRoute: typeof ApiPublicCentrosRoute
+  ApiPublicEmergenciasRoute: typeof ApiPublicEmergenciasRoute
   ApiPublicNoticiasRoute: typeof ApiPublicNoticiasRoute
   ApiPublicPersonasRoute: typeof ApiPublicPersonasRoute
 }
@@ -608,6 +621,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/noticias'
       fullPath: '/api/public/noticias'
       preLoaderRoute: typeof ApiPublicNoticiasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/emergencias': {
+      id: '/api/public/emergencias'
+      path: '/api/public/emergencias'
+      fullPath: '/api/public/emergencias'
+      preLoaderRoute: typeof ApiPublicEmergenciasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/centros': {
@@ -776,6 +796,7 @@ const rootRouteChildren: RootRouteChildren = {
   DesaparecidosIdRoute: DesaparecidosIdRoute,
   DesaparecidosIndexRoute: DesaparecidosIndexRoute,
   ApiPublicCentrosRoute: ApiPublicCentrosRoute,
+  ApiPublicEmergenciasRoute: ApiPublicEmergenciasRoute,
   ApiPublicNoticiasRoute: ApiPublicNoticiasRoute,
   ApiPublicPersonasRoute: ApiPublicPersonasRoute,
 }

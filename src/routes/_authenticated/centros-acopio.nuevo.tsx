@@ -26,7 +26,6 @@ function Page() {
   const [direccion, setDireccion] = useState("");
   const [coverPhoto, setCoverPhoto] = useState<string | null>(null);
   const [preview, setPreview] = useState(false);
-  const formRef = useState<HTMLFormElement | null>(null)[0];
   const [formEl, setFormEl] = useState<HTMLFormElement | null>(null);
 
   function buildPreviewData() {

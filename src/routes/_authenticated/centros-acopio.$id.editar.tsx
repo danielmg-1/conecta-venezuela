@@ -8,6 +8,7 @@ import { ESTADOS_VE } from "@/lib/venezuela";
 import { MapPicker } from "@/components/MapPicker";
 import { UserPlus, X } from "lucide-react";
 import { AidContactsSection } from "@/components/AidContactsSection";
+import { AidCoverPhotoInput } from "@/components/AidCoverPhotoInput";
 
 export const Route = createFileRoute("/_authenticated/centros-acopio/$id/editar")({
   ssr: false,
@@ -28,6 +29,7 @@ type Row = {
   necesidades: string | null;
   lat: number | null;
   lng: number | null;
+  cover_photo: string | null;
 };
 
 function Page() {
@@ -42,6 +44,7 @@ function Page() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isHost, setIsHost] = useState(false);
+  const [coverPhoto, setCoverPhoto] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.from("aid_points").select("*").eq("id", id).maybeSingle().then(({ data }) => {
@@ -49,6 +52,7 @@ function Page() {
       setRow(r);
       if (r?.lat != null && r?.lng != null) setCoords({ lat: r.lat, lng: r.lng });
       if (r) setDireccion(r.direccion ?? "");
+      if (r) setCoverPhoto(r.cover_photo ?? null);
       setLoading(false);
     });
   }, [id]);
@@ -87,6 +91,7 @@ function Page() {
         necesidades: String(fd.get("necesidades") || "").trim() || null,
         lat: coords?.lat ?? null,
         lng: coords?.lng ?? null,
+        cover_photo: coverPhoto,
       }).eq("id", row.id);
       if (upErr) throw upErr;
       router.navigate({ to: "/centros-acopio" });
@@ -149,6 +154,10 @@ function Page() {
         </div>
 
         <label className="grid gap-1.5 text-sm"><span className="font-medium">Necesidades</span><textarea name="necesidades" rows={2} defaultValue={row.necesidades ?? ""} className="rounded-xl border border-input bg-background px-3 py-2.5" /></label>
+
+        {user && (
+          <AidCoverPhotoInput userId={user.id} value={coverPhoto} onChange={setCoverPhoto} />
+        )}
 
         {error && <p className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}
         <button disabled={saving} className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-50">

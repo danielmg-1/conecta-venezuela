@@ -7,6 +7,7 @@ import { AID_TYPES } from "@/lib/aid";
 import { ESTADOS_VE } from "@/lib/venezuela";
 import { MapPicker } from "@/components/MapPicker";
 import { AidContactDraftEditor, type DraftContact } from "@/components/AidContactsSection";
+import { AidCoverPhotoInput } from "@/components/AidCoverPhotoInput";
 
 export const Route = createFileRoute("/_authenticated/centros-acopio/nuevo")({
   ssr: false,
@@ -21,6 +22,7 @@ function Page() {
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [contacts, setContacts] = useState<DraftContact[]>([]);
   const [direccion, setDireccion] = useState("");
+  const [coverPhoto, setCoverPhoto] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -42,6 +44,7 @@ function Page() {
         necesidades: String(fd.get("necesidades") || "").trim() || null,
         lat: coords?.lat ?? null,
         lng: coords?.lng ?? null,
+        cover_photo: coverPhoto,
       }).select("id").single();
       if (insErr) throw insErr;
       if (inserted?.id && contacts.length > 0) {
@@ -111,6 +114,10 @@ function Page() {
           />
         </div>
         <Field name="horario" label="Horario" placeholder="L-V 8am-5pm" />
+
+        {user && (
+          <AidCoverPhotoInput userId={user.id} value={coverPhoto} onChange={setCoverPhoto} />
+        )}
 
         <div className="grid gap-1.5 text-sm">
           <AidContactDraftEditor value={contacts} onChange={setContacts} />

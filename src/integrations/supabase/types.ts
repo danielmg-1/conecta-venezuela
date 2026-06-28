@@ -140,6 +140,7 @@ export type Database = {
       aid_points: {
         Row: {
           ciudad: string | null
+          cover_photo: string | null
           created_at: string
           descripcion: string | null
           direccion: string | null
@@ -159,6 +160,7 @@ export type Database = {
         }
         Insert: {
           ciudad?: string | null
+          cover_photo?: string | null
           created_at?: string
           descripcion?: string | null
           direccion?: string | null
@@ -178,6 +180,7 @@ export type Database = {
         }
         Update: {
           ciudad?: string | null
+          cover_photo?: string | null
           created_at?: string
           descripcion?: string | null
           direccion?: string | null

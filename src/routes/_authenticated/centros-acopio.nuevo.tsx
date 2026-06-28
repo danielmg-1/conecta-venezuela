@@ -96,9 +96,7 @@ function Page() {
           <p className="text-xs text-muted-foreground">Toca el mapa para marcar el punto exacto. Puedes arrastrar el marcador para ajustarlo.</p>
           <MapPicker value={coords} onChange={setCoords} />
         </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          <Field name="horario" label="Horario" placeholder="L-V 8am-5pm" />
-        </div>
+        <Field name="horario" label="Horario" placeholder="L-V 8am-5pm" />
 
         <div className="grid gap-1.5 text-sm">
           <AidContactDraftEditor value={contacts} onChange={setContacts} />

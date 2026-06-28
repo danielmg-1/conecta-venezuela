@@ -26,6 +26,10 @@ export function MapPicker({ value, onChange, onAddressChange, defaultCenter, hei
   const [suggestions, setSuggestions] = useState<Array<{ placeId: string; text: string }>>([]);
   const [showSugg, setShowSugg] = useState(false);
   const [formattedAddress, setFormattedAddress] = useState<string | null>(null);
+  const [manualOpen, setManualOpen] = useState(false);
+  const [manualLat, setManualLat] = useState("");
+  const [manualLng, setManualLng] = useState("");
+  const [manualAddr, setManualAddr] = useState("");
   const reverseGeocodeFn = useServerFn(reverseGeocode);
   const key = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY as string | undefined;
 
@@ -109,6 +113,38 @@ export function MapPicker({ value, onChange, onAddressChange, defaultCenter, hei
       }
     } catch { /* ignore */ }
   }
+
+  function applyManual() {
+    const lat = parseFloat(manualLat.replace(",", "."));
+    const lng = parseFloat(manualLng.replace(",", "."));
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      alert("Coordenadas inválidas. Usa formato decimal, por ejemplo 10.4806, -66.9036");
+      return;
+    }
+    const pos = { lat, lng };
+    mapRef.current?.setCenter(pos);
+    mapRef.current?.setZoom(17);
+    placeMarker(pos);
+    onChange(pos);
+    const addr = manualAddr.trim();
+    if (addr) {
+      setFormattedAddress(addr);
+      onAddressChange?.(addr);
+    } else {
+      void doReverseGeocode(pos);
+    }
+  }
+
+  // Prefill manual fields when value or formattedAddress change externally
+  useEffect(() => {
+    if (value) {
+      setManualLat((v) => (v ? v : value.lat.toFixed(6)));
+      setManualLng((v) => (v ? v : value.lng.toFixed(6)));
+    }
+  }, [value]);
+  useEffect(() => {
+    if (formattedAddress) setManualAddr((v) => (v ? v : formattedAddress));
+  }, [formattedAddress]);
 
   // Debounced autocomplete via Places API (New)
   useEffect(() => {
@@ -240,6 +276,9 @@ export function MapPicker({ value, onChange, onAddressChange, defaultCenter, hei
         </span>
         <div className="flex shrink-0 gap-2">
           <button type="button" onClick={useMyLocation} className="rounded-full border border-input px-3 py-1">Usar mi ubicación</button>
+          <button type="button" onClick={() => setManualOpen((o) => !o)} className="rounded-full border border-input px-3 py-1">
+            {manualOpen ? "Cerrar ajuste" : "Ajustar manualmente"}
+          </button>
           {value && (
             <>
               <button
@@ -265,6 +304,54 @@ export function MapPicker({ value, onChange, onAddressChange, defaultCenter, hei
           )}
         </div>
       </div>
+      {manualOpen && (
+        <div className="rounded-xl border border-border bg-muted/30 p-3">
+          <p className="mb-2 text-xs font-medium text-foreground">Ajuste manual de ubicación</p>
+          <p className="mb-2 text-[11px] text-muted-foreground">
+            Útil si el geocoding falla o si tienes las coordenadas exactas. Puedes copiarlas desde Google Maps (clic derecho → "¿Qué hay aquí?").
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <label className="text-[11px] text-muted-foreground">
+              Latitud
+              <input
+                value={manualLat}
+                onChange={(e) => setManualLat(e.target.value)}
+                placeholder="10.480600"
+                inputMode="decimal"
+                className="mt-0.5 w-full rounded-lg border border-input bg-background px-2.5 py-1.5 text-sm text-foreground"
+              />
+            </label>
+            <label className="text-[11px] text-muted-foreground">
+              Longitud
+              <input
+                value={manualLng}
+                onChange={(e) => setManualLng(e.target.value)}
+                placeholder="-66.903600"
+                inputMode="decimal"
+                className="mt-0.5 w-full rounded-lg border border-input bg-background px-2.5 py-1.5 text-sm text-foreground"
+              />
+            </label>
+          </div>
+          <label className="mt-2 block text-[11px] text-muted-foreground">
+            Dirección final (opcional, sobrescribe la sugerida)
+            <input
+              value={manualAddr}
+              onChange={(e) => setManualAddr(e.target.value)}
+              placeholder="Ej. Av. Francisco de Miranda, Edif. X, Chacao, Caracas"
+              className="mt-0.5 w-full rounded-lg border border-input bg-background px-2.5 py-1.5 text-sm text-foreground"
+            />
+          </label>
+          <div className="mt-2 flex justify-end">
+            <button
+              type="button"
+              onClick={applyManual}
+              className="rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-90"
+            >
+              Aplicar ubicación
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
